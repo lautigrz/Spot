@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Info de País</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h1>Buscar país por código</h1>
+
+<form th:action="@{/pais-info}" method="post">
+    <label for="code">Código del país (ej: AR, US, DE):</label>
+    <input type="text" id="code" name="code" required>
+    <button type="submit">Buscar</button>
+</form>
+
+<div th:if="${error}">
+    <p th:text="${error}" style="color:red;"></p>
+</div>
+
+<div th:if="${pais}">
+    <h2 th:text="${pais.nombre.comun}">Nombre</h2>
+    <p><strong>Capital:</strong> <span th:text="${pais.capitales[0]}"></span></p>
+    <p><strong>Población:</strong> <span th:text="${pais.poblacion}"></span></p>
+    <p><strong>Region:</strong> <span th:text="${pais.region}"></span></p>
+    <img th:src="${pais.banderas.png}" alt="Bandera">
+</div>
+</body>
+</html>

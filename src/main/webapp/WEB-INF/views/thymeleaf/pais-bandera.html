@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Buscar bandera</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h1>Seleccioná un país</h1>
+
+<a href="https://flagsapi.com/#countries" target="_blank">flagsapi</a>
+
+<form th:action="@{/pais-bandera}" method="post">
+    <label for="codigoPais">Código del país (ej. AR, US, FR):</label>
+    <input type="text" id="codigoPais" name="codigoPais" required>
+    <button type="submit">Mostrar bandera</button>
+</form>
+
+<div th:if="${banderaUrl}">
+    <h2>Bandera:</h2>
+    <img th:src="${banderaUrl}" alt="Bandera del país">
+</div>
+</body>
+</html>
