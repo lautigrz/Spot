@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Álbumes</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #1DB954;
+        }
+
+        .album-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+        }
+
+        .album {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .album:hover {
+            transform: scale(1.05);
+        }
+
+        .album img {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .album-name {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<h1>Álbumes del artista</h1>
+
+<div th:if="${error}" class="error" th:text="${error}"></div>
+
+<div class="album-grid" th:if="${albums}">
+    <div class="album" th:each="album : ${albums}">
+        <img th:src="${album.images[0].url}" alt="Portada del álbum" />
+        <div class="album-name" th:text="${album.name}"></div>
+        <a th:href="${album.externalUrls}" target="_blank">Ver en Spotify</a>
+    </div>
+</div>
+
+</body>
+</html>
