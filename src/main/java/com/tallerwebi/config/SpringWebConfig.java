@@ -2,10 +2,12 @@ package com.tallerwebi.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -13,14 +15,25 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templatemode.TemplateMode;
+import se.michaelthelin.spotify.SpotifyApi;
 
+import java.net.URI;
 import java.net.http.HttpClient;
 
 @EnableWebMvc
 @Configuration
+@PropertySource("classpath:application.properties")
 @ComponentScan({"com.tallerwebi.presentacion", "com.tallerwebi.dominio", "com.tallerwebi.infraestructura"})
 public class SpringWebConfig implements WebMvcConfigurer {
 
+    @Value("${spotify.client-id}")
+    private String clientId;
+
+    @Value("${spotify.client-secret}")
+    private String clientSecret;
+
+    @Value("${spotify.redirect-uri}")
+    private String redirectUri;
     // Spring + Thymeleaf need this
     @Autowired
     private ApplicationContext applicationContext;
@@ -82,5 +95,15 @@ public class SpringWebConfig implements WebMvcConfigurer {
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
+    }
+
+    @Bean
+    public SpotifyApi buildSpotifyApi() {
+        return new SpotifyApi.Builder()
+                .setClientId(clientId)
+                .setClientSecret(clientSecret)
+                .setRedirectUri(URI.create(redirectUri))
+                .build();
+
     }
 }
