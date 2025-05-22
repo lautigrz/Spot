@@ -47,6 +47,21 @@
         .btn-custom:hover {
             background-color: #32335e;
         }
+        .playlist-link {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #32335e;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+
+        .playlist-link:hover {
+            background-color: #3f4079;
+            transform: scale(1.03);
+        }
+
     </style>
 </head>
 <body>
@@ -71,7 +86,7 @@
         <div class="col">
             <div class="top-item">
                 <h6>Seguidores</h6>
-                <p>128</p>
+                <p>10</p>
             </div>
         </div>
         <div class="col">
@@ -89,10 +104,17 @@
     </div>
 
     <!-- Qué está escuchando -->
-    <div class="current-track mb-4 text-center">
-        <h5 class="mb-1">🎵 Escuchando ahora</h5>
-        <p class="mb-0">"Track actual" - Artista</p>
+    <!-- Si está escuchando algo -->
+    <div class="current-track mb-4 text-center" th:if="${escuchando != null}">
+        <h5 class="mb-1">Escuchando ahora</h5>
+        <p class="mb-0"><span th:text="${artista}"></span> - <span th:text="${escuchando.getName()}"> </span> </p>
     </div>
+
+    <!-- Si NO está escuchando nada -->
+    <div class="current-track mb-4 text-center" th:unless="${escuchando != null}">
+        <h5 class="mb-1">No escuchando en este momento</h5>
+    </div>
+
 
     <!-- Playlist -->
     <div class="mb-5">
@@ -102,7 +124,8 @@
         </div>
         <div class="playlist-card">
             <div class="playlist-item" th:each="lista : ${playlist}">
-                <a th:href="${lista.getUri()}" th:text="${lista.getName()}" class="text-decoration-none"></a>
+                <a th:href="${lista.getUri()}" th:text="${lista.getName()}" class="playlist-link"></a>
+
             </div>
         </div>
 

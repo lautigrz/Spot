@@ -10,4 +10,5 @@ public interface ServicioPerfil {
     List<Artist> obtenerMejoresArtistasDelUsuario(String token, String refreshToken) throws Exception;
     List<PlaylistSimplified> obtenerNombreDePlaylistDelUsuario(String token, String refreshToken) throws Exception;
     Integer obtenerCantidadDePlaylistDelUsuario(String token, String refreshToken) throws Exception;
+    Track obtenerReproduccionActualDelUsuario(String token, String refreshToken) throws Exception;
 }

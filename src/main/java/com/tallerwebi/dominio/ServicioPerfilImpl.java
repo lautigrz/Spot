@@ -5,9 +5,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.enums.ModelObjectType;
+import se.michaelthelin.spotify.model_objects.miscellaneous.CurrentlyPlaying;
 import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.data.follow.GetUsersFollowedArtistsRequest;
 import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopArtistsRequest;
+import se.michaelthelin.spotify.requests.data.player.GetInformationAboutUsersCurrentPlaybackRequest;
+import se.michaelthelin.spotify.requests.data.player.GetUsersCurrentlyPlayingTrackRequest;
 import se.michaelthelin.spotify.requests.data.playlists.GetListOfCurrentUsersPlaylistsRequest;
 
 import java.util.ArrayList;
@@ -18,8 +21,13 @@ import java.util.List;
 @Service
 public class ServicioPerfilImpl implements ServicioPerfil {
 
-    @Autowired
+
     private ServicioSpotify spotify;
+
+    @Autowired
+    public ServicioPerfilImpl(ServicioSpotify spotify) {
+        this.spotify = spotify;
+    }
 
     private static final ModelObjectType type = ModelObjectType.ARTIST;
 
@@ -81,6 +89,25 @@ public class ServicioPerfilImpl implements ServicioPerfil {
 
         return playlists.getTotal();
     }
+
+    @Override
+    public Track obtenerReproduccionActualDelUsuario(String token, String refreshToken) throws Exception {
+        Track track = null;
+        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+
+        GetUsersCurrentlyPlayingTrackRequest currentlyPlayingTrackRequest = spotifyApi.getUsersCurrentlyPlayingTrack().build();
+
+        CurrentlyPlaying currentlyPlaying = currentlyPlayingTrackRequest.execute();
+
+        if(currentlyPlaying != null && currentlyPlaying.getItem() instanceof Track) {
+            track = (Track) currentlyPlaying.getItem();
+
+        }
+
+        return track;
+    }
+
+
 
 
 }
