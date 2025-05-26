@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.infraestructura.RepositorioAuthImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +17,12 @@ import se.michaelthelin.spotify.requests.authorization.authorization_code.Author
 public class ServicioAuthImpl implements ServicioAuth {
 
     private SpotifyApi spotifyApi;
+    private RepositorioAuth repositorioAuth;
 
     @Autowired
-    public ServicioAuthImpl(SpotifyApi spotifyApi) {
+    public ServicioAuthImpl(SpotifyApi spotifyApi, RepositorioAuth repositorioAuth) {
         this.spotifyApi = spotifyApi;
+        this.repositorioAuth = repositorioAuth;
     }
 
 
@@ -47,7 +50,20 @@ public class ServicioAuthImpl implements ServicioAuth {
         return autorizacion;
     }
 
+    @Override
+    public void guardarUsuario(Usuario usuario) {
+        this.repositorioAuth.guardar(usuario);
+    }
 
+    @Override
+    public User obtenerPerfilUsuario(String token, String refreshToken) throws Exception {
+        SpotifyApi spotifyApi = SpotifyApi.builder().setAccessToken(token)
+                .setRefreshToken(refreshToken)
+                .build();
+        User user = spotifyApi.getCurrentUsersProfile().build().execute();
+        return user;
+
+    }
 
 
 }

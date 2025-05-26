@@ -27,16 +27,10 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
                 .add(Restrictions.eq("password", password))
                 .uniqueResult();
     }
-
     @Override
-    public void guardar(Usuario usuario) {
-        sessionFactory.getCurrentSession().save(usuario);
-    }
-
-    @Override
-    public Usuario buscar(String email) {
+    public Usuario buscar(String user) {
         return (Usuario) sessionFactory.getCurrentSession().createCriteria(Usuario.class)
-                .add(Restrictions.eq("email", email))
+                .add(Restrictions.eq("user", user))
                 .uniqueResult();
     }
 

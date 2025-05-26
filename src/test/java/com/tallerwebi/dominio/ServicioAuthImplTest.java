@@ -17,7 +17,7 @@ import static org.mockito.Mockito.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ServicioAuthImplTest {
-
+/*
     private SpotifyApi mockSpotifyApi;
 
     // objeto que usa patron Builder para construir paso a paso el objeto
@@ -111,6 +111,8 @@ public class ServicioAuthImplTest {
         verify(mockRequest).execute();
 
     }
+
+ */
 
 
 

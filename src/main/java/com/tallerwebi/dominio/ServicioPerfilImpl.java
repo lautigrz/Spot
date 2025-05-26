@@ -56,7 +56,7 @@ public class ServicioPerfilImpl implements ServicioPerfil {
         Paging<Artist> artists = getUsersTopArtistsRequest.execute();
 
         List<Artist> mejores = new ArrayList<>();
-
+        
         mejores.addAll(Arrays.asList(artists.getItems()));
 
         return mejores;

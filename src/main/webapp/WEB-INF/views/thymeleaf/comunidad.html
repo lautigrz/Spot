@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>NeonBeats UI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background-color: #fff;
+        }
+        aside, section {
+            background-color: #f8f9fa;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .rounded-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .music-card {
+            background-color: #fde2e2;
+            border-radius: 12px;
+        }
+        .track-progress {
+            height: 6px;
+            background-color: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .track-progress-inner {
+            height: 100%;
+            width: 70%;
+            background-color: red;
+        }
+        .action-icons i {
+            cursor: pointer;
+            margin-right: 15px;
+        }
+        aside {
+            height: 100vh; /* Full height */
+            background-color: red;
+            border-radius: 20px;
+            margin-left: 1rem;         /* Margen para que no esté pegado */
+            padding: 1rem;             /* Espacio interior */
+            width: 60%;                /* Hace que sea más chico dentro del col-md-2 */
+        }
+        .friends-feed-fixed {
+            position: fixed;
+            top: 2%;
+            right: 0;
+            height: 100vh;
+            background-color: #ffffff;
+            padding: 1rem;
+            width: 25%;
+            display: flex;
+            flex-direction: column;
+        }aside {
+             height: 80vh; /* Full height */
+             background-color: rgb(255, 255, 255);
+             border-radius: 20px;
+             margin-left: 1rem;
+             margin-top: 20px !important;       /* Margen para que no esté pegado */
+             /* Espacio interior */
+             width: 60%;                /* Hace que sea más chico dentro del col-md-2 */
+             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Sombra agregada */
+         }
+        .notificacion {
+            background-color: white;
+            margin-right: 13px;
+        }
+        .lista-friends {
+            flex: 1;
+            overflow-y: auto;
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-height: 100%; /* importante para que respete el alto disponible */
+        }
+        .btn-spotify {
+            background-color: #390657; /* verde Spotify */
+            color: white;
+            border: none;
+            border-radius: 10px;
+        }
+        .btn-spotify:hover {
+            background-color: #5917a4;
+            color: white;
+        }
+
+        nav > a.nav-link {
+            color: black;
+            font-weight: 600;
+        }
+
+        #backToTop{
+            display: none;
+        }
+
+        .fixed-message-box {
+            position: sticky;
+            bottom: 12%;
+            background-color: #fff;
+            padding: 15px 20px;
+            z-index: 1000;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .fixed-message-box input {
+            height: 60px; /* más alto como pediste */
+        }
+
+
+
+    </style>
+</head>
+<body>
+<input type="hidden" id="username" th:value="${usuario}">
+<input type="hidden" id="idUsuario" th:value="${id}">
+<input type="hidden" id="urlFoto" th:value="${urlFoto}">
+<input type="hidden" id="token" th:value="${token}">
+<div class="container-fluid">
+    <div class="row mt-10">
+
+        <!-- Aside Menu -->
+        <aside class="col-md-2 p-3 d-flex flex-column">
+            <h5>Comunidad</h5>
+            <nav class="nav flex-column mt-3">
+                <a class="nav-link active" href="#"><i class="fas fa-music me-2"></i>Recomendar Canción</a>
+                <a class="nav-link" href="#"><i class="fas fa-list me-2"></i>Recomendar Playlist</a>
+                <a class="nav-link" href="#"><i class="fas fa-users me-2"></i>Ver Playlists Compartidas</a>
+                <a class="nav-link" href="#"><i class="fas fa-star me-2"></i>Top Tracks de la Comunidad</a>
+                <a class="nav-link" href="#"><i class="fas fa-calendar-alt me-2"></i>Eventos proximos</a>
+
+            </nav>
+
+        </aside>
+
+
+        <!-- Main Content -->
+        <main class="col-md-7 p-4">
+            <!-- Search bar + top nav -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <input type="text" class="form-control w-70 rounded-pill" placeholder="Buscar comunidad">
+
+            </div>
+
+            <!-- Track Content -->
+            <article class="billie-community text-white p-4 rounded"
+                     style="background: url('https://www.nme.com/wp-content/uploads/2021/07/Billie-Eilish.jpg') no-repeat center center / cover; position: relative; overflow: hidden;">
+
+                <!-- Capa oscura encima del fondo -->
+                <div style="position: absolute; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 1;"></div>
+
+                <!-- Contenido -->
+                <div style="position: relative; z-index: 2;">
+                    <a href="#" class="text-decoration-none text-light mb-3 d-inline-block">&larr; Back</a>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="" alt="Billie Eilish" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover; border: 2px solid white;">
+                        <div>
+                            <h3 class="mb-0">Billie Eilish Community</h3>
+                            <small class="text-white">Est. 2020 · +120k fans</small>
+                        </div>
+                    </div>
+
+                    <p class="mb-3">
+                        Unite a la comunidad oficial de fans de <strong>Billie Eilish</strong>. Compartí arte, música, experiencias y todo lo que te inspira de una de las artistas más influyentes del mundo. 🎤🌑
+                    </p>
+
+                    <div class="stats d-flex gap-4 mb-3 text-white">
+                        <small>🎧 56 playlists compartidas</small>
+                        <small>💬 2430 conversaciones activas</small>
+                        <small>🖼️ 870 artworks subidos</small>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="#" class="btn btn-light btn-sm">Unirme a la comunidad</a>
+                        <a href="#" class="btn btn-spotify btn-sm">
+                            <i class="fas fa-headphones me-2"></i> Sincronizarme a escuchar
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+
+            <!-- Discover More -->
+            <section class="mt-3" id="mensajeVista">
+                <h5>Chat de la comunidad</h5>
+
+                <!-- Mensajes -->
+                <div class="chat-message p-3 d-flex align-items-start my-2 bg-light rounded">
+                    <img src="R.jpeg" class="rounded-circle me-3" alt="User" style="width: 50px; height: 50px; object-fit: cover;">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <strong>@BassHunter</strong><br>
+                            <small class="text-muted">20 Aug 2023 · 10:20 AM</small>
+                            <p class="mb-0 d-inline">Anyone else catch the sample from that old 90s track? 😮</p>
+                        </div>
+                        <i class="fas fa-heart ms-3 corazon" style="cursor:pointer;" title="Like"></i>
+                    </div>
+
+            </section>
+            <!-- Formulario para enviar un nuevo mensaje -->
+            <div class="container mb-5" id="fixed-message-box">
+
+                    <div class="d-flex align-items-start">
+                        <img th:src="@{urlFoto}" class="rounded-circle me-3" alt="User" style="width: 50px; height: 50px; object-fit: cover;">
+                        <div class="flex-grow-1 position-relative w-100">
+                            <input type="text" name="mensaje" id="mensajeInput" class="form-control py-3 pe-5" placeholder="Escribe tu mensaje..." maxlength="200" required style="height: 70px;">
+
+                            <!-- Botón de enviar dentro del input -->
+                            <button type="submit" class="btn btn-primary position-absolute" id="enviar" style="top: 50%; right: 10px; transform: translateY(-50%); padding: 8px 12px;">
+                                <i class="bi bi-send"></i>
+                            </button>
+
+                            <div class="text-end small text-muted mt-1" id="contador">0/200</div>
+                        </div>
+                    </div>
+
+            </div>
+        </main>
+
+
+
+        <section class="friends-feed-fixed">
+            <!-- Notificación -->
+            <div class="d-flex align-items-center notificacion mb-1 ms-auto">
+                <i class="fa-solid fa-bell fa-lg mx-3"></i>
+                <img src="https://i.pinimg.com/originals/c8/9e/06/c89e0643a40ef6c46c7ab77272941897.jpg" class="rounded-profile" alt="profile">
+            </div>
+
+
+            <!-- Título -->
+            <h5 class="mb-2">Amigos</h5>
+
+            <!-- Lista de amigos -->
+            <div class="lista-friends">
+                <ul class="list-unstyled">
+                    <li class="d-flex align-items-center mb-3">
+                        <img src="" class="rounded-profile me-3">
+                        <div>
+                            <strong>Alexandra Beats</strong><br>
+                            <small>🎧 Listening to Latest Hits</small>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-center mb-3">
+                        <img src="" class="rounded-profile me-3">
+                        <div>
+                            <strong>Lucas Groove</strong><br>
+                            <small>⬇️ Downloading Summer Vibes Mix</small>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-center mb-3">
+                        <img src="" class="rounded-profile me-3">
+                        <div>
+                            <strong>Max Power</strong><br>
+                            <small>📢 Published: Tech Talk Episode</small>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-center mb-3">
+                        <img src="" class="rounded-profile me-3">
+                        <div>
+                            <strong>Sarah Sounds</strong><br>
+                            <small>▶️ Currently playing: Chill Beats Mix</small>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-center mb-3">
+                        <img src="R.jpeg" class="rounded-profile me-3">
+                        <div>
+                            <strong>Sarah Sounds</strong><br>
+                            <small>▶️ Currently playing: Chill Beats Mix</small>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-center mb-3">
+                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
+                        <div>
+                            <strong>Sarah Sounds</strong><br>
+                            <small>▶️ Currently playing: Chill Beats Mix</small>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-center mb-3">
+                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
+                        <div>
+                            <strong>Sarah Sounds</strong><br>
+                            <small>▶️ Currently playing: Chill Beats Mix</small>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-center mb-3">
+                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
+                        <div>
+                            <strong>Sarah Sounds</strong><br>
+                            <small>▶️ Currently playing: Chill Beats Mix</small>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-center mb-3">
+                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
+                        <div>
+                            <strong>Sarah Sounds</strong><br>
+                            <small>▶️ Currently playing: Chill Beats Mix</small>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-center mb-3">
+                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
+                        <div>
+                            <strong>Sarah Sounds</strong><br>
+                            <small>▶️ Currently playing: Chill Beats Mix</small>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-center mb-3">
+                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
+                        <div>
+                            <strong>Sarah Sounds</strong><br>
+                            <small>▶️ Currently playing: Chill Beats Mix</small>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-center mb-3">
+                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
+                        <div>
+                            <strong>Sarah Sounds</strong><br>
+                            <small>▶️ Currently playing: Chill Beats Mix</small>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-center mb-3">
+                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
+                        <div>
+                            <strong>Sarah Sounds</strong><br>
+                            <small>▶️ Currently playing: Chill Beats Mix</small>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+
+    </div>
+</div>
+
+
+<footer class="music-player-footer bg-dark text-white fixed-bottom px-4 d-flex align-items-center justify-content-between shadow-lg" id="footer" style="height: 50px !important; padding: 35px !important;">
+    <!-- Información de la canción -->
+    <div class="d-flex align-items-center z-1">
+        <img src="" class="rounded me-3" alt="Album cover" style="width: 53px; height: 53px; object-fit: cover;">
+        <div>
+            <strong>Billie Eilish</strong><br>
+            <small class="text-white">Lovely (feat. Khalid)</small>
+        </div>
+    </div>
+
+    <!-- Centro flotante y centrado -->
+    <div class="position-absolute top-50 start-50 translate-middle text-center" id="centro" style="z-index: 2;">
+        <div class="mb-2">
+            <i class="fas fa-music fa-spin fa-lg text-success me-2"></i>
+            <span class="fw-light">Escuchando...</span>
+        </div>
+        <div class="d-flex align-items-center gap-2" style="font-size: 0.85rem; width: 220px;">
+            <small class="text-white">1:12</small>
+            <div class="progress flex-grow-1" style="height: 4px;">
+                <div class="progress-bar bg-success" style="width: 45%;"></div>
+            </div>
+            <small class="text-white">3:20</small>
+        </div>
+    </div>
+
+    <!-- Botón de cerrar -->
+    <button class="btn btn-sm btn-outline-light rounded-circle z-1" id="cerrar" style="width: 28px; height: 28px; line-height: 1; padding: 0;">
+        &times;
+    </button>
+</footer>
+<!-- Botón para volver arriba -->
+<a href="#" id="backToTop" class="btn btn-dark position-fixed bottom-0 start-50 translate-middle-x mb-3" style="z-index: 1000;">
+    <i class="fas fa-chevron-up"></i>
+</a>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script th:src="@{/js/comunidad.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('cerrar').addEventListener('click', function() {
+            document.getElementById('footer').style.setProperty('display', 'none', 'important');
+
+            document.getElementById('backToTop').style.setProperty('display', 'flex' ,'important');
+            document.getElementById('fixed-message-box').classList.remove('mb-5');
+            document.getElementById('fixed-message-box').classList.add('mb-0');
+
+
+
+            console.log('Footer closed');
+        });
+
+        document.getElementById('backToTop').addEventListener('click', function(e) {
+            e.preventDefault();
+
+            document.getElementById('footer').style.setProperty('display', 'flex', 'important');
+
+            const box = document.getElementById('fixed-message-box');
+            box.classList.remove('mb-0');
+            box.classList.add('mb-5');
+            console.log('Clases actuales:', box.className);
+
+        });
+
+    });
+    const input = document.getElementById('mensajeInput');
+    const contador = document.getElementById('contador');
+
+    input.addEventListener('input', () => {
+        const longitud = input.value.length;
+        contador.textContent = `${longitud}/200`;
+    });
+
+    function validarMensaje() {
+        return input.value.trim().length > 0;
+    }
+</script>
+
+
+
+</body>
+</html>
