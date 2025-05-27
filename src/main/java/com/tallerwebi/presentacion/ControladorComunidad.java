@@ -13,12 +13,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
 public class ControladorComunidad {
     private ServicioComunidad servicioComunidad;
-
 
     public ControladorComunidad(ServicioComunidad servicioComunidad) {
         this.servicioComunidad = servicioComunidad;
@@ -33,16 +33,18 @@ public class ControladorComunidad {
     @MessageMapping("/chat.send")
     @SendTo("/topic/public")
     public ChatMessage send(@Payload ChatMessage message, @Header("id") String idUsuario) {
+
         Long id = Long.parseLong(String.valueOf(idUsuario));
-        System.out.println("El id:" + id);
-        System.out.println("El mensaje:" + message.getContent());
         return servicioComunidad.send(message, id);
+
     }
 
     @GetMapping("/comunidad")
-    public String comunidad(Model model) {
+    public String comunidad(Model model, HttpSession session) {
 
-        Usuario usuario = servicioComunidad.obtenerUsuarioDeLaComunidad("lautigrz");
+        String user = (String) session.getAttribute("user");
+
+        Usuario usuario = servicioComunidad.obtenerUsuarioDeLaComunidad(user);
         List<Mensaje> mensajes = servicioComunidad.obtenerMensajes();
         System.out.println("Usuario" + usuario.getUser());
 
@@ -51,6 +53,7 @@ public class ControladorComunidad {
         model.addAttribute("id", usuario.getId());
         model.addAttribute("token", usuario.getToken());
         model.addAttribute("mensajes", mensajes);
+
         return "comunidad";
     }
 }

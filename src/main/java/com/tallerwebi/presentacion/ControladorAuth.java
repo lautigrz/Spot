@@ -26,31 +26,40 @@ public class ControladorAuth {
 
     @GetMapping("/inicio")
     public String login(HttpServletResponse response) throws Exception {
-        System.out.println("Iniciando login");
+
         try {
             AuthorizationCodeUriRequest authorizationCodeRequest = servicioAuth.login();
             URI uri = authorizationCodeRequest.getUri();
 
             response.sendRedirect(uri.toString());
-            return null;
+
         }catch (Exception e) {  System.out.println("Error al iniciar login: " + e.getMessage());
             e.printStackTrace();
             return "redirect:/error";
 
         }
 
+        return "login";
 
         }
 
     @GetMapping("/callback")
     public String callback(@RequestParam("code") String code, HttpSession session) throws Exception {
-        AuthorizationCodeCredentials credentials = servicioAuth.credentials(code);
 
-        session.setAttribute("token", credentials.getAccessToken());
-        session.setAttribute("refreshToken", credentials.getRefreshToken());
-        Usuario usuario = generarUsuario(credentials.getAccessToken(), credentials.getRefreshToken());
-        session.setAttribute("user", usuario.getUser());
-        servicioAuth.guardarUsuario(usuario);
+        try{
+            AuthorizationCodeCredentials credentials = servicioAuth.credentials(code);
+
+            session.setAttribute("token", credentials.getAccessToken());
+            session.setAttribute("refreshToken", credentials.getRefreshToken());
+            Usuario usuario = generarUsuario(credentials.getAccessToken(), credentials.getRefreshToken());
+            session.setAttribute("user", usuario.getUser());
+            servicioAuth.guardarUsuario(usuario);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/login";
+
+        }
 
         return "redirect:/comunidad";
     }
@@ -66,8 +75,6 @@ public class ControladorAuth {
         usuario.setToken(token);
         usuario.setRefreshToken(refreshToken);
         usuario.setUrlFoto(user.getImages()[0].getUrl());
-
-
 
         return usuario;
     }

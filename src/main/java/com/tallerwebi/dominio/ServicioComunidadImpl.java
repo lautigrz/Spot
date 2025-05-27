@@ -56,18 +56,13 @@ public class ServicioComunidadImpl implements ServicioComunidad {
             if (username != null && !usuarios.contains(username)) {
                 canales.get("public").add(username);
                 System.out.println("agregado " + username);
-            }else {
-                System.out.println("Usuario no existe");
             }
 
-
-
-            return message;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
 
+        return message;
     }
 
     @Override
