@@ -1,7 +1,7 @@
 "user static";
 
 var username = document.getElementById("username").value;
-var idUser = document.getElementById("idUsuario").value;
+var idUser = document.getElementById("id").value;
 
 
 var messageInput = document.querySelector("#mensajeInput");
@@ -65,7 +65,7 @@ function send(event){
             image: urlImage,
             type: "CHAT",
         };
-        stompClient.send("/app/chat.send", {"user-id": idUser}, JSON.stringify(chatMessage));
+        stompClient.send("/app/chat.send", {"id": idUser}, JSON.stringify(chatMessage));
         messageInput.value = "";
 
     }

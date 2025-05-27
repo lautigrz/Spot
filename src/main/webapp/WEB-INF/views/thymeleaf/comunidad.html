@@ -101,16 +101,12 @@
             display: none;
         }
 
-        .fixed-message-box {
-            position: sticky;
-            bottom: 12%;
-            background-color: #fff;
-            padding: 15px 20px;
-            z-index: 1000;
-            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+        #fixed-message-box {
+            margin-bottom: 6%;
         }
 
         .fixed-message-box input {
+
             height: 60px; /* más alto como pediste */
         }
 
@@ -120,7 +116,7 @@
 </head>
 <body>
 <input type="hidden" id="username" th:value="${usuario}">
-<input type="hidden" id="idUsuario" th:value="${id}">
+<input type="hidden" id="id" th:value="${id}">
 <input type="hidden" id="urlFoto" th:value="${urlFoto}">
 <input type="hidden" id="token" th:value="${token}">
 <div class="container-fluid">
@@ -189,43 +185,42 @@
 
 
             <!-- Discover More -->
-            <section class="mt-3" id="mensajeVista">
+            <section class="mt-3" style="height: 600px; display: flex; flex-direction: column;">
                 <h5>Chat de la comunidad</h5>
 
-                <!-- Mensajes -->
-                <div class="chat-message p-3 d-flex align-items-start my-2 bg-light rounded">
-                    <img src="R.jpeg" class="rounded-circle me-3" alt="User" style="width: 50px; height: 50px; object-fit: cover;">
-                    <div class="d-flex align-items-center">
-                        <div>
-                            <strong>@BassHunter</strong><br>
-                            <small class="text-muted">20 Aug 2023 · 10:20 AM</small>
-                            <p class="mb-0 d-inline">Anyone else catch the sample from that old 90s track? 😮</p>
+                <!-- Contenedor de mensajes -->
+                <div id="mensajeVista" style="flex-grow: 1; overflow-y: auto; padding: 10px;">
+                    <div class="chat-message p-3 d-flex align-items-start my-2 bg-light rounded" th:each="mensaje : ${mensajes}">
+                        <img th:src="@{${mensaje.getUsuario().getUrlFoto()}}" class="rounded-circle me-3" alt="User" style="width: 50px; height: 50px; object-fit: cover;">
+                        <div class="d-flex align-items-center flex-grow-1">
+                            <div class="flex-grow-1">
+                                <strong th:text="${mensaje.getUsuario().getUser()}"></strong><br>
+                                <small class="text-muted">20 Aug 2023 · 10:20 AM</small>
+                                <p class="mb-0 d-inline" th:text="${mensaje.getTexto()}"></p>
+                            </div>
+                            <i class="fas fa-heart ms-3 corazon" style="cursor:pointer;" title="Like"></i>
                         </div>
-                        <i class="fas fa-heart ms-3 corazon" style="cursor:pointer;" title="Like"></i>
                     </div>
+                    <!-- Aquí se agregarán más mensajes -->
+                </div>
 
-            </section>
-            <!-- Formulario para enviar un nuevo mensaje -->
-            <div class="container mb-5" id="fixed-message-box">
-
+                <!-- Formulario de envío -->
+                <div id="fixed-message-box" class="p-3 border-top bg-white">
                     <div class="d-flex align-items-start">
-                        <img th:src="@{urlFoto}" class="rounded-circle me-3" alt="User" style="width: 50px; height: 50px; object-fit: cover;">
+                        <img th:src="@{${urlFoto}}" class="rounded-circle me-3" alt="User" style="width: 50px; height: 50px; object-fit: cover;">
                         <div class="flex-grow-1 position-relative w-100">
                             <input type="text" name="mensaje" id="mensajeInput" class="form-control py-3 pe-5" placeholder="Escribe tu mensaje..." maxlength="200" required style="height: 70px;">
-
-                            <!-- Botón de enviar dentro del input -->
                             <button type="submit" class="btn btn-primary position-absolute" id="enviar" style="top: 50%; right: 10px; transform: translateY(-50%); padding: 8px 12px;">
                                 <i class="bi bi-send"></i>
                             </button>
-
                             <div class="text-end small text-muted mt-1" id="contador">0/200</div>
                         </div>
                     </div>
+                </div>
+            </section>
 
-            </div>
+            <!-- Formulario para enviar un nuevo mensaje -->
         </main>
-
-
 
         <section class="friends-feed-fixed">
             <!-- Notificación -->

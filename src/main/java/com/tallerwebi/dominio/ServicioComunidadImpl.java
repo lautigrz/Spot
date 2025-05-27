@@ -18,14 +18,17 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
 
     private RepositorioUsuario repositorioUsuario;
+    private RepositorioComunidad repositorioComunidad;
+
     @Autowired
-    public ServicioComunidadImpl(RepositorioUsuario repositorioUsuario) {
+    public ServicioComunidadImpl(RepositorioUsuario repositorioUsuario, RepositorioComunidad repositorioComunidad) {
         this.repositorioUsuario = repositorioUsuario;
+        this.repositorioComunidad = repositorioComunidad;
     }
 
     @Override
-    public void guardarMensaje(String mensaje) {
-
+    public void guardarMensaje(String mensaje, Long idUsuario) {
+        repositorioComunidad.guardarMensajeDeLaComunidad(mensaje, idUsuario);
     }
 
     @Override
@@ -34,8 +37,8 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     }
 
     @Override
-    public void obtenerMensajes() {
-
+    public List<Mensaje> obtenerMensajes() {
+        return repositorioComunidad.obtenerMensajesDeComunidad();
     }
 
     @Override
@@ -57,6 +60,8 @@ public class ServicioComunidadImpl implements ServicioComunidad {
                 System.out.println("Usuario no existe");
             }
 
+
+
             return message;
         } catch (Exception e) {
             e.printStackTrace();
@@ -66,7 +71,14 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     }
 
     @Override
-    public ChatMessage send(ChatMessage message) {
+    public ChatMessage send(ChatMessage message, Long idUsuario) {
+        try {
+            repositorioComunidad.guardarMensajeDeLaComunidad(message.getContent(), idUsuario);
+            System.out.println("Mensaje guardado correctamente");
+        } catch (Exception e) {
+            System.out.println("Error al guardar el mensaje: " + e.getMessage());
+            e.printStackTrace();
+        }
         return message;
     }
 
