@@ -54,6 +54,6 @@ public class ControladorComunidad {
         model.addAttribute("token", usuario.getToken());
         model.addAttribute("mensajes", mensajes);
 
-        return "comunidad";
+        return "comunidad-general";
     }
 }

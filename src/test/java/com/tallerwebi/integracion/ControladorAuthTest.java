@@ -2,6 +2,7 @@ package com.tallerwebi.integracion;
 
 import com.tallerwebi.dominio.ServicioAuth;
 
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.presentacion.ControladorAuth;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,8 @@ import javax.servlet.http.HttpSession;
 import java.net.URI;
 
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import static org.mockito.Mockito.*;
@@ -71,10 +74,10 @@ public class ControladorAuthTest {
         HttpSession sessionMock = mock(HttpSession.class);
 
         // Configurar mocks 'AuthorizationCodeCredentials' que contiene los datos de autenticación
-        when(servicioAuth.credentials(code)).thenReturn(mockCredentials);
+        when(servicioAuth.credentials(anyString())).thenReturn(mockCredentials);
         when(mockCredentials.getAccessToken()).thenReturn(accessToken);
         when(mockCredentials.getRefreshToken()).thenReturn(refreshToken);
-
+        when(servicioAuth.guardarUsuario(anyString(), anyString())).thenReturn("user");
 
         // Act
         String vista = controladorAuth.callback(code, sessionMock);
@@ -82,7 +85,7 @@ public class ControladorAuthTest {
         // Assert
         verify(sessionMock).setAttribute("token", accessToken);
         verify(sessionMock).setAttribute("refreshToken", refreshToken);
-        assertEquals("redirect:/perfil", vista);
+        assertThat("redirect:/comunidad", equalTo(vista));
     }
 
 

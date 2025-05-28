@@ -40,7 +40,7 @@ public class RepositorioComunidadImplTest {
     public void seDebeGuardarElMensajeEnLaBD(){
 
         Usuario usuario = new Usuario();
-        usuario.setId(3L);
+
         usuario.setToken("223");
         usuario.setUrlFoto("https://");
         usuario.setUser("lauti");
@@ -50,21 +50,16 @@ public class RepositorioComunidadImplTest {
 
         String mensaje = "Hola como estas";
 
-        Mensaje mensaje1 = new Mensaje();
+        repositorioComunidad.guardarMensajeDeLaComunidad(mensaje, usuario.getId());
 
-        mensaje1.setId(1L);
-        mensaje1.setTexto(mensaje);
-        mensaje1.setUsuario(usuario);
-
-        repositorioComunidad.guardarMensajeDeLaComunidad(mensaje1.getTexto(), usuario.getId());
-
-        String hql = "FROM Mensaje WHERE id = :id";
-        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
-        query.setParameter("id",mensaje1.getId());
+        String hql = "FROM Mensaje WHERE texto = :texto";
+        Query query = sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("texto", mensaje);
 
         Mensaje mensajeObtenido = (Mensaje) query.getResultList().get(0);
 
-        assertThat(mensaje1, equalTo(mensajeObtenido));
+        assertThat(mensajeObtenido.getTexto(), equalTo(mensaje));
+        assertThat(mensajeObtenido.getUsuario().getId(), equalTo(usuario.getId()));
 
     }
 

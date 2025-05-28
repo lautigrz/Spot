@@ -51,18 +51,29 @@ public class ServicioAuthImpl implements ServicioAuth {
     }
 
     @Override
-    public void guardarUsuario(Usuario usuario) {
+    public String guardarUsuario(String token, String refreshToken) throws Exception {
+
+            User user = obtenerPerfilUsuario(token, refreshToken);
+
+            if(user == null) {
+                throw new Exception("Error al obtener el usuario");
+            }
+            Usuario usuario = new Usuario();
+            usuario.setUser(user.getDisplayName());
+            usuario.setToken(token);
+            usuario.setRefreshToken(refreshToken);
+            usuario.setUrlFoto(user.getImages()[0].getUrl());
+
         this.repositorioAuth.guardar(usuario);
+
+        return usuario.getUser();
     }
 
     @Override
     public User obtenerPerfilUsuario(String token, String refreshToken) throws Exception {
-        SpotifyApi spotifyApi = SpotifyApi.builder().setAccessToken(token)
-                .setRefreshToken(refreshToken)
-                .build();
-        User user = spotifyApi.getCurrentUsersProfile().build().execute();
-        return user;
-
+        spotifyApi.setAccessToken(token);
+        spotifyApi.setRefreshToken(refreshToken);
+        return spotifyApi.getCurrentUsersProfile().build().execute();
     }
 
 

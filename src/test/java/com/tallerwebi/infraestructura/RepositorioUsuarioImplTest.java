@@ -40,12 +40,9 @@ public class RepositorioUsuarioImplTest {
 
         sessionFactory.getCurrentSession().save(usuario);
 
-        String hql = "from Usuario where user = :user";
-        Query query = sessionFactory.getCurrentSession().createQuery(hql);
-        query.setParameter("user", usuario.getUser());
-        Usuario usuario2 = (Usuario) query.uniqueResult();
+        Usuario usuarioBuscado = repositorioUsuario.buscar(usuario.getUser());
 
-        assertThat(usuario, equalTo(usuario2));
+        assertThat(usuario, equalTo(usuarioBuscado));
 
     }
 

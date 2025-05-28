@@ -9,6 +9,6 @@ import se.michaelthelin.spotify.requests.authorization.authorization_code.Author
 public interface ServicioAuth {
     AuthorizationCodeUriRequest login() throws Exception;
     AuthorizationCodeCredentials credentials(String code) throws Exception;
-    void guardarUsuario(Usuario usuario);
+    String guardarUsuario(String token, String refreshToken) throws Exception ;
     User obtenerPerfilUsuario(String token, String refreshToken) throws Exception;
 }

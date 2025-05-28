@@ -51,9 +51,9 @@ public class ControladorComunidadTest {
 
     }
 
-    // Falta terminarlo, no me funca
-    /*@Test
 
+
+    @Test
     public void debeMostrarVistaComunidadConDatosDelUsuario() throws Exception {
         // Preparar datos mock
         Usuario usuarioMock = new Usuario();
@@ -75,7 +75,7 @@ public class ControladorComunidadTest {
         mockMvc.perform(get("/comunidad")
                         .sessionAttr("user", usuarioMock.getUser()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("comunidad"))
+                .andExpect(view().name("comunidad-general"))
                 .andExpect(model().attribute("usuario", usuarioMock.getUser()))
                 .andExpect(model().attribute("urlFoto", usuarioMock.getUrlFoto()))
                 .andExpect(model().attribute("id", usuarioMock.getId()))
@@ -87,7 +87,6 @@ public class ControladorComunidadTest {
         verify(servicioComunidadMock).obtenerMensajes();
     }
 
-     */
     @Test
     public void debeDelegarEnServicioYRetornarElMensaje() {
         // Arrange

@@ -51,10 +51,11 @@ public class ControladorAuth {
 
             session.setAttribute("token", credentials.getAccessToken());
             session.setAttribute("refreshToken", credentials.getRefreshToken());
-            Usuario usuario = generarUsuario(credentials.getAccessToken(), credentials.getRefreshToken());
-            session.setAttribute("user", usuario.getUser());
-            servicioAuth.guardarUsuario(usuario);
 
+
+           String usuario = servicioAuth.guardarUsuario(credentials.getAccessToken(), credentials.getRefreshToken());
+
+           session.setAttribute("user", usuario);
         } catch (Exception e) {
             e.printStackTrace();
             return "redirect:/login";
@@ -64,20 +65,7 @@ public class ControladorAuth {
         return "redirect:/comunidad";
     }
 
-    private Usuario generarUsuario(String token, String refreshToken) throws Exception {
-        User user = servicioAuth.obtenerPerfilUsuario(token, refreshToken);
 
-        if(user == null) {
-            throw new Exception("Error al obtener el usuario");
-        }
-        Usuario usuario = new Usuario();
-        usuario.setUser(user.getDisplayName());
-        usuario.setToken(token);
-        usuario.setRefreshToken(refreshToken);
-        usuario.setUrlFoto(user.getImages()[0].getUrl());
-
-        return usuario;
-    }
 
 
 }

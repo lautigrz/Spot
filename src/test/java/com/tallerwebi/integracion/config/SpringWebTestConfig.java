@@ -78,7 +78,9 @@ public class SpringWebTestConfig implements WebMvcConfigurer {
         ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
         viewResolver.setTemplateEngine(templateEngine());
         return viewResolver;
-    } @Bean
+    }
+
+    @Bean
     public HttpClient httpClient() {
         return HttpClient.newHttpClient();
     }
