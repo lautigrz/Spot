@@ -46,7 +46,7 @@ public class ControladorComunidad {
 
         Usuario usuario = servicioComunidad.obtenerUsuarioDeLaComunidad(user);
         List<Mensaje> mensajes = servicioComunidad.obtenerMensajes();
-        System.out.println("Usuario" + usuario.getUser());
+
 
         model.addAttribute("usuario", usuario.getUser());
         model.addAttribute("urlFoto", usuario.getUrlFoto());

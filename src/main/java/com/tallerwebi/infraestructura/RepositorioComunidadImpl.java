@@ -22,9 +22,8 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
 
     @Override
     public void guardarMensajeDeLaComunidad(String contenido, Long idUsuario) {
-        // Obtener usuario desde la BD
-        Usuario usuario = sessionFactory.getCurrentSession().get(Usuario.class, idUsuario);
 
+        Usuario usuario = sessionFactory.getCurrentSession().get(Usuario.class, idUsuario);
         Mensaje mensaje = new Mensaje();
         mensaje.setTexto(contenido);
         mensaje.setUsuario(usuario);

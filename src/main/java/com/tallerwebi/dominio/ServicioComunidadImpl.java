@@ -41,6 +41,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
         return repositorioComunidad.obtenerMensajesDeComunidad();
     }
 
+    // falta test
     @Override
     public ChatMessage register(ChatMessage message, SimpMessageHeaderAccessor simpMessageHeaderAccessor) {
         try{
@@ -65,6 +66,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
         return message;
     }
 
+    // falta test
     @Override
     public ChatMessage send(ChatMessage message, Long idUsuario) {
         try {

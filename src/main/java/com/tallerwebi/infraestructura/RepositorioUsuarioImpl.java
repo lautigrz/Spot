@@ -17,7 +17,7 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
     public RepositorioUsuarioImpl(SessionFactory sessionFactory){
         this.sessionFactory = sessionFactory;
     }
-
+    //falta testear
     @Override
     public Usuario buscarUsuario(String email, String password) {
 
@@ -38,5 +38,4 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
     public void modificar(Usuario usuario) {
         sessionFactory.getCurrentSession().update(usuario);
     }
-
 }
