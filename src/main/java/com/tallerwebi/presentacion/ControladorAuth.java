@@ -62,7 +62,7 @@ public class ControladorAuth {
 
         }
 
-        return "redirect:/comunidad";
+        return "redirect:/lista";
     }
 
 

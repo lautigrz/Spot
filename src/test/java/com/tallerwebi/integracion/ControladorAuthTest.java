@@ -88,5 +88,4 @@ public class ControladorAuthTest {
         assertThat("redirect:/comunidad", equalTo(vista));
     }
 
-
 }

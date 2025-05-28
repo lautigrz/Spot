@@ -119,6 +119,7 @@
 <input type="hidden" id="id" th:value="${id}">
 <input type="hidden" id="urlFoto" th:value="${urlFoto}">
 <input type="hidden" id="token" th:value="${token}">
+<input type="hidden" id="comunidad" th:value="${comunidad}">
 <div class="container-fluid">
     <div class="row mt-10">
 
@@ -176,9 +177,17 @@
 
                     <div class="d-flex justify-content-between">
                         <a href="#" class="btn btn-light btn-sm">Unirme a la comunidad</a>
-                        <a href="#" class="btn btn-spotify btn-sm">
+                        <a href="#" id="sincronizar"  class="btn btn-spotify btn-sm"
+                           th:if="${hayUsuarios}">
                             <i class="fas fa-headphones me-2"></i> Sincronizarme a escuchar
                         </a>
+
+                        <a href="#" th:href="@{/reproducir}" class="btn btn-spotify btn-sm"
+                           th:unless="${hayUsuarios}">
+                            <i class="fas fa-play me-2"></i> Empezar reproducción
+
+                        </a>
+
                     </div>
                 </div>
             </article>

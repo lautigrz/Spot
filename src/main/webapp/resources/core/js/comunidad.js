@@ -8,7 +8,7 @@ var messageInput = document.querySelector("#mensajeInput");
 var messageArea = document.querySelector("#mensajeVista");
 var messageForm = document.getElementById("enviar");
 var urlImage = document.getElementById("urlFoto").value;
-
+var idComunidad = document.getElementById("comunidad").value;
 var stompClient = null;
 
 
@@ -27,34 +27,36 @@ function connect() {
 }
 function onConnected(options) {
 
-    stompClient.subscribe("/topic/public", onMessageReceived);
-    stompClient.subscribe("/user/queue/playback", sincronizarSpotify);
-
-
+   // stompClient.subscribe("/topic/public", onMessageReceived);
+    stompClient.subscribe(`/topic/${idComunidad}`, onMessageReceived);
+  //  stompClient.subscribe("/user/queue/playback", sincronizarSpotify);
 
     stompClient.send(
-        "/app/chat.register",
-        {},
+        `/app/chat.register/${idComunidad}`,
+        { id: idUser},
         JSON.stringify({sender: username ,type: "JOIN"}),
-    )
+    );
+
+}
+
+
+window.onload = function() {
+    const btn = document.getElementById("sincronizar");
+    if (btn) {
+        btn.addEventListener("click", conectarAlCanalDeSincronizacion);
+    }
+};
+
+function conectarAlCanalDeSincronizacion(){
+
+    stompClient.subscribe("/user/queue/playback", sincronizarSpotify);
+
     stompClient.send(
         "/app/chat.repro",
         {},
         JSON.stringify({sender: username ,type: "JOIN"}),
     )
-
-
-
-
-
 }
-
-
-function onError(error) {
-
-}
-
-
 
 function send(event){
     var message = messageInput.value.trim();

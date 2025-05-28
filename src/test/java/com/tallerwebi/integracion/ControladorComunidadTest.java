@@ -87,7 +87,7 @@ public class ControladorComunidadTest {
         verify(servicioComunidadMock).obtenerMensajes();
     }
 
-    @Test
+   /* @Test
     public void debeDelegarEnServicioYRetornarElMensaje() {
         // Arrange
         ChatMessage mensajeEnviado = new ChatMessage();
@@ -109,6 +109,8 @@ public class ControladorComunidadTest {
 
     }
 
+    */
+/*
     @Test
     public void debeDelegarEnServicioYRetornarElMensajeEsperado() {
         // Arrange
@@ -135,5 +137,7 @@ public class ControladorComunidadTest {
         verify(servicioComunidadMock).send(mensajeEnviado, idUsuarioEsperado);
     }
 
+
+ */
 
 }

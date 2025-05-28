@@ -16,23 +16,21 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Comunidad {
+public class Playlist {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
+
     private String nombre;
-    private String descripcion;
-    private String nombreCancion;
 
-   /* @ManyToMany
+    @ManyToMany
     @JoinTable(
-            name = "comunidad_playlist",
-            joinColumns = @JoinColumn(name = "comunidad_id"),
-            inverseJoinColumns = @JoinColumn(name = "playlist_id")
+            name = "playlist_cancion",
+            joinColumns = @JoinColumn(name = "playlist_id"),
+            inverseJoinColumns = @JoinColumn(name = "cancion_id")
     )
-    private List<Playlist> playlist = new ArrayList<>();
-
-    */
+    private List<Cancion> canciones;
 
 
 }
