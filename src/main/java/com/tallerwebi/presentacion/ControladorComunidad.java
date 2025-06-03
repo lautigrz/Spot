@@ -78,27 +78,33 @@ public class ControladorComunidad {
         return "redirect:/comunidad";
     }
 
-    @MessageMapping("/chat.register/{comunidad}")
+    @MessageMapping("/chat.register/{idComunidad}")
     public void register(@Payload ChatMessage message,
-                         @DestinationVariable String comunidad,
+                         @DestinationVariable String idComunidad,
                          SimpMessageHeaderAccessor headerAccessor) {
 
         servicioComunidad.register(message, headerAccessor);
 
         // Enviar manualmente el mensaje al canal de esa comunidad
-        messagingTemplate.convertAndSend("/topic/" + comunidad, message);
+        messagingTemplate.convertAndSend("/topic/" + idComunidad, message);
     }
 
-    @MessageMapping("/chat.send/{comunidad}")
+    @MessageMapping("/chat.send/{idComunidad}")
     public void send(@Payload ChatMessage message,
-                     @DestinationVariable String comunidad,
-                     @Header("id") String idUsuario) {
+                     @DestinationVariable String idComunidad) {
 
-        Long id = Long.parseLong(idUsuario);
-        ChatMessage response = servicioComunidad.send(message, id);
+        try {
+            Long id = Long.parseLong(message.getId());
+            ChatMessage response = servicioComunidad.send(message, id);
 
-        messagingTemplate.convertAndSend("/topic/" + comunidad, response);
+            messagingTemplate.convertAndSend("/topic/" + idComunidad, response);
+        } catch (NumberFormatException e) {
+            // Log y manejo de error
+            System.err.println("ID de usuario inválido: " + message.getId());
+            // Podrías enviar un mensaje de error o ignorar
+        }
     }
+
 
 
     @GetMapping("/comunidad/{id}")

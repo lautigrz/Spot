@@ -1,42 +1,42 @@
 "user static";
 
-var username = document.getElementById("username").value;
-var idUser = document.getElementById("id").value;
-
-
 var messageInput = document.querySelector("#mensajeInput");
 var messageArea = document.querySelector("#mensajeVista");
 var messageForm = document.getElementById("enviar");
-var urlImage = document.getElementById("urlFoto").value;
-var idComunidad = document.getElementById("comunidad").value;
 var stompClient = null;
-
 
 function connect() {
 
+    const datos = {
+        username: document.getElementById("username").value,
+        idUser: document.getElementById("id").value,
+        urlImage: document.getElementById("urlFoto").value,
+        idComunidad: document.getElementById("comunidad").value
+    }
 
+    var socket = new SockJS("/spring/websocket");
+    stompClient = Stomp.over(socket);
 
-        var socket = new SockJS("/spring/websocket");
-        stompClient = Stomp.over(socket);
+    console.log("Valor de idComunidad antes de conectar:", datos.idComunidad);
 
-        stompClient.connect({}, onConnected);
-        // ← solo se llama cuando realmente se conecta
-
-
-
+    stompClient.connect({}, function(frame) {
+        onConnected(datos);
+    }, onError);
 }
-function onConnected(options) {
 
-   // stompClient.subscribe("/topic/public", onMessageReceived);
-    stompClient.subscribe(`/topic/${idComunidad}`, onMessageReceived);
-  //  stompClient.subscribe("/user/queue/playback", sincronizarSpotify);
+function onError(error) {
+    console.error("Error al conectar STOMP:", error);
+}
+
+function onConnected(datos) {
+    console.log("Suscrito a: ", `/topic/${datos.idComunidad}`);
+    stompClient.subscribe(`/topic/${datos.idComunidad}`, onMessageReceived);
 
     stompClient.send(
-        `/app/chat.register/${idComunidad}`,
-        { id: idUser},
-        JSON.stringify({sender: username ,type: "JOIN"}),
+        `/app/chat.register/${datos.idComunidad}`,
+        {},
+        JSON.stringify({sender: datos.username, type: "JOIN"}),
     );
-
 }
 
 
@@ -60,14 +60,22 @@ function conectarAlCanalDeSincronizacion(){
 
 function send(event){
     var message = messageInput.value.trim();
+    var username = document.getElementById("username").value;
+    var idUser = document.getElementById("id").value;
+    var urlImage = document.getElementById("urlFoto").value;
+    var idComunidad = document.getElementById("comunidad").value;
+
     if(message && stompClient) {
         var chatMessage = {
             sender: username,
             content: messageInput.value,
             image: urlImage,
             type: "CHAT",
+            id: idUser,
         };
-        stompClient.send("/app/chat.send", {"id": idUser}, JSON.stringify(chatMessage));
+        ///app/chat.register/${idComunidad}`
+        stompClient.send(`/app/chat.send/${idComunidad}`, {}, JSON.stringify(chatMessage));
+
         messageInput.value = "";
 
     }
@@ -76,6 +84,7 @@ function send(event){
 
 function onMessageReceived(payload) {
 
+    console.log("Mensaje recibido:", payload);
     var message = JSON.parse(payload.body);
 
     if(message.content && message.content.trim() !== "") {
@@ -83,9 +92,6 @@ function onMessageReceived(payload) {
         messageArea.appendChild(nuevoMensaje);
         messageArea.scrollTop = messageArea.scrollHeight;
     }
-
-
-
 }
 
 function crearMensajeHTML(message) {
