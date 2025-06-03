@@ -21,7 +21,6 @@ import java.util.List;
 @Service
 public class ServicioPerfilImpl implements ServicioPerfil {
 
-
     private ServicioSpotify spotify;
 
     @Autowired

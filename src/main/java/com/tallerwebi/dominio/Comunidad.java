@@ -34,5 +34,12 @@ public class Comunidad {
 
     */
 
+    @OneToMany(mappedBy = "comunidad", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Mensaje> mensajes = new ArrayList<>();
+
+    public void agregarMensaje(Mensaje mensaje) {
+        mensajes.add(mensaje);
+        mensaje.setComunidad(this); // ← este es el punto clave
+    }
 
 }

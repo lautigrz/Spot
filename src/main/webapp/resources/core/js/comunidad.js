@@ -40,21 +40,19 @@ function onConnected(datos) {
 }
 
 
-window.onload = function() {
-    const btn = document.getElementById("sincronizar");
-    if (btn) {
-        btn.addEventListener("click", conectarAlCanalDeSincronizacion);
-    }
-};
-
 function conectarAlCanalDeSincronizacion(){
+    event.preventDefault();
+    console.log("Entro a conectar al canal de sincronizacion");
+
+    let username = document.getElementById("username").value;
+    let idComunidad = document.getElementById("comunidad").value;
 
     stompClient.subscribe("/user/queue/playback", sincronizarSpotify);
 
     stompClient.send(
         "/app/chat.repro",
         {},
-        JSON.stringify({sender: username ,type: "JOIN"}),
+        JSON.stringify({sender: username ,type: "JOIN", id:idComunidad}),
     )
 }
 
@@ -185,7 +183,7 @@ function sincronizarSpotify(payload) {
 
             console.log('Reproduciendo en Spotify:', data);
             console.log('Latencia:', latency);
-            console.log('Posición ajustada:', adjustedPositionMs);
+            console.log('Posicion ajustada:', adjustedPositionMs);
 
             // Puedes usar adjustedPositionMs para futuras sincronizaciones si es necesario.
         }) // Muestra la respuesta de Spotify
@@ -196,7 +194,12 @@ function sincronizarSpotify(payload) {
 
 messageForm.addEventListener("click", send, true);
 window.addEventListener("load", function () {
+    const btn = document.getElementById("sincronizar");
+    if (btn) {
+        btn.addEventListener("click", conectarAlCanalDeSincronizacion);
+    }
     connect();
+
 });
 
 document.addEventListener('DOMContentLoaded', function() {

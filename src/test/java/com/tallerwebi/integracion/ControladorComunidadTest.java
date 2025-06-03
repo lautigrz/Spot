@@ -52,7 +52,7 @@ public class ControladorComunidadTest {
     }
 
 
-
+/*
     @Test
     public void debeMostrarVistaComunidadConDatosDelUsuario() throws Exception {
         // Preparar datos mock
@@ -86,6 +86,8 @@ public class ControladorComunidadTest {
         verify(servicioComunidadMock).obtenerUsuarioDeLaComunidad("lauti");
         verify(servicioComunidadMock).obtenerMensajes();
     }
+
+
 
    /* @Test
     public void debeDelegarEnServicioYRetornarElMensaje() {

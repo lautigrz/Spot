@@ -34,36 +34,31 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     }
 
     @Override
-    public void guardarMensaje(String mensaje, Long idUsuario) {
-        repositorioComunidad.guardarMensajeDeLaComunidad(mensaje, idUsuario);
-    }
-
-    @Override
     public void guardarUsuarioEnComunidad() {
 
     }
 
     @Override
-    public List<Mensaje> obtenerMensajes() {
-        return repositorioComunidad.obtenerMensajesDeComunidad();
+    public List<Mensaje> obtenerMensajes(Long id) {
+        return repositorioComunidad.obtenerMensajesDeComunidad(id);
     }
 
     // falta test
     @Override
-    public ChatMessage register(ChatMessage message, SimpMessageHeaderAccessor simpMessageHeaderAccessor) {
+    public ChatMessage registrarUsuarioEnCanalDeComunidad(ChatMessage message, SimpMessageHeaderAccessor simpMessageHeaderAccessor, String idComunidad) {
         try {
             simpMessageHeaderAccessor.getSessionAttributes().put("usuario", message.getSender());
 
             String username = (String) simpMessageHeaderAccessor.getSessionAttributes().get("usuario");
 
             // Si el canal no existe, crearlo
-            canales.putIfAbsent("public", new ArrayList<>());
+            canales.putIfAbsent(idComunidad, new ArrayList<>());
 
             // Agregar el usuario a la lista del canal correspondiente
-            List<String> usuarios = canales.get("public");
+            List<String> usuarios = canales.get(idComunidad);
             if (username != null && !usuarios.contains(username)) {
-                canales.get("public").add(username);
-                System.out.println("agregado " + username);
+                canales.get(idComunidad).add(username);
+                System.out.println("agregado " + username + "en canal " + idComunidad);
             }
 
         } catch (Exception e) {
@@ -75,9 +70,9 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
     // falta test
     @Override
-    public ChatMessage send(ChatMessage message, Long idUsuario) {
+    public ChatMessage guardarMensaje(ChatMessage message, Long idUsuario, Long idComunidad) {
         try {
-            repositorioComunidad.guardarMensajeDeLaComunidad(message.getContent(), idUsuario);
+            repositorioComunidad.guardarMensajeDeLaComunidad(message.getContent(), idUsuario,idComunidad);
             System.out.println("Mensaje guardado correctamente");
         } catch (Exception e) {
             System.out.println("Error al guardar el mensaje: " + e.getMessage());
@@ -97,15 +92,15 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     }
 
     @Override
-    public String obtenerUsuarioDeLaComunidadActivoDeLaLista(String canal) {
+    public String obtenerUsuarioDeLaComunidadActivoDeLaLista(String canal, String user) {
 
         List<String> usuarios = canales.get(canal);
 
         for (String usuario : usuarios) {
-            return usuario;
+            if(!usuario.equals(user)) {
+                return usuario;
+            }
         }
-
-
         return null;
     }
 
@@ -122,7 +117,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
             StartResumeUsersPlaybackRequest star = spotifyApi.startResumeUsersPlayback()
                     .uris(JsonParser.parseString("[\"spotify:track:4stQ9ma0kqGifqLQQSgOGH\"]").getAsJsonArray())
-                    .position_ms(0)  // Asegúrate de que 'position_ms' se establece correctamente
+                    .position_ms(0)
                     .build();
             star.execute();
             return true;
@@ -130,19 +125,15 @@ public class ServicioComunidadImpl implements ServicioComunidad {
             e.printStackTrace();
         }
 
-
         throw new Exception();
     }
 
     @Override
     public Sincronizacion obtenerSincronizacion(String user) throws Exception {
-        //if (canales.get("public").size() > 1) {
-
-           // System.out.println("Entroo: " + message.getSender() + ", Principal: " + principal.getName());
 
             String token = obtenerTokenDelUsuario(user);
             int ms = obtenerPosicionEnMsDeLoQueEscucha(token);
-            ms+=468;
+            ms+=500;
             System.out.println("Ms: " + ms);
             Sincronizacion synchronize = new Sincronizacion();
             synchronize.setPositionMs(ms);
@@ -166,14 +157,13 @@ public class ServicioComunidadImpl implements ServicioComunidad {
                     .build().execute();
 
             System.out.println("Position");
+            return playing.getProgress_ms();
         }catch (Exception e) {
             e.printStackTrace();
             System.out.println("Error al obtener el token: " + e.getMessage());
         }
 
-
-        assert playing != null;
-        return playing.getProgress_ms();
+        return 0;
 
     }
 

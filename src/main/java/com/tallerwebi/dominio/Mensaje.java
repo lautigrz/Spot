@@ -15,12 +15,11 @@ public class Mensaje {
     private Long id;
     private String texto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
-   // @ManyToOne(fetch = FetchType.LAZY)
-   // @JoinColumn(name = "comunidad_id", nullable = false)
-   // private Comunidad comunidad;
-
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "comunidad_id", nullable = false)
+   private Comunidad comunidad;
 }

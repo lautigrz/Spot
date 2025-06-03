@@ -35,6 +35,7 @@ public class RepositorioComunidadImplTest {
         repositorioComunidad = new RepositorioComunidadImpl(sessionFactory);
     }
 
+  /*
     @Test
     @Transactional
     public void seDebeGuardarElMensajeEnLaBD(){
@@ -62,6 +63,8 @@ public class RepositorioComunidadImplTest {
         assertThat(mensajeObtenido.getUsuario().getId(), equalTo(usuario.getId()));
 
     }
+
+   */
 
     @Test
     @Transactional

@@ -24,22 +24,25 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
     }
 
     @Override
-    public void guardarMensajeDeLaComunidad(String contenido, Long idUsuario) {
+    public void guardarMensajeDeLaComunidad(String contenido, Long idUsuario,Long idComunidad) {
 
         Usuario usuario = sessionFactory.getCurrentSession().get(Usuario.class, idUsuario);
+        Comunidad comunidad = sessionFactory.getCurrentSession().get(Comunidad.class, idComunidad);
+
         Mensaje mensaje = new Mensaje();
         mensaje.setTexto(contenido);
         mensaje.setUsuario(usuario);
+
+        comunidad.agregarMensaje(mensaje);
 
         sessionFactory.getCurrentSession().save(mensaje);
     }
 
     @Override
-    public List<Mensaje> obtenerMensajesDeComunidad() {
-        String hql = "SELECT m FROM Mensaje m JOIN FETCH m.usuario";
-        return sessionFactory.getCurrentSession()
-                .createQuery(hql, Mensaje.class)
-                .getResultList();
+    public List<Mensaje> obtenerMensajesDeComunidad(Long id) {
+        Comunidad comunidad = sessionFactory.getCurrentSession().get(Comunidad.class, id);
+        comunidad.getMensajes().size();  // forzamos la carga
+        return comunidad.getMensajes();
     }
 
     @Override

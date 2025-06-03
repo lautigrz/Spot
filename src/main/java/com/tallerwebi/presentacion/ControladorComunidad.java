@@ -43,47 +43,48 @@ public class ControladorComunidad {
         return "lista-comunidades";
     }
 
-
     @MessageMapping("/chat.repro")
     @SendToUser("/queue/playback")
-    public Sincronizacion sincronizar(@Payload ChatMessage message) throws Exception {
-        // o podés devolver un Synchronize vacío o con error, depende de tu diseño
+    public Sincronizacion sincronizar(@Payload ChatMessage message,
+                                      SimpMessageHeaderAccessor headerAccessor) {
+        try {
+            System.out.println("Entró a sincronizar");
 
-        Sincronizacion sincronizacion = null;
+            String username = (String) headerAccessor.getSessionAttributes().get("usuario");
 
-        try{
-            System.out.println("Entroo a sincronizar");
-            sincronizacion = servicioComunidad.obtenerSincronizacion("lautigrz");
-        }catch (Exception e){
+            String usuario = servicioComunidad.obtenerUsuarioDeLaComunidadActivoDeLaLista(message.getId(), username);
+
+            return servicioComunidad.obtenerSincronizacion(usuario);
+
+        } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Error al obtener la sincronizacion");
+            System.out.println("Error al obtener la sincronización");
+            return null;
         }
-
-        return sincronizacion;
     }
 
 
-    @GetMapping("/reproducir")
-    public String reproducirMusica(HttpSession session) {
-        // Obtener el objeto spotifyApi de la sesión
 
+    @GetMapping("/reproducir/{idComunidad}")
+    public String reproducirMusica(HttpSession session, @PathVariable String idComunidad) {
         try {
             String token = (String) session.getAttribute("token");
             servicioComunidad.reproducirCancion(token);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return "redirect:/comunidad";
+        // Redirigir a la página de la comunidad usando el idComunidad recibido
+        return "redirect:/comunidad/" + idComunidad;
     }
+
 
     @MessageMapping("/chat.register/{idComunidad}")
     public void register(@Payload ChatMessage message,
                          @DestinationVariable String idComunidad,
                          SimpMessageHeaderAccessor headerAccessor) {
 
-        servicioComunidad.register(message, headerAccessor);
+        servicioComunidad.registrarUsuarioEnCanalDeComunidad(message, headerAccessor, idComunidad);
 
         // Enviar manualmente el mensaje al canal de esa comunidad
         messagingTemplate.convertAndSend("/topic/" + idComunidad, message);
@@ -95,13 +96,13 @@ public class ControladorComunidad {
 
         try {
             Long id = Long.parseLong(message.getId());
-            ChatMessage response = servicioComunidad.send(message, id);
-
+            Long idComuni = Long.parseLong(idComunidad);
+            ChatMessage response = servicioComunidad.guardarMensaje(message, id, idComuni);
             messagingTemplate.convertAndSend("/topic/" + idComunidad, response);
         } catch (NumberFormatException e) {
-            // Log y manejo de error
+
             System.err.println("ID de usuario inválido: " + message.getId());
-            // Podrías enviar un mensaje de error o ignorar
+
         }
     }
 
@@ -112,12 +113,12 @@ public class ControladorComunidad {
 
         String user = (String) session.getAttribute("user");
 
-        String nombreComunidad = servicioComunidad.obtenerComunidad(id).getNombre();
+        List<Mensaje> mensajes = servicioComunidad.obtenerMensajes(id);
 
         Usuario usuario = servicioComunidad.obtenerUsuarioDeLaComunidad(user);
-        List<Mensaje> mensajes = servicioComunidad.obtenerMensajes();
 
-        Boolean com = servicioComunidad.hayAlguienEnLaComunidad(nombreComunidad, user);
+        String d = String.valueOf(id);
+        Boolean com = servicioComunidad.hayAlguienEnLaComunidad(d, user);
 
         System.out.println("validacion:" + com);
 
@@ -129,7 +130,6 @@ public class ControladorComunidad {
         model.addAttribute("id", usuario.getId());
         model.addAttribute("token", usuario.getToken());
         model.addAttribute("mensajes", mensajes);
-
         return "comunidad-general";
     }
 }

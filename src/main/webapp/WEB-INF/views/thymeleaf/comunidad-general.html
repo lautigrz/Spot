@@ -177,12 +177,11 @@
 
                     <div class="d-flex justify-content-between">
                         <a href="#" class="btn btn-light btn-sm">Unirme a la comunidad</a>
-                        <a href="#" id="sincronizar"  class="btn btn-spotify btn-sm"
-                           th:if="${hayUsuarios}">
+                        <button id="sincronizar" class="btn btn-spotify btn-sm" th:if="${hayUsuarios}">
                             <i class="fas fa-headphones me-2"></i> Sincronizarme a escuchar
-                        </a>
+                        </button>
 
-                        <a href="#" th:href="@{/reproducir}" class="btn btn-spotify btn-sm"
+                        <a href="#" th:href="@{/reproducir/{id}(id=${comunidad})}" class="btn btn-spotify btn-sm"
                            th:unless="${hayUsuarios}">
                             <i class="fas fa-play me-2"></i> Empezar reproducción
 
@@ -235,7 +234,7 @@
             <!-- Notificación -->
             <div class="d-flex align-items-center notificacion mb-1 ms-auto">
                 <i class="fa-solid fa-bell fa-lg mx-3"></i>
-                <img src="https://i.pinimg.com/originals/c8/9e/06/c89e0643a40ef6c46c7ab77272941897.jpg" class="rounded-profile" alt="profile">
+                <img th:src="@{${urlFoto}}" class="rounded-profile" alt="profile">
             </div>
 
 
@@ -382,6 +381,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script th:src="@{/js/comunidad.js}"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('cerrar').addEventListener('click', function() {
