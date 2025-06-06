@@ -21,29 +21,23 @@ public class Comunidad {
     private String descripcion;
     private String nombreCancion;
 
-   /* @ManyToMany
-    @JoinTable(
-            name = "comunidad_playlist",
-            joinColumns = @JoinColumn(name = "comunidad_id"),
-            inverseJoinColumns = @JoinColumn(name = "playlist_id")
-    )
-    private List<Playlist> playlist = new ArrayList<>();
-
-    */
-
     @OneToMany(mappedBy = "comunidad", fetch = FetchType.LAZY)
     private List<Mensaje> mensajes = new ArrayList<>();
 
     @ManyToMany(mappedBy = "comunidades", fetch = FetchType.LAZY)
     private Set<Usuario> usuarios = new HashSet<>();
 
-    @Column(nullable = false, unique = true, updatable = false)
-
-
+    @OneToMany(mappedBy = "comunidad", fetch = FetchType.LAZY)
+    private List<Playlist> playlists = new ArrayList<>();
 
     public void agregarMensaje(Mensaje mensaje) {
         mensajes.add(mensaje);
         mensaje.setComunidad(this); // ← este es el punto clave
+    }
+
+    public void agregarPlaylist(Playlist playlist) {
+        playlists.add(playlist);
+        playlist.setComunidad(this);
     }
 
     @Override

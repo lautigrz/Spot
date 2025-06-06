@@ -3,9 +3,11 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.Cancion;
 import com.tallerwebi.dominio.RepositorioCancion;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 @Repository
@@ -17,7 +19,6 @@ public class ReposiorioCancionImpl implements RepositorioCancion {
     public ReposiorioCancionImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
-
 
     @Override
     public void guardarCancion(Cancion cancion) {
@@ -31,11 +32,21 @@ public class ReposiorioCancionImpl implements RepositorioCancion {
 
     @Override
     public List<Cancion> obtenerTodas() {
-        return List.of();
+        Query query = sessionFactory.getCurrentSession().createQuery("from Cancion");
+        return query.list();
     }
 
     @Override
     public void eliminarCancion(Long id) {
+        sessionFactory.getCurrentSession().delete(obtenerPorId(id));
+    }
 
+    @Override
+    public Cancion buscarCancionPorElIdDeSpotify(Long sporifyId) {
+        String hql = "FROM Cancion c WHERE c.spotifyId = :spotifyId";
+        Query<Cancion> query = sessionFactory.getCurrentSession().createQuery(hql, Cancion.class);
+        query.setParameter("spotifyId", sporifyId);
+
+        return query.uniqueResult();
     }
 }

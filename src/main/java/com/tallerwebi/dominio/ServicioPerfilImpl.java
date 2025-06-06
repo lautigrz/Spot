@@ -21,10 +21,10 @@ import java.util.List;
 @Service
 public class ServicioPerfilImpl implements ServicioPerfil {
 
-    private ServicioSpotify spotify;
+    private ServicioInstancia spotify;
 
     @Autowired
-    public ServicioPerfilImpl(ServicioSpotify spotify) {
+    public ServicioPerfilImpl(ServicioInstancia spotify) {
         this.spotify = spotify;
     }
 
@@ -33,14 +33,14 @@ public class ServicioPerfilImpl implements ServicioPerfil {
     @Override
     public User obtenerPerfilUsuario(String token, String refreshToken) throws Exception {
 
-        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
         User user = spotifyApi.getCurrentUsersProfile().build().execute();
         return user;
     }
 
     @Override
     public Integer obtenerCantidadDeArtistaQueSigueElUsuario(String token, String refreshToken) throws Exception {
-        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
         GetUsersFollowedArtistsRequest followed = spotifyApi.getUsersFollowedArtists(type).build();
 
         PagingCursorbased<Artist> artists = followed.execute();
@@ -50,7 +50,7 @@ public class ServicioPerfilImpl implements ServicioPerfil {
 
     @Override
     public List<Artist> obtenerMejoresArtistasDelUsuario(String token, String refreshToken) throws Exception {
-        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
         GetUsersTopArtistsRequest getUsersTopArtistsRequest = spotifyApi.getUsersTopArtists().limit(10).build();
         Paging<Artist> artists = getUsersTopArtistsRequest.execute();
 
@@ -64,7 +64,7 @@ public class ServicioPerfilImpl implements ServicioPerfil {
     @Override
     public List<PlaylistSimplified> obtenerNombreDePlaylistDelUsuario(String token, String refreshToken) throws Exception {
 
-        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
 
         GetListOfCurrentUsersPlaylistsRequest playlist = spotifyApi.getListOfCurrentUsersPlaylists().build();
 
@@ -80,7 +80,7 @@ public class ServicioPerfilImpl implements ServicioPerfil {
 
     @Override
     public Integer obtenerCantidadDePlaylistDelUsuario(String token, String refreshToken) throws Exception {
-        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
 
         GetListOfCurrentUsersPlaylistsRequest playlist = spotifyApi.getListOfCurrentUsersPlaylists().build();
 
@@ -92,7 +92,7 @@ public class ServicioPerfilImpl implements ServicioPerfil {
     @Override
     public Track obtenerReproduccionActualDelUsuario(String token, String refreshToken) throws Exception {
         Track track = null;
-        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
 
         GetUsersCurrentlyPlayingTrackRequest currentlyPlayingTrackRequest = spotifyApi.getUsersCurrentlyPlayingTrack().build();
 
@@ -100,13 +100,7 @@ public class ServicioPerfilImpl implements ServicioPerfil {
 
         if(currentlyPlaying != null && currentlyPlaying.getItem() instanceof Track) {
             track = (Track) currentlyPlaying.getItem();
-
         }
-
         return track;
     }
-
-
-
-
 }

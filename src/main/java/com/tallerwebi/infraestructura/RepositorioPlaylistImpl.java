@@ -25,7 +25,10 @@ public class RepositorioPlaylistImpl implements RepositorioPlaylist {
 
     public void agregarPlaylist(Playlist playlist, List<Cancion> canciones) {
         for (Cancion cancion : canciones) {
-            playlist.getCanciones().add(cancion);
+            if (cancion != null) {
+                playlist.getCanciones().add(cancion);
+                cancion.getPlaylists().add(playlist);
+            }
         }
         sessionFactory.getCurrentSession().saveOrUpdate(playlist);
     }
@@ -43,6 +46,8 @@ public class RepositorioPlaylistImpl implements RepositorioPlaylist {
     @Override
     public void eliminarCancionALaPlaylist(Long id, Cancion cancion) {
 
+        Playlist playlist = obtenerPlaylist(id);
+        playlist.getCanciones().remove(cancion);
     }
 
     @Override
