@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {HibernateInfraestructuraTestConfig.class})
+@Transactional
 public class RepositorioUsuarioImplTest {
 
     @Autowired
@@ -30,7 +32,7 @@ public class RepositorioUsuarioImplTest {
     }
 
     @Test
-    @Transactional
+    @Rollback
     public void seDebeObtenerElUsuarioPorSuUser(){
         Usuario usuario = new Usuario();
         usuario.setUser("lautigrz");
@@ -43,6 +45,24 @@ public class RepositorioUsuarioImplTest {
         Usuario usuarioBuscado = repositorioUsuario.buscar(usuario.getUser());
 
         assertThat(usuario, equalTo(usuarioBuscado));
+
+    }
+
+    @Test
+    @Rollback
+    public void seDebeObtenerElUsuarioPorId(){
+        Usuario usuario = new Usuario();
+        usuario.setUser("lautigrz");
+        usuario.setToken("dad");
+        usuario.setRefreshToken("dsdasd");
+        usuario.setUrlFoto("ddas");
+
+        sessionFactory.getCurrentSession().save(usuario);
+
+        Usuario usuario1 = repositorioUsuario.buscarUsuarioPorId(usuario.getId());
+
+        assertThat(usuario, equalTo(usuario1));
+
 
     }
 

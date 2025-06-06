@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioAuth;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,9 +54,10 @@ public class ControladorAuth {
             session.setAttribute("refreshToken", credentials.getRefreshToken());
 
 
-           String usuario = servicioAuth.guardarUsuario(credentials.getAccessToken(), credentials.getRefreshToken());
+          UsuarioDto usuario = servicioAuth.guardarUsuario(credentials.getAccessToken(), credentials.getRefreshToken());
 
-           session.setAttribute("user", usuario);
+          session.setAttribute("user", usuario.getId());
+
         } catch (Exception e) {
             e.printStackTrace();
             return "redirect:/login";

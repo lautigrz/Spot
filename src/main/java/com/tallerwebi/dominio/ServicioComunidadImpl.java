@@ -3,6 +3,7 @@ package com.tallerwebi.dominio;
 import com.google.gson.JsonParser;
 import com.tallerwebi.presentacion.dto.ChatMessage;
 import com.tallerwebi.presentacion.dto.Sincronizacion;
+import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.apache.hc.core5.http.ParseException;
 import org.hibernate.annotations.Synchronize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,19 +24,41 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     private static final Map<String, List<String>> canales = new HashMap<>();
 
     private SpotifyApi spotifyApi;
-    private RepositorioUsuario repositorioUsuario;
     private RepositorioComunidad repositorioComunidad;
+    private RepositorioUsuario repositorioUsuario;
 
     @Autowired
-    public ServicioComunidadImpl(RepositorioUsuario repositorioUsuario, RepositorioComunidad repositorioComunidad, SpotifyApi spotifyApi) {
-        this.repositorioUsuario = repositorioUsuario;
+    public ServicioComunidadImpl(RepositorioUsuario repositorioUsuario ,RepositorioComunidad repositorioComunidad, SpotifyApi spotifyApi) {
         this.spotifyApi = spotifyApi;
+        this.repositorioUsuario = repositorioUsuario;
         this.repositorioComunidad = repositorioComunidad;
     }
 
     @Override
-    public void guardarUsuarioEnComunidad() {
+    public Boolean guardarUsuarioEnComunidad(Long idUsuario, Long idComunidad) {
 
+        Usuario usuarioEncontrado = repositorioUsuario.buscarUsuarioPorId(idUsuario);
+
+        if(usuarioEncontrado == null){
+            return false;
+        }
+        return repositorioComunidad.guardarUsuarioEnComunidad(usuarioEncontrado, idComunidad);
+    }
+
+    @Override
+    public UsuarioDto obtenerUsuarioDeLaComunidad(Long idUsuario, Long idComunidad) {
+        Usuario usuario = repositorioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
+
+        if(usuario == null){
+            return null;
+        }
+        UsuarioDto usuarioDto = new UsuarioDto();
+        usuarioDto.setId(usuario.getId());
+        usuarioDto.setUser(usuario.getUser());
+        usuarioDto.setToken(usuario.getToken());
+        usuarioDto.setUrlFoto(usuario.getUrlFoto());
+
+        return usuarioDto;
     }
 
     @Override
@@ -47,6 +70,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     @Override
     public ChatMessage registrarUsuarioEnCanalDeComunidad(ChatMessage message, SimpMessageHeaderAccessor simpMessageHeaderAccessor, String idComunidad) {
         try {
+
             simpMessageHeaderAccessor.getSessionAttributes().put("usuario", message.getSender());
 
             String username = (String) simpMessageHeaderAccessor.getSessionAttributes().get("usuario");
@@ -68,29 +92,19 @@ public class ServicioComunidadImpl implements ServicioComunidad {
         return message;
     }
 
-    // falta test
     @Override
     public ChatMessage guardarMensaje(ChatMessage message, Long idUsuario, Long idComunidad) {
         try {
             repositorioComunidad.guardarMensajeDeLaComunidad(message.getContent(), idUsuario,idComunidad);
-            System.out.println("Mensaje guardado correctamente");
+            return message;
         } catch (Exception e) {
             System.out.println("Error al guardar el mensaje: " + e.getMessage());
             e.printStackTrace();
         }
-        return message;
+        return new ChatMessage();
     }
 
-    @Override
-    public void conectarmeALaComunidad(Usuario usuario) {
-
-    }
-
-    @Override
-    public Usuario obtenerUsuarioDeLaComunidad(String user) {
-        return repositorioUsuario.buscar(user);
-    }
-
+    //falta test
     @Override
     public String obtenerUsuarioDeLaComunidadActivoDeLaLista(String canal, String user) {
 
@@ -101,7 +115,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
                 return usuario;
             }
         }
-        return null;
+        return "";
     }
 
     @Override
@@ -109,6 +123,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
         return repositorioComunidad.obtenerComunidad(id);
     }
 
+    //falta test
     @Override
     public Boolean reproducirCancion(String token) throws Exception {
 
@@ -128,10 +143,11 @@ public class ServicioComunidadImpl implements ServicioComunidad {
         throw new Exception();
     }
 
+    //falta test
     @Override
-    public Sincronizacion obtenerSincronizacion(String user) throws Exception {
+    public Sincronizacion obtenerSincronizacion(String user, Long idComunidad) throws Exception {
 
-            String token = obtenerTokenDelUsuario(user);
+            String token = obtenerTokenDelUsuario(user, idComunidad);
             int ms = obtenerPosicionEnMsDeLoQueEscucha(token);
             ms+=500;
             System.out.println("Ms: " + ms);
@@ -145,15 +161,16 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
     }
 
+    //falta test
     @Override
     public int obtenerPosicionEnMsDeLoQueEscucha(String token) throws IOException, ParseException, SpotifyWebApiException {
-        CurrentlyPlaying playing = null;
+
         try {
             spotifyApi = new SpotifyApi.Builder()
                     .setAccessToken(token)
                     .build();
 
-            playing = spotifyApi.getUsersCurrentlyPlayingTrack()
+            CurrentlyPlaying playing = spotifyApi.getUsersCurrentlyPlayingTrack()
                     .build().execute();
 
             System.out.println("Position");
@@ -167,11 +184,13 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
     }
 
+    //falta test
     @Override
-    public String obtenerTokenDelUsuario(String user) {
-        return repositorioComunidad.obtenerTokenDelUsuario(user);
+    public String obtenerTokenDelUsuario(String user, Long idComunidad) {
+        return repositorioComunidad.obtenerTokenDelUsuarioQuePerteneceAUnaComunidad(user, idComunidad);
     }
 
+    //falta test
     @Override
     public Boolean hayAlguienEnLaComunidad(String nombreComunidad, String user) {
         List<String> usuarios = canales.get(nombreComunidad);

@@ -3,6 +3,7 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.RepositorioAuth;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
+import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,7 @@ public class RepositorioAuthImplTest {
         usuario.setRefreshToken("dsdasd");
         usuario.setUrlFoto("ddas");
 
-        repositorioAuth.guardar(usuario);
+       UsuarioDto usuarioDto = repositorioAuth.guardar(usuario);
 
         String hql = "from Usuario where id = :id";
         Query query = sessionFactory.getCurrentSession().createQuery(hql);
@@ -45,6 +46,7 @@ public class RepositorioAuthImplTest {
         Usuario usuarioGuardado = (Usuario) query.uniqueResult();
 
         assertThat(usuario, equalTo(usuarioGuardado));
+        assertThat(usuarioDto.getId(), equalTo(usuarioGuardado.getId()));
 
     }
 }

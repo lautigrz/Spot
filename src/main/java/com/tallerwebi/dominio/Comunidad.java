@@ -6,10 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -34,12 +31,30 @@ public class Comunidad {
 
     */
 
-    @OneToMany(mappedBy = "comunidad", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "comunidad", fetch = FetchType.LAZY)
     private List<Mensaje> mensajes = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "comunidades", fetch = FetchType.LAZY)
+    private Set<Usuario> usuarios = new HashSet<>();
+
+    @Column(nullable = false, unique = true, updatable = false)
+
+
 
     public void agregarMensaje(Mensaje mensaje) {
         mensajes.add(mensaje);
         mensaje.setComunidad(this); // ← este es el punto clave
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Comunidad comunidad = (Comunidad) o;
+        return Objects.equals(id, comunidad.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

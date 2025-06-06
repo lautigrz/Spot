@@ -8,7 +8,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-@Repository("repositorioUsuario")
+@Repository
 public class RepositorioUsuarioImpl implements RepositorioUsuario {
 
     private SessionFactory sessionFactory;
@@ -18,15 +18,7 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
         this.sessionFactory = sessionFactory;
     }
     //falta testear
-    @Override
-    public Usuario buscarUsuario(String email, String password) {
 
-        final Session session = sessionFactory.getCurrentSession();
-        return (Usuario) session.createCriteria(Usuario.class)
-                .add(Restrictions.eq("email", email))
-                .add(Restrictions.eq("password", password))
-                .uniqueResult();
-    }
     @Override
     public Usuario buscar(String user) {
         return (Usuario) sessionFactory.getCurrentSession().createCriteria(Usuario.class)
@@ -35,7 +27,10 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
     }
 
     @Override
-    public void modificar(Usuario usuario) {
-        sessionFactory.getCurrentSession().update(usuario);
+    public Usuario buscarUsuarioPorId(Long id) {
+
+        return (Usuario) sessionFactory.getCurrentSession().get(Usuario.class, id);
     }
+
+
 }

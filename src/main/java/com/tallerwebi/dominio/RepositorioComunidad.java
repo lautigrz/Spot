@@ -1,5 +1,7 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.presentacion.dto.UsuarioDto;
+
 import java.util.List;
 
 public interface RepositorioComunidad {
@@ -8,6 +10,8 @@ public interface RepositorioComunidad {
     void guardarNuevaComunidad(Comunidad comunidad);
     List<Comunidad> obtenerComunidades();
     Comunidad obtenerComunidad(Long id);
-    String obtenerTokenDelUsuario(String user);
-
+    String obtenerTokenDelUsuarioQuePerteneceAUnaComunidad(String user, Long idComunidad);
+    Boolean guardarUsuarioEnComunidad(Usuario usuario,Long idComunidad);
+    Usuario obtenerUsuarioEnComunidad(Long idUsuario, Long idComunidad);
+    Comunidad  obtenerComunidadConUsuarios(Long idComunidad);
 }

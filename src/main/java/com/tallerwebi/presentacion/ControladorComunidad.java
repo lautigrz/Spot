@@ -1,28 +1,26 @@
 package com.tallerwebi.presentacion;
-
-import com.google.gson.JsonParser;
-import com.tallerwebi.dominio.Mensaje;
 import com.tallerwebi.dominio.ServicioComunidad;
-import com.tallerwebi.dominio.Usuario;
+
 import com.tallerwebi.presentacion.dto.ChatMessage;
 import com.tallerwebi.presentacion.dto.Sincronizacion;
-import org.hibernate.annotations.Synchronize;
+import com.tallerwebi.presentacion.dto.UsuarioDto;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SendToUser;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.requests.data.player.StartResumeUsersPlaybackRequest;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 
 import javax.servlet.http.HttpSession;
-import java.security.Principal;
-import java.util.Collections;
-import java.util.List;
 
 @Controller
 public class ControladorComunidad {
@@ -43,35 +41,39 @@ public class ControladorComunidad {
         return "lista-comunidades";
     }
 
-    @MessageMapping("/chat.repro")
-    @SendToUser("/queue/playback")
-    public Sincronizacion sincronizar(@Payload ChatMessage message,
-                                      SimpMessageHeaderAccessor headerAccessor) {
+    @PostMapping("/sincronizarme/{idComunidad}")
+    @ResponseBody
+    public ResponseEntity<?> sincronizar(@Payload ChatMessage message, @PathVariable Long idComunidad) {
+
+
         try {
             System.out.println("Entró a sincronizar");
 
-            String username = (String) headerAccessor.getSessionAttributes().get("usuario");
+            //String username = (String) headerAccessor.getSessionAttributes().get("usuario");
 
-            String usuario = servicioComunidad.obtenerUsuarioDeLaComunidadActivoDeLaLista(message.getId(), username);
+            String usuario = servicioComunidad.obtenerUsuarioDeLaComunidadActivoDeLaLista(String.valueOf(idComunidad), message.getSender());
 
-            return servicioComunidad.obtenerSincronizacion(usuario);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    servicioComunidad.obtenerSincronizacion(usuario,idComunidad)
+            );
 
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Error al obtener la sincronización");
-            return null;
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new Sincronizacion());
         }
     }
-
-
 
     @GetMapping("/reproducir/{idComunidad}")
     public String reproducirMusica(HttpSession session, @PathVariable String idComunidad) {
         try {
             String token = (String) session.getAttribute("token");
             servicioComunidad.reproducirCancion(token);
+
         } catch (Exception e) {
             e.printStackTrace();
+            return "redirect:/error";
         }
 
         // Redirigir a la página de la comunidad usando el idComunidad recibido
@@ -100,36 +102,62 @@ public class ControladorComunidad {
             ChatMessage response = servicioComunidad.guardarMensaje(message, id, idComuni);
             messagingTemplate.convertAndSend("/topic/" + idComunidad, response);
         } catch (NumberFormatException e) {
-
             System.err.println("ID de usuario inválido: " + message.getId());
-
         }
     }
-
-
 
     @GetMapping("/comunidad/{id}")
     public String comunidad(Model model, HttpSession session, @PathVariable Long id) {
 
-        String user = (String) session.getAttribute("user");
+        Long idUsuario = (Long) session.getAttribute("user");
+        String idComunidad = String.valueOf(id);
+        UsuarioDto usuarioDto = servicioComunidad.obtenerUsuarioDeLaComunidad(idUsuario, id);
+        boolean estaEnComunidad = false;
 
-        List<Mensaje> mensajes = servicioComunidad.obtenerMensajes(id);
-
-        Usuario usuario = servicioComunidad.obtenerUsuarioDeLaComunidad(user);
-
-        String d = String.valueOf(id);
-        Boolean com = servicioComunidad.hayAlguienEnLaComunidad(d, user);
-
-        System.out.println("validacion:" + com);
-
-        model.addAttribute("hayUsuarios", com);
+        if(usuarioDto != null){
+            model.addAttribute("usuario", usuarioDto.getUser());
+            model.addAttribute("urlFoto", usuarioDto.getUrlFoto());
+            model.addAttribute("id", usuarioDto.getId());
+            model.addAttribute("token", usuarioDto.getToken());
+            model.addAttribute("hayUsuarios", servicioComunidad.hayAlguienEnLaComunidad(idComunidad, usuarioDto.getUser()));
+            model.addAttribute("mensajes", servicioComunidad.obtenerMensajes(id));
+            System.out.println("usuario:" + servicioComunidad.hayAlguienEnLaComunidad(idComunidad, usuarioDto.getUser()));
+            estaEnComunidad = true;
+        }
 
         model.addAttribute("comunidad", id);
-        model.addAttribute("usuario", usuario.getUser());
-        model.addAttribute("urlFoto", usuario.getUrlFoto());
-        model.addAttribute("id", usuario.getId());
-        model.addAttribute("token", usuario.getToken());
-        model.addAttribute("mensajes", mensajes);
+        model.addAttribute("estaEnComunidad", estaEnComunidad);
+
         return "comunidad-general";
     }
+
+
+    //ResponseEntity clase de Spring que representa toda la respuesta HTTP
+    @GetMapping("/unirme/{idComunidad}")
+    public String unirme(HttpSession session, @PathVariable Long idComunidad) {
+        Long idUsuario = (Long) session.getAttribute("user");
+        Boolean seGuardo = servicioComunidad.guardarUsuarioEnComunidad(idUsuario,idComunidad);
+
+        if(!seGuardo){
+
+            return "redirect:/error";
+
+        }
+
+        return "redirect:/comunidad/" + idComunidad;
+    }
+
+    @GetMapping("/usuario-en-comunidad/{idUsuario}/{idComunidad}")
+    @ResponseBody
+    public ResponseEntity<?> usuarioEnComunidad(@PathVariable Long idUsuario, @PathVariable Long idComunidad) {
+
+        UsuarioDto usuarioDto = servicioComunidad.obtenerUsuarioDeLaComunidad(idUsuario, idComunidad);
+
+        if(usuarioDto == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.infraestructura.RepositorioAuthImpl;
+import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +52,7 @@ public class ServicioAuthImpl implements ServicioAuth {
     }
 
     @Override
-    public String guardarUsuario(String token, String refreshToken) throws Exception {
+    public UsuarioDto guardarUsuario(String token, String refreshToken) throws Exception {
 
             User user = obtenerPerfilUsuario(token, refreshToken);
 
@@ -64,9 +65,8 @@ public class ServicioAuthImpl implements ServicioAuth {
             usuario.setRefreshToken(refreshToken);
             usuario.setUrlFoto(user.getImages()[0].getUrl());
 
-        this.repositorioAuth.guardar(usuario);
 
-        return usuario.getUser();
+        return this.repositorioAuth.guardar(usuario);
     }
 
     @Override

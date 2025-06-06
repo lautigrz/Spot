@@ -1,6 +1,8 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.presentacion.dto.UsuarioDto;
+
 public interface RepositorioAuth {
-    void guardar(Usuario usuario);
+    UsuarioDto guardar(Usuario usuario);
 
 }

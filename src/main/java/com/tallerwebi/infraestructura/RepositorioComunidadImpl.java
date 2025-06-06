@@ -26,8 +26,8 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
     @Override
     public void guardarMensajeDeLaComunidad(String contenido, Long idUsuario,Long idComunidad) {
 
-        Usuario usuario = sessionFactory.getCurrentSession().get(Usuario.class, idUsuario);
-        Comunidad comunidad = sessionFactory.getCurrentSession().get(Comunidad.class, idComunidad);
+        Usuario usuario = obtenerUsuarioEnComunidad(idUsuario,idComunidad);
+        Comunidad comunidad = obtenerComunidad(idComunidad);
 
         Mensaje mensaje = new Mensaje();
         mensaje.setTexto(contenido);
@@ -40,7 +40,7 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
 
     @Override
     public List<Mensaje> obtenerMensajesDeComunidad(Long id) {
-        Comunidad comunidad = sessionFactory.getCurrentSession().get(Comunidad.class, id);
+        Comunidad comunidad = obtenerComunidad(id);
         comunidad.getMensajes().size();  // forzamos la carga
         return comunidad.getMensajes();
     }
@@ -62,13 +62,65 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
         return sessionFactory.getCurrentSession().get(Comunidad.class, id);
     }
 
+    //falta test
     @Override
-    public String obtenerTokenDelUsuario(String user) {
-        String hql = "SELECT u.token FROM Usuario u WHERE u.user = :usuario";
-        TypedQuery<String> query = sessionFactory.getCurrentSession().createQuery(hql, String.class);
-        query.setParameter("usuario", user);
+    public String obtenerTokenDelUsuarioQuePerteneceAUnaComunidad(String user, Long idComunidad) {
+        String hql = "SELECT u.token FROM Usuario u " +
+                "JOIN u.comunidades c " +
+                "WHERE u.user = :username AND c.id = :idComunidad";
 
-        return query.getSingleResult(); // o getResultList() si esperás múltiples resultados
+        return sessionFactory.getCurrentSession()
+                .createQuery(hql, String.class)
+                .setParameter("username", user)
+                .setParameter("idComunidad", idComunidad)
+                .uniqueResult();
 
+    }
+
+    @Override
+    public Boolean guardarUsuarioEnComunidad(Usuario usuario, Long idComunidad) {
+        try {
+            Comunidad comunidad = obtenerComunidad(idComunidad);
+            if (comunidad == null) return false;
+
+            usuario.getComunidades().add(comunidad);
+            comunidad.getUsuarios().add(usuario);
+
+            sessionFactory.getCurrentSession().saveOrUpdate(comunidad);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public Usuario obtenerUsuarioEnComunidad(Long idUsuario,Long idComunidad) {
+
+        Comunidad comunidad = obtenerComunidadConUsuarios(idComunidad);
+
+        if (comunidad == null) {
+            return null;
+        }
+
+        for (Usuario usuario : comunidad.getUsuarios()) {
+            if (usuario.getId().equals(idUsuario)) return usuario;
+        }
+
+        return null;
+    }
+
+    @Override
+    public Comunidad obtenerComunidadConUsuarios(Long idComunidad) {
+
+        String hql = "FROM Comunidad c JOIN FETCH c.usuarios WHERE c.id = :idComunidad";
+
+        Query query = sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("idComunidad", idComunidad);
+
+        Comunidad comunidad = (Comunidad) query.uniqueResult();
+
+        return comunidad;
     }
 }

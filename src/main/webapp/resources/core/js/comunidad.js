@@ -1,9 +1,9 @@
-"user static";
 
 var messageInput = document.querySelector("#mensajeInput");
 var messageArea = document.querySelector("#mensajeVista");
 var messageForm = document.getElementById("enviar");
 var stompClient = null;
+
 
 function connect() {
 
@@ -14,6 +14,7 @@ function connect() {
         idComunidad: document.getElementById("comunidad").value
     }
 
+
     var socket = new SockJS("/spring/websocket");
     stompClient = Stomp.over(socket);
 
@@ -22,6 +23,8 @@ function connect() {
     stompClient.connect({}, function(frame) {
         onConnected(datos);
     }, onError);
+
+
 }
 
 function onError(error) {
@@ -37,23 +40,6 @@ function onConnected(datos) {
         {},
         JSON.stringify({sender: datos.username, type: "JOIN"}),
     );
-}
-
-
-function conectarAlCanalDeSincronizacion(){
-    event.preventDefault();
-    console.log("Entro a conectar al canal de sincronizacion");
-
-    let username = document.getElementById("username").value;
-    let idComunidad = document.getElementById("comunidad").value;
-
-    stompClient.subscribe("/user/queue/playback", sincronizarSpotify);
-
-    stompClient.send(
-        "/app/chat.repro",
-        {},
-        JSON.stringify({sender: username ,type: "JOIN", id:idComunidad}),
-    )
 }
 
 function send(event){
@@ -152,10 +138,12 @@ function crearMensajeHTML(message) {
     return container;
 }
 
+
+
 function sincronizarSpotify(payload) {
     // Usamos la Spotify Web API para sincronizar la reproducción
-    console.log("entrooo");
-    const info = JSON.parse(payload.body);
+    console.log("entrooo" + payload);
+    const info = payload
 
     console.log(info.uris);
     const startTime = Date.now();
@@ -191,16 +179,92 @@ function sincronizarSpotify(payload) {
 
 }
 
-
 messageForm.addEventListener("click", send, true);
 window.addEventListener("load", function () {
     const btn = document.getElementById("sincronizar");
+    const sincronizarse = document.getElementById("sincronizarse");
     if (btn) {
         btn.addEventListener("click", conectarAlCanalDeSincronizacion);
     }
-    connect();
+
+    if (sincronizarse) {
+        sincronizarse.addEventListener("click", async () => {
+            let sincronizacion = await obtenerUnaSincronizacion();
+            sincronizarSpotify(sincronizacion);
+        });
+    }
+
+// se usa await que espera que la promesa termine
+    (async () => {
+        let estado = await existeUsuarioEnLaComunidad();
+        console.log("existe:" + estado);
+
+        if (estado) {
+            connect();
+        }
+    })();
+
 
 });
+
+
+
+async function obtenerUnaSincronizacion() {
+    const comunidad = document.getElementById("comunidad").value;
+    const username = document.getElementById("username").value;
+    const idUser = document.getElementById("id").value;
+
+    // Esto asume que ChatMessage espera algo como: sender, content, etc.
+    const message = {
+        sender: username,
+        content: "",
+        id: idUser
+    };
+
+    try {
+        const response = await fetch(`/spring/sincronizarme/${comunidad}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(message)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error de red: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Sincronización recibida:", data);
+
+
+        return data;
+
+    } catch (error) {
+        console.error("Error al sincronizar:", error);
+    }
+}
+
+//funcion asincrona para verificar si el usuario existe en la comunidad
+//devuelve una promesa (el resultado de si el usuario existe en la comunidad)
+
+async function existeUsuarioEnLaComunidad() {
+    let idUsuario = document.getElementById("id").value;
+    let idComunidad = document.getElementById("comunidad").value;
+
+    try {
+        let response = await fetch(`/spring/usuario-en-comunidad/${idUsuario}/${idComunidad}`);
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status}`);
+        }
+        let data = await response.text();
+        console.log("Usuario en comunidad existe:", data);
+        return true;
+    } catch (error) {
+        console.error("No se pudo verificar existencia:", error);
+        return false;
+    }
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     const heartIcons = document.querySelectorAll('.corazon');
@@ -220,4 +284,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
 

@@ -1,9 +1,8 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.enums.AuthorizationScope;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
@@ -15,6 +14,8 @@ import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfi
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 
 import static org.mockito.Mockito.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -53,6 +54,7 @@ public class ServicioAuthImplTest {
         // instancia del servicio pasando el mock
         servicio = new ServicioAuthImpl(mockSpotifyApi,repositorioAuthMock);
     }
+
 
     @Test
     public void debeConstruirLaUrlDeAutorizacion() throws Exception {
@@ -163,10 +165,96 @@ public class ServicioAuthImplTest {
         when(user.getDisplayName()).thenReturn("bitxp");
         when(user.getImages()).thenReturn(images);
         when(getCurrentUsersProfileRequest.execute()).thenReturn(user);
+        UsuarioDto usuarioDto = new UsuarioDto();
 
-        String username = servicio.guardarUsuario(autorizacion.getAccessToken(),autorizacion.getRefreshToken());
+        usuarioDto.setId(usuario.getId());
 
-       assertThat(username, is(equalTo("bitxp")));
+        when(repositorioAuthMock.guardar(any(Usuario.class))).thenReturn(usuarioDto);
+
+        UsuarioDto usuarioDto1 = servicio.guardarUsuario(autorizacion.getAccessToken(),autorizacion.getRefreshToken());
+
+       assertThat(usuarioDto1.getId(), equalTo(usuario.getId()));
+
+    }
+
+    @Test
+    public void debeLanzarUnaExcepcionAlPedirAlUsuarioDeSpotify() throws Exception {
+        Usuario usuario = new Usuario();
+        usuario.setUser("lauti");
+        usuario.setUrlFoto("htt://fds");
+
+        String code = "spot12";
+
+        //   Cuando se llama al metodo authorizationCode(code) en el mock de SpotifyApi
+
+        //    devuelve un builder para construir la petición de autorización,
+        //    entonces devolvemos el mock del builder 'mockRequestBuilder'
+        when(mockSpotifyApi.authorizationCode(code)).thenReturn(mockRequestBuilder);
+
+        // 3. Cuando se llama al metodo 'build()' en el builder (para construir la solicitud),
+        //    entonces devolvemos nuestro mock de la solicitud 'mockRequest'
+        when(mockRequestBuilder.build()).thenReturn(mockRequest);
+
+        // 4. Cuando se ejecuta la solicitud con 'execute()', se simula que devuelve
+        //    el objeto 'AuthorizationCodeCredentials' que contiene los datos de autenticación
+        when(mockRequest.execute()).thenReturn(mockCredentials);
+
+        // 5. Llamamos al metodo real que queremos probar
+        // el cual hace toda esa cadena de llamadas
+        AuthorizationCodeCredentials autorizacion = servicio.credentials(code);
+
+        when(mockSpotifyApiBuilder.setAccessToken(anyString())).thenReturn(mockSpotifyApiBuilder);
+        when(mockSpotifyApiBuilder.setRefreshToken(anyString())).thenReturn(mockSpotifyApiBuilder);
+        when(mockSpotifyApiBuilder.build()).thenReturn(mockSpotifyApi);
+
+        GetCurrentUsersProfileRequest.Builder getCurrentUsersProfileRequestBuilder = mock(GetCurrentUsersProfileRequest.Builder.class);
+        GetCurrentUsersProfileRequest getCurrentUsersProfileRequest = mock(GetCurrentUsersProfileRequest.class);
+
+        when(mockSpotifyApi.getCurrentUsersProfile()).thenReturn(getCurrentUsersProfileRequestBuilder);
+        when(getCurrentUsersProfileRequestBuilder.build()).thenReturn(getCurrentUsersProfileRequest);
+        User user = mock(User.class);
+
+        Image image = mock(Image.class);
+        when(image.getUrl()).thenReturn("http://ejemplo.url/image.jpg");
+
+        Image[] images = new Image[]{image};
+
+        when(user.getDisplayName()).thenReturn("bitxp");
+        when(user.getImages()).thenReturn(images);
+        when(getCurrentUsersProfileRequest.execute()).thenReturn(null);
+
+        UsuarioDto usuarioDto = new UsuarioDto();
+
+        usuarioDto.setId(usuario.getId());
+
+        when(repositorioAuthMock.guardar(any(Usuario.class))).thenReturn(usuarioDto);
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            servicio.guardarUsuario(autorizacion.getAccessToken(), autorizacion.getRefreshToken());
+        });
+
+        assertThat(exception.getMessage(), equalTo("Error al obtener el usuario"));
+
+    }
+
+    @Test
+    public void seDebeObtenerELPerfilDeSpotifyDelUsuario() throws Exception {
+        User user = mock(User.class);
+        when(user.getId()).thenReturn("spotify_user_123");
+
+        when(mockSpotifyApiBuilder.setAccessToken(anyString())).thenReturn(mockSpotifyApiBuilder);
+        when(mockSpotifyApiBuilder.setRefreshToken(anyString())).thenReturn(mockSpotifyApiBuilder);
+        when(mockSpotifyApiBuilder.build()).thenReturn(mockSpotifyApi);
+
+        GetCurrentUsersProfileRequest.Builder getCurrentUsersProfileRequestBuilder = mock(GetCurrentUsersProfileRequest.Builder.class);
+        GetCurrentUsersProfileRequest getCurrentUsersProfileRequest = mock(GetCurrentUsersProfileRequest.class);
+
+        when(mockSpotifyApi.getCurrentUsersProfile()).thenReturn(getCurrentUsersProfileRequestBuilder);
+        when(getCurrentUsersProfileRequestBuilder.build()).thenReturn(getCurrentUsersProfileRequest);
+        when(getCurrentUsersProfileRequest.execute()).thenReturn(user);
+
+        User user2 = servicio.obtenerPerfilUsuario("","");
+        assertThat(user2.getId(), equalTo("spotify_user_123"));
 
     }
 

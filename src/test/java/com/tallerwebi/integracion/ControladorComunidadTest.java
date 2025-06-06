@@ -1,5 +1,6 @@
 package com.tallerwebi.integracion;
 
+import com.tallerwebi.dominio.Comunidad;
 import com.tallerwebi.dominio.Mensaje;
 import com.tallerwebi.dominio.ServicioComunidad;
 import com.tallerwebi.dominio.Usuario;
@@ -7,6 +8,7 @@ import com.tallerwebi.integracion.config.HibernateTestConfig;
 import com.tallerwebi.integracion.config.SpringWebTestConfig;
 import com.tallerwebi.presentacion.ControladorComunidad;
 import com.tallerwebi.presentacion.dto.ChatMessage;
+import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,8 +53,6 @@ public class ControladorComunidadTest {
 
     }
 
-
-/*
     @Test
     public void debeMostrarVistaComunidadConDatosDelUsuario() throws Exception {
         // Preparar datos mock
@@ -60,36 +60,59 @@ public class ControladorComunidadTest {
         usuarioMock.setUser("lauti");
         usuarioMock.setUrlFoto("https://foto.jpg");
         usuarioMock.setToken("token123");
-        usuarioMock.setId(42L);  // fijate que seteas id también
+        usuarioMock.setId(42L);
+
+        Comunidad comunidadMock = new Comunidad();
+        comunidadMock.setNombre("Rock");
+        comunidadMock.setId(4L);
+        comunidadMock.getUsuarios().add(usuarioMock);
+        usuarioMock.getComunidades().add(comunidadMock);
 
         List<Mensaje> mensajesMock = List.of(
-                new Mensaje(1L, "Hola", usuarioMock),
-                new Mensaje(2L, "¿Qué tal?", usuarioMock)
+                new Mensaje(2L,"Hola",usuarioMock,comunidadMock),
+                new Mensaje(3L,"Hola",usuarioMock,comunidadMock)
         );
 
+        UsuarioDto usuarioDto = new UsuarioDto();
+        usuarioDto.setId(usuarioMock.getId());
+        usuarioDto.setUser(usuarioMock.getUser());
+        usuarioDto.setUrlFoto(usuarioMock.getUrlFoto());
+        usuarioDto.setToken(usuarioMock.getToken());
+
         // Definir comportamiento del mock
-        when(servicioComunidadMock.obtenerUsuarioDeLaComunidad(anyString())).thenReturn(usuarioMock);
-        when(servicioComunidadMock.obtenerMensajes()).thenReturn(mensajesMock);
+        when(servicioComunidadMock.obtenerUsuarioDeLaComunidad(usuarioMock.getId(), comunidadMock.getId()))
+                .thenReturn(usuarioDto);
+
+        when(servicioComunidadMock.hayAlguienEnLaComunidad(String.valueOf(comunidadMock.getId()), usuarioMock.getUser()))
+                .thenReturn(true);
+
+        when(servicioComunidadMock.obtenerMensajes(comunidadMock.getId()))
+                .thenReturn(mensajesMock);
 
         // Ejecutar y verificar
-        mockMvc.perform(get("/comunidad")
-                        .sessionAttr("user", usuarioMock.getUser()))
+        mockMvc.perform(get("/comunidad/{id}", comunidadMock.getId())
+                        .sessionAttr("user", usuarioMock.getId()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("comunidad-general"))
                 .andExpect(model().attribute("usuario", usuarioMock.getUser()))
                 .andExpect(model().attribute("urlFoto", usuarioMock.getUrlFoto()))
                 .andExpect(model().attribute("id", usuarioMock.getId()))
                 .andExpect(model().attribute("token", usuarioMock.getToken()))
-                .andExpect(model().attribute("mensajes", mensajesMock));
+                .andExpect(model().attribute("mensajes", mensajesMock))
+                .andExpect(model().attribute("hayUsuarios", true))
+                .andExpect(model().attribute("comunidad", comunidadMock.getId()))
+                .andExpect(model().attribute("estaEnComunidad", true));
 
-        // Verificar que los métodos mock fueron llamados
-        verify(servicioComunidadMock).obtenerUsuarioDeLaComunidad("lauti");
-        verify(servicioComunidadMock).obtenerMensajes();
+        // Verificaciones opcionales
+        verify(servicioComunidadMock).obtenerUsuarioDeLaComunidad(usuarioMock.getId(), comunidadMock.getId());
+       // verify(servicioComunidadMock).hayAlguienEnLaComunidad(String.valueOf(comunidadMock.getId()), usuarioMock.getUser());
+        verify(servicioComunidadMock).obtenerMensajes(comunidadMock.getId());
     }
 
 
 
-   /* @Test
+/*
+    @Test
     public void debeDelegarEnServicioYRetornarElMensaje() {
         // Arrange
         ChatMessage mensajeEnviado = new ChatMessage();
@@ -111,8 +134,6 @@ public class ControladorComunidadTest {
 
     }
 
-    */
-/*
     @Test
     public void debeDelegarEnServicioYRetornarElMensajeEsperado() {
         // Arrange

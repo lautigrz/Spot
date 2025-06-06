@@ -176,16 +176,19 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="#" class="btn btn-light btn-sm">Unirme a la comunidad</a>
-                        <button id="sincronizar" class="btn btn-spotify btn-sm" th:if="${hayUsuarios}">
+                        <a href="#" class="btn btn-light btn-sm" th:if="${estaEnComunidad}">Miembro</a>
+
+                        <a th:href="@{/unirme/{idComunidad}(idComunidad=${comunidad})}" class="btn btn-light btn-sm" th:unless="${estaEnComunidad}">Unirme a la comunidad</a>
+                        <div th:if="${estaEnComunidad}">
+                        <button id="sincronizarse" class="btn btn-spotify btn-sm" th:if="${hayUsuarios}">
                             <i class="fas fa-headphones me-2"></i> Sincronizarme a escuchar
                         </button>
 
                         <a href="#" th:href="@{/reproducir/{id}(id=${comunidad})}" class="btn btn-spotify btn-sm"
                            th:unless="${hayUsuarios}">
                             <i class="fas fa-play me-2"></i> Empezar reproducción
-
                         </a>
+                        </div>
 
                     </div>
                 </div>

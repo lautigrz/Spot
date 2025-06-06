@@ -3,11 +3,12 @@ package com.tallerwebi.dominio;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Objects;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
 @Entity
 public class Mensaje {
     @Id
@@ -20,6 +21,18 @@ public class Mensaje {
     private Usuario usuario;
 
    @ManyToOne(fetch = FetchType.LAZY)
-   @JoinColumn(name = "comunidad_id", nullable = false)
+   @JoinColumn(name = "comunidad_id")
    private Comunidad comunidad;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Mensaje mensaje = (Mensaje) o;
+        return Objects.equals(id, mensaje.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }
