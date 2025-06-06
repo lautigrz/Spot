@@ -30,7 +30,9 @@ public class Playlist {
             joinColumns = @JoinColumn(name = "playlist_id"),
             inverseJoinColumns = @JoinColumn(name = "cancion_id")
     )
-    private List<Cancion> canciones;
+    private Set<Cancion> canciones = new HashSet<>();
 
-
+    @ManyToOne
+    @JoinColumn(name = "comunidad_id")
+    private Comunidad comunidad;
 }
