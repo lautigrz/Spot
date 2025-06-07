@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.infraestructura.RepositorioUsuarioImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -21,10 +22,12 @@ public class ServicioPerfilImplTest {
     private SpotifyApi spotifyApi;
     private GetCurrentUsersProfileRequest.Builder profileRequestBuilder;
     private GetCurrentUsersProfileRequest profileRequest;
+    private RepositorioUsuarioImpl repositorioUsuario;
     @BeforeEach
     public void setUp() {
         servicioSpotify = mock(ServicioSpotify.class);
-        perfil = new ServicioPerfilImpl(servicioSpotify);
+        RepositorioUsuarioImpl repositorioUsuarioImpl = mock(RepositorioUsuarioImpl.class);
+        perfil = new ServicioPerfilImpl(servicioSpotify, repositorioUsuarioImpl);
         spotifyApi = mock(SpotifyApi.class);
         profileRequestBuilder = mock(GetCurrentUsersProfileRequest.Builder.class);
         profileRequest = mock(GetCurrentUsersProfileRequest.class);

@@ -28,6 +28,9 @@ public class Usuario {
     @Lob
     private String refreshToken;
     private String urlFoto;
+    private String spotifyID;
+    @ManyToOne
+    private EstadoDeAnimo estadoDeAnimo;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

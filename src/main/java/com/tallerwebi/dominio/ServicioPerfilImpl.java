@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.infraestructura.RepositorioUsuarioImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,11 +22,13 @@ import java.util.List;
 @Service
 public class ServicioPerfilImpl implements ServicioPerfil {
 
+    private final RepositorioUsuarioImpl repositorioUsuarioImpl;
     private ServicioSpotify spotify;
 
     @Autowired
-    public ServicioPerfilImpl(ServicioSpotify spotify) {
+    public ServicioPerfilImpl(ServicioSpotify spotify, RepositorioUsuarioImpl repositorioUsuarioImpl) {
         this.spotify = spotify;
+        this.repositorioUsuarioImpl = repositorioUsuarioImpl;
     }
 
     private static final ModelObjectType type = ModelObjectType.ARTIST;
@@ -106,7 +109,20 @@ public class ServicioPerfilImpl implements ServicioPerfil {
         return track;
     }
 
+    @Override
+    public EstadoDeAnimo obtenerEstadoDeAnimoDelUsuario(String token, String refreshToken) throws Exception{
+    SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+    User user = spotifyApi.getCurrentUsersProfile().build().execute();
+    Usuario usuario = repositorioUsuarioImpl.buscarUsuarioPorSpotifyID(user.getId());
+    return usuario.getEstadoDeAnimo();
+    }
 
-
-
+    @Override
+    public void actualizarEstadoDeAnimoUsuario(String token, String refreshToken, EstadoDeAnimo estadoDeAnimo) throws Exception{
+        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+        User user = spotifyApi.getCurrentUsersProfile().build().execute();
+        Usuario usuario = repositorioUsuarioImpl.buscarUsuarioPorSpotifyID(user.getId());
+        usuario.setEstadoDeAnimo(estadoDeAnimo);
+        repositorioUsuarioImpl.actualizarUsuario(usuario);
+    }
 }
