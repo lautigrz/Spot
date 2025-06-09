@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Detalle del artista</title>
+</head>
+<body>
+<h1 th:text="${artista.name}">Nombre del Artista</h1>
+<img th:src="${artista.images[0].url}" alt="Imagen del artista" width="300"/>
+
+
+<form th:action="@{/artistas/{id}/favorito(id=${artista.id})}" method="post" th:if="${!esFavorito}">
+  <button type="submit">Agregar a favoritos</button>
+</form>
+<p th:if="${esFavorito}">Ya es tu favorito.</p>
+
+<a href="/perfil">Volver a perfil</a>
+</body>
+</html>
