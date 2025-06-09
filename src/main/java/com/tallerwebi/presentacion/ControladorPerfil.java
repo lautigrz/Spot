@@ -1,5 +1,10 @@
 package com.tallerwebi.presentacion;
 
+import com.tallerwebi.dominio.RepositorioUsuario;
+import com.tallerwebi.dominio.ServicioFavorito;
+import com.tallerwebi.dominio.ServicioPerfil;
+import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.infraestructura.RepositorioUsuarioImpl;
 import com.tallerwebi.dominio.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,7 +21,6 @@ import se.michaelthelin.spotify.model_objects.specification.User;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 public class ControladorPerfil {
@@ -25,6 +29,9 @@ public class ControladorPerfil {
     private ServicioEstadoDeAnimo servicioEstadoDeAnimo;
     private ServicioRecomendaciones servicioRecomendaciones;
 
+    private ServicioFavorito servicioFavorito;
+    private RepositorioUsuario repositorioUsuario;
+
     @Autowired
     public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioEstadoDeAnimo servicioEstadoDeAnimo, ServicioRecomendaciones servicioRecomendaciones) {
         this.servicioPerfil = servicioPerfil;
@@ -32,10 +39,19 @@ public class ControladorPerfil {
         this.servicioRecomendaciones = servicioRecomendaciones;
     }
 
+    @Autowired
+    public void setServicioFavorito(ServicioFavorito servicioFavorito) {
+        this.servicioFavorito = servicioFavorito;
+    }
+
     @GetMapping("/perfil")
     public String perfil(HttpSession session, Model model) throws Exception {
         String token = (String) session.getAttribute("token");
         String refreshToken = (String) session.getAttribute("refreshToken");
+        Long usuarioId = (Long) session.getAttribute("user");
+
+
+
 
         try {
             User user = servicioPerfil.obtenerPerfilUsuario(token, refreshToken);
@@ -54,6 +70,12 @@ public class ControladorPerfil {
                 model.addAttribute("estadoDeAnimoActual", servicioPerfil.obtenerEstadoDeAnimoDelUsuario(token, refreshToken));
             }
 
+
+           if (usuarioId != null) {
+                Usuario usuario = repositorioUsuario.buscarUsuarioPorId(usuarioId);
+                model.addAttribute("favoritos", servicioFavorito.obtenerFavoritos(usuario));
+            }
+
             if (!model.containsAttribute("recomendaciones")) {
                 model.addAttribute("recomendaciones", new ArrayList<Track>());
             }
@@ -61,6 +83,7 @@ public class ControladorPerfil {
             e.printStackTrace();
 
         }
+
         return "perfil";
     }
 
@@ -86,7 +109,7 @@ public class ControladorPerfil {
         String refreshToken = (String) session.getAttribute("refreshToken");
         System.out.println("CHECK CONTROLLER");
         try{
-            List <Track> recomendaciones = servicioRecomendaciones.generarRecomendaciones(token, refreshToken);
+            List<Track> recomendaciones = servicioRecomendaciones.generarRecomendaciones(token, refreshToken);
             redirectAttributes.addFlashAttribute("recomendaciones", recomendaciones);
 
         } catch (Exception e){
@@ -97,4 +120,8 @@ public class ControladorPerfil {
     }
 
 
+    @Autowired
+    public void setRepositorioUsuario(RepositorioUsuario repositorioUsuario) {
+        this.repositorioUsuario = repositorioUsuario;
+    }
 }
