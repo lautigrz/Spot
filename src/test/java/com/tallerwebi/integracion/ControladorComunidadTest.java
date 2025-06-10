@@ -47,7 +47,7 @@ public class ControladorComunidadTest {
     @BeforeEach
     public void setUp() {
         servicioComunidadMock = mock(ServicioComunidad.class);
-        controladorComunidad = new ControladorComunidad(servicioComunidadMock);
+        controladorComunidad = new ControladorComunidad(servicioComunidadMock, null, null, null);
         headerAccessorMock = mock(SimpMessageHeaderAccessor.class);
         mockMvc = MockMvcBuilders.standaloneSetup(controladorComunidad).build();
 

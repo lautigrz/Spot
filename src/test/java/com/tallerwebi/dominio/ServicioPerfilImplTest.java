@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class ServicioPerfilImplTest {
-    private ServicioSpotify servicioSpotify;
+    private ServicioInstancia servicioSpotify;
     private ServicioPerfil perfil;
     private SpotifyApi spotifyApi;
     private GetCurrentUsersProfileRequest.Builder profileRequestBuilder;
@@ -25,7 +25,8 @@ public class ServicioPerfilImplTest {
     private RepositorioUsuarioImpl repositorioUsuarioImpl;
     @BeforeEach
     public void setUp() {
-        servicioSpotify = mock(ServicioSpotify.class);
+        servicioSpotify = mock(ServicioInstancia.class);
+        perfil = new ServicioPerfilImpl(servicioSpotify);
         repositorioUsuarioImpl = mock(RepositorioUsuarioImpl.class);
         perfil = new ServicioPerfilImpl(servicioSpotify, repositorioUsuarioImpl);
         spotifyApi = mock(SpotifyApi.class);
@@ -43,7 +44,7 @@ public class ServicioPerfilImplTest {
         // Simulamos que cuando se pide una instancia de SpotifyApi con los tokens,
         // el mock servicioSpotify devuelve el mock spotifyApi.
         // Es decir, estamos "inyectando" spotifyApi para que se use en el metodo probado.
-        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken)).thenReturn(spotifyApi);
+        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token)).thenReturn(spotifyApi);
 
 // Simulamos que al llamar al metodo getCurrentUsersProfile() del spotifyApi,
 // devuelve un mock del builder de la solicitud (request builder).
@@ -69,7 +70,7 @@ public class ServicioPerfilImplTest {
         assertEquals(mockUser, userObtenido);
 
         // Verificar que se llamó correctamente
-        verify(servicioSpotify).obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+        verify(servicioSpotify).obtenerInstanciaDeSpotifyConToken(token);
         verify(spotifyApi).getCurrentUsersProfile();
         verify(profileRequestBuilder).build();
         verify(profileRequest).execute();
@@ -95,7 +96,7 @@ public class ServicioPerfilImplTest {
         Artist[] artistasArray = new Artist[]{artista1, artista2};
 
         // Configuramos el mock para que devuelva la instancia de spotifyApi con los tokens
-        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken)).thenReturn(spotifyApi);
+        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token)).thenReturn(spotifyApi);
 
         // Configuramos la cadena de llamadas encadenadas
         when(spotifyApi.getUsersTopArtists()).thenReturn(requestBuilder);
@@ -116,7 +117,7 @@ public class ServicioPerfilImplTest {
         assertTrue(resultado.contains(artista2));
 
         // Verificar que se invocaron los métodos esperados
-        verify(servicioSpotify).obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+        verify(servicioSpotify).obtenerInstanciaDeSpotifyConToken(token);
         verify(spotifyApi).getUsersTopArtists();
         verify(requestBuilder).limit(10);
         verify(requestBuilder).build();
@@ -145,7 +146,7 @@ public class ServicioPerfilImplTest {
         PlaylistSimplified[] playlistsArray = new PlaylistSimplified[]{playlist1, playlist2};
 
         // Configuramos mocks para devolver la instancia de SpotifyApi con tokens
-        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken)).thenReturn(spotifyApi);
+        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token)).thenReturn(spotifyApi);
 
         // Configuramos la cadena de llamadas
         when(spotifyApi.getListOfCurrentUsersPlaylists()).thenReturn(requestBuilder);
@@ -163,7 +164,7 @@ public class ServicioPerfilImplTest {
         assertTrue(resultado.contains(playlist2));
 
         // Verificar que se llamaron los métodos esperados
-        verify(servicioSpotify).obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+        verify(servicioSpotify).obtenerInstanciaDeSpotifyConToken(token);
         verify(spotifyApi).getListOfCurrentUsersPlaylists();
         verify(requestBuilder).build();
         verify(request).execute();
@@ -185,7 +186,7 @@ public class ServicioPerfilImplTest {
         int cantidadEsperada = 15;
 
         // Simulación de comportamiento
-        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken)).thenReturn(spotifyApi);
+        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token)).thenReturn(spotifyApi);
         when(spotifyApi.getListOfCurrentUsersPlaylists()).thenReturn(requestBuilder);
         when(requestBuilder.build()).thenReturn(request);
         when(request.execute()).thenReturn(paging);
@@ -199,7 +200,7 @@ public class ServicioPerfilImplTest {
         assertEquals(cantidadEsperada, cantidadObtenida);
 
         // Verificar interacciones
-        verify(servicioSpotify).obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+        verify(servicioSpotify).obtenerInstanciaDeSpotifyConToken(token);
         verify(spotifyApi).getListOfCurrentUsersPlaylists();
         verify(requestBuilder).build();
         verify(request).execute();
@@ -219,7 +220,7 @@ public class ServicioPerfilImplTest {
         Track mockTrack = mock(Track.class);
 
         // Configurar comportamiento simulado
-        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken)).thenReturn(spotifyApi);
+        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token)).thenReturn(spotifyApi);
         when(spotifyApi.getUsersCurrentlyPlayingTrack()).thenReturn(requestBuilder);
         when(requestBuilder.build()).thenReturn(request);
         when(request.execute()).thenReturn(currentlyPlaying);
@@ -232,7 +233,7 @@ public class ServicioPerfilImplTest {
         assertNotNull(trackObtenido);
         assertEquals(mockTrack, trackObtenido);
 
-        verify(servicioSpotify).obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+        verify(servicioSpotify).obtenerInstanciaDeSpotifyConToken(token);
         verify(spotifyApi).getUsersCurrentlyPlayingTrack();
         verify(requestBuilder).build();
         verify(request).execute();

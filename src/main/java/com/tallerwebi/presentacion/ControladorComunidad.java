@@ -1,10 +1,12 @@
 package com.tallerwebi.presentacion;
-import com.tallerwebi.dominio.ServicioComunidad;
+import com.tallerwebi.dominio.*;
 
+import com.tallerwebi.presentacion.dto.CancionDto;
 import com.tallerwebi.presentacion.dto.ChatMessage;
 import com.tallerwebi.presentacion.dto.Sincronizacion;
 import com.tallerwebi.presentacion.dto.UsuarioDto;
 
+import org.apache.hc.core5.http.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,22 +16,29 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class ControladorComunidad {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
     private ServicioComunidad servicioComunidad;
+    private ServicioSpotify servicioSpotify;
+    private ServicioPlaylist servicioPlaylist;
+    private ServicioReproduccion servicioReproduccion;
 
-    public ControladorComunidad(ServicioComunidad servicioComunidad) {
+    public ControladorComunidad(ServicioComunidad servicioComunidad, ServicioSpotify servicioSpotify, ServicioPlaylist servicioPlaylist, ServicioReproduccion servicioReproduccion) {
+        this.servicioPlaylist = servicioPlaylist;
+        this.servicioReproduccion = servicioReproduccion;
         this.servicioComunidad = servicioComunidad;
+        this.servicioSpotify = servicioSpotify;
     }
 
 
@@ -39,6 +48,26 @@ public class ControladorComunidad {
         model.addAttribute("comunidades", servicioComunidad.obtenerTodasLasComunidades());
 
         return "lista-comunidades";
+    }
+
+    @GetMapping("/busqueda-cancion/{texto}")
+    public ResponseEntity<?> buscarCancion(@PathVariable String texto, HttpSession session) throws IOException, ParseException, SpotifyWebApiException {
+        String token = (String) session.getAttribute("token");
+        List<CancionDto> cancionesObtenida = servicioSpotify.obtenerCancionesDeSpotify(token, texto);
+
+        return ResponseEntity.ok(cancionesObtenida);
+    }
+
+
+    @PostMapping("/guardar-canciones/{idComunidad}")
+    @ResponseBody
+    public String guardarCanciones(@RequestBody List<CancionDto> canciones, HttpSession session, @PathVariable Long idComunidad){
+
+        Comunidad comunidad = servicioComunidad.obtenerComunidad(idComunidad);
+
+        servicioPlaylist.crearNuevaPlaylistConCanciones(comunidad, canciones);
+
+        return "/spring/comunidad/" + idComunidad;
     }
 
     @PostMapping("/sincronizarme/{idComunidad}")
@@ -54,7 +83,7 @@ public class ControladorComunidad {
             String usuario = servicioComunidad.obtenerUsuarioDeLaComunidadActivoDeLaLista(String.valueOf(idComunidad), message.getSender());
 
             return ResponseEntity.status(HttpStatus.OK).body(
-                    servicioComunidad.obtenerSincronizacion(usuario,idComunidad)
+                    servicioReproduccion.obtenerSincronizacion(usuario, idComunidad)
             );
 
         } catch (Exception e) {
@@ -66,10 +95,11 @@ public class ControladorComunidad {
     }
 
     @GetMapping("/reproducir/{idComunidad}")
-    public String reproducirMusica(HttpSession session, @PathVariable String idComunidad) {
+    public String reproducirMusica(HttpSession session, @PathVariable Long idComunidad) {
         try {
             String token = (String) session.getAttribute("token");
-            servicioComunidad.reproducirCancion(token);
+            Long idUsuario = (Long) session.getAttribute("user");
+            servicioReproduccion.reproducirCancion(token, idComunidad, idUsuario);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -107,11 +137,12 @@ public class ControladorComunidad {
     }
 
     @GetMapping("/comunidad/{id}")
-    public String comunidad(Model model, HttpSession session, @PathVariable Long id) {
+    public String comunidad(Model model, HttpSession session, @PathVariable Long id) throws IOException, ParseException, SpotifyWebApiException {
 
         Long idUsuario = (Long) session.getAttribute("user");
         String idComunidad = String.valueOf(id);
         UsuarioDto usuarioDto = servicioComunidad.obtenerUsuarioDeLaComunidad(idUsuario, id);
+
         boolean estaEnComunidad = false;
 
         if(usuarioDto != null){
@@ -120,6 +151,7 @@ public class ControladorComunidad {
             model.addAttribute("id", usuarioDto.getId());
             model.addAttribute("token", usuarioDto.getToken());
             model.addAttribute("hayUsuarios", servicioComunidad.hayAlguienEnLaComunidad(idComunidad, usuarioDto.getUser()));
+
             model.addAttribute("mensajes", servicioComunidad.obtenerMensajes(id));
             System.out.println("usuario:" + servicioComunidad.hayAlguienEnLaComunidad(idComunidad, usuarioDto.getUser()));
             estaEnComunidad = true;
@@ -159,5 +191,30 @@ public class ControladorComunidad {
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @GetMapping("/cancion/{idComunidad}")
+    @ResponseBody
+    public ResponseEntity<?> cambiarCancion(@PathVariable Long idComunidad) {
+        try {
+
+            CancionDto cancion = servicioReproduccion.obtenerCancionSonandoEnLaComunidad(idComunidad);
+
+            if (cancion == null) {
+                return ResponseEntity.badRequest().body("Cancion  null"); // 204 No Content
+            }
+
+            return ResponseEntity.ok(cancion); // 200 OK con cuerpo
+
+        } catch (SpotifyWebApiException e) {
+            // Error específico de Spotify
+            System.err.println("Error Spotify: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build(); // 502 Bad Gateway error servidor externo
+        } catch (IOException | ParseException e) {
+            // Otros errores del backend o parseo
+            System.err.println("Error al procesar la canción: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // 500
+        }
+    }
+
 
 }

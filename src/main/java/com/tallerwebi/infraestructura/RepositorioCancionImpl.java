@@ -7,16 +7,15 @@ import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.TypedQuery;
 import java.util.List;
 
 @Repository
-public class ReposiorioCancionImpl implements RepositorioCancion {
+public class RepositorioCancionImpl implements RepositorioCancion {
 
     private SessionFactory sessionFactory;
 
     @Autowired
-    public ReposiorioCancionImpl(SessionFactory sessionFactory) {
+    public RepositorioCancionImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
@@ -42,7 +41,7 @@ public class ReposiorioCancionImpl implements RepositorioCancion {
     }
 
     @Override
-    public Cancion buscarCancionPorElIdDeSpotify(Long sporifyId) {
+    public Cancion buscarCancionPorElIdDeSpotify(String sporifyId) {
         String hql = "FROM Cancion c WHERE c.spotifyId = :spotifyId";
         Query<Cancion> query = sessionFactory.getCurrentSession().createQuery(hql, Cancion.class);
         query.setParameter("spotifyId", sporifyId);

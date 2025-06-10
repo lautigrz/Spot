@@ -22,21 +22,6 @@
             border-radius: 50%;
             object-fit: cover;
         }
-        .music-card {
-            background-color: #fde2e2;
-            border-radius: 12px;
-        }
-        .track-progress {
-            height: 6px;
-            background-color: #eee;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        .track-progress-inner {
-            height: 100%;
-            width: 70%;
-            background-color: red;
-        }
         .action-icons i {
             cursor: pointer;
             margin-right: 15px;
@@ -110,6 +95,18 @@
             height: 60px; /* más alto como pediste */
         }
 
+        .btn-white-border {
+            background-color: white;
+            color: black;
+            border: 1px solid black;
+            font-weight: bold;
+        }
+        .btn-success-checked {
+            background-color: green !important;
+            color: white !important;
+            border-color: green !important;
+        }
+
 
 
     </style>
@@ -127,9 +124,10 @@
         <aside class="col-md-2 p-3 d-flex flex-column">
             <h5>Comunidad</h5>
             <nav class="nav flex-column mt-3">
+
+                <a class="nav-link" href="#" id="playlist" data-bs-toggle="modal" data-bs-target="#modalPlaylist"><i class="bi bi-plus-circle"></i> Crear nueva playlist</a>
                 <a class="nav-link active" href="#"><i class="fas fa-music me-2"></i>Recomendar Canción</a>
-                <a class="nav-link" href="#"><i class="fas fa-list me-2"></i>Recomendar Playlist</a>
-                <a class="nav-link" href="#"><i class="fas fa-users me-2"></i>Ver Playlists Compartidas</a>
+                <a class="nav-link" href="#"><i class="fas fa-users me-2"></i>Ver Playlists de la comunidad</a>
                 <a class="nav-link" href="#"><i class="fas fa-star me-2"></i>Top Tracks de la Comunidad</a>
                 <a class="nav-link" href="#"><i class="fas fa-calendar-alt me-2"></i>Eventos proximos</a>
 
@@ -347,30 +345,31 @@
 </div>
 
 
-<footer class="music-player-footer bg-dark text-white fixed-bottom px-4 d-flex align-items-center justify-content-between shadow-lg" id="footer" style="height: 50px !important; padding: 35px !important;">
+<footer class="music-player-footer text-white fixed-bottom px-4 d-flex align-items-center justify-content-between shadow-lg" id="footer"  style="height: 50px !important; padding: 35px !important; display: none !important;">
     <!-- Información de la canción -->
+
     <div class="d-flex align-items-center z-1">
-        <img src="" class="rounded me-3" alt="Album cover" style="width: 53px; height: 53px; object-fit: cover;">
+        <img id="imageTrack" class="rounded me-3" crossorigin="anonymous" style="width: 53px; height: 53px; object-fit: cover;">
         <div>
-            <strong>Billie Eilish</strong><br>
-            <small class="text-white">Lovely (feat. Khalid)</small>
+            <strong id="artista" class="text-white"></strong><br>
+            <small id="titulo" class="text-white"></small>
         </div>
     </div>
 
-    <!-- Centro flotante y centrado -->
     <div class="position-absolute top-50 start-50 translate-middle text-center" id="centro" style="z-index: 2;">
         <div class="mb-2">
             <i class="fas fa-music fa-spin fa-lg text-success me-2"></i>
             <span class="fw-light">Escuchando...</span>
         </div>
         <div class="d-flex align-items-center gap-2" style="font-size: 0.85rem; width: 220px;">
-            <small class="text-white">1:12</small>
+            <small id="tiempoActual" class="text-white"></small>
             <div class="progress flex-grow-1" style="height: 4px;">
-                <div class="progress-bar bg-success" style="width: 45%;"></div>
+                <div id="barraProgreso" class="progress-bar bg-success" style="width: 0%;"></div>
             </div>
-            <small class="text-white">3:20</small>
+            <small id="tiempoTotal" class="text-white"></small>
         </div>
     </div>
+
 
     <!-- Botón de cerrar -->
     <button class="btn btn-sm btn-outline-light rounded-circle z-1" id="cerrar" style="width: 28px; height: 28px; line-height: 1; padding: 0;">
@@ -381,9 +380,43 @@
 <a href="#" id="backToTop" class="btn btn-dark position-fixed bottom-0 start-50 translate-middle-x mb-3" style="z-index: 1000;">
     <i class="fas fa-chevron-up"></i>
 </a>
+
+
+<!-- Modal -->
+<div class="modal fade" id="modalPlaylist" tabindex="-1" aria-labelledby="modalPlaylistLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalPlaylistLabel">Agregar canciones a tu nueva playlist</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Input de búsqueda -->
+                <input type="text" id="inputBusqueda" class="form-control mb-3" placeholder="Buscar canción...">
+
+                <!-- Lista de canciones -->
+                <div id="contenedorCanciones" class="list-group">
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button id="crearPlaylistBtn" type="button" class="btn btn-primary">Crear Playlist</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script th:src="@{/js/comunidad.js}"></script>
+<script th:src="@{/js/barra-escuchando.js}"></script>
+<script th:src="@{/js/playlist.js}"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

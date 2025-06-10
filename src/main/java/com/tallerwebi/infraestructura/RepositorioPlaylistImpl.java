@@ -1,8 +1,10 @@
 package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.Cancion;
+import com.tallerwebi.dominio.Comunidad;
 import com.tallerwebi.dominio.Playlist;
 import com.tallerwebi.dominio.RepositorioPlaylist;
+import com.tallerwebi.presentacion.dto.CancionDto;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.query.Query;
@@ -11,7 +13,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class RepositorioPlaylistImpl implements RepositorioPlaylist {
@@ -64,5 +68,19 @@ public class RepositorioPlaylistImpl implements RepositorioPlaylist {
     @Override
     public Playlist obtenerPlaylist(Long idPlaylist) {
         return sessionFactory.getCurrentSession().get(Playlist.class, idPlaylist);
+    }
+
+    @Override
+    public void crearNuevaPlaylistConCanciones(Comunidad comunidad, Set<Cancion> canciones) {
+
+        Comunidad comunidadManaged = sessionFactory.getCurrentSession().get(Comunidad.class, comunidad.getId());
+
+        Playlist playlist = new Playlist();
+        playlist.setNombre("Samo");
+        playlist.setComunidad(comunidad);
+        playlist.agregarCanciones(canciones);
+        comunidadManaged.agregarPlaylist(playlist);
+
+        sessionFactory.getCurrentSession().saveOrUpdate(playlist);
     }
 }

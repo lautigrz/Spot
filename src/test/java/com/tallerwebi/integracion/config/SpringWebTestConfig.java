@@ -106,7 +106,7 @@ public class SpringWebTestConfig implements WebMvcConfigurer {
 
     @Bean
     public ControladorComunidad controladorComunidad(ServicioComunidad servicioComunidad) {
-        return new ControladorComunidad(servicioComunidad);
+        return new ControladorComunidad(servicioComunidad, null, null, null);
     }
 
 }

@@ -3,6 +3,7 @@ var messageInput = document.querySelector("#mensajeInput");
 var messageArea = document.querySelector("#mensajeVista");
 var messageForm = document.getElementById("enviar");
 var stompClient = null;
+var comunidadInicializada = false;
 
 
 function connect() {
@@ -35,11 +36,13 @@ function onConnected(datos) {
     console.log("Suscrito a: ", `/topic/${datos.idComunidad}`);
     stompClient.subscribe(`/topic/${datos.idComunidad}`, onMessageReceived);
 
+
     stompClient.send(
         `/app/chat.register/${datos.idComunidad}`,
         {},
         JSON.stringify({sender: datos.username, type: "JOIN"}),
     );
+    obtenerCancionActualDesdeServidor(datos.idComunidad);
 }
 
 function send(event){
@@ -158,6 +161,7 @@ function sincronizarSpotify(payload) {
         },
         body: JSON.stringify({
             uris: info.uris,
+            offset: { uri: info.uriInicio },  // esta es la canción por la que querés empezar
             position_ms: info.positionMs // Asegúrate de que sea 'position_ms' con guion bajo
         })
     })
@@ -265,24 +269,22 @@ async function existeUsuarioEnLaComunidad() {
         return false;
     }
 }
-
 document.addEventListener('DOMContentLoaded', function() {
+    // Tu listener de corazón
     const heartIcons = document.querySelectorAll('.corazon');
     heartIcons.forEach(heartIcon => {
         heartIcon.addEventListener('click', () => {
-
-            if(heartIcon.classList.contains('text-danger')) {
+            if (heartIcon.classList.contains('text-danger')) {
                 heartIcon.classList.remove('fas', 'fa-heart', 'ms-3', 'text-danger');
                 heartIcon.classList.add('fa-regular', 'fa-heart', 'ms-3');
-
-            }else{
+            } else {
                 heartIcon.classList.remove('fa-regular', 'fa-heart', 'ms-3');
                 heartIcon.classList.add('fas', 'fa-heart', 'ms-3', 'text-danger');
             }
-
-
         });
     });
+
+
 });
 
 
