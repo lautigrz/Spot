@@ -64,5 +64,26 @@ public class RepositorioFavoritoImplTest {
     }
 
 
+    @Test
+    @Rollback
+    public void deberiaEncontrarSiUnArtistaYaEsFavoritoDeUnUsuario(){
+        Usuario usuario = new Usuario();
+        usuario.setUser("testuser");
+        usuario.setToken("token");
+        usuario.setRefreshToken("refresh");
+        usuario.setUrlFoto("foto.jpg");
+        sessionFactory.getCurrentSession().save(usuario);
+
+        // Crear y guardar un favorito
+        Favorito favorito = new Favorito();
+        favorito.setSpotifyArtistId("3TVXtAsR1Inumwj472S9r4"); // Drake
+        favorito.setUsuario(usuario);
+        sessionFactory.getCurrentSession().save(favorito);
+
+        boolean esFavorito = repositorioFavorito.yaEsFavorito(favorito.getSpotifyArtistId(), usuario.getId());
+
+        assertThat(esFavorito, equalTo(true));
+    }
+
     }
 
