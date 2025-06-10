@@ -7,6 +7,6 @@ public interface RepositorioCancion {
     Cancion obtenerPorId(Long id);               // Buscar canción por id
     List<Cancion> obtenerTodas();                // Listar todas las canciones
     void eliminarCancion(Long id);
-    Cancion buscarCancionPorElIdDeSpotify(Long sporifyId);
+    Cancion buscarCancionPorElIdDeSpotify(String sporifyId);
 }
 

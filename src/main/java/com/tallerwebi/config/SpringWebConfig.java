@@ -23,7 +23,7 @@ import java.net.http.HttpClient;
 @EnableWebMvc
 @Configuration
 @PropertySource("classpath:application.properties")
-@ComponentScan({"com.tallerwebi.presentacion", "com.tallerwebi.dominio", "com.tallerwebi.infraestructura","com.tallerwebi.config"})
+@ComponentScan({"com.tallerwebi.presentacion", "com.tallerwebi.dominio", "com.tallerwebi.infraestructura","com.tallerwebi.config","com.tallerwebi.websocket"})
 public class SpringWebConfig implements WebMvcConfigurer {
 
     @Value("${spotify.client-id}")

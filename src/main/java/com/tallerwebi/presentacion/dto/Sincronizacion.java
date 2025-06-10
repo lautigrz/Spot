@@ -11,7 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 public class Sincronizacion {
     private List<String> uris;
-
     private int positionMs;
-    private Long timeStampMs;
+    private String uriInicio;
 }

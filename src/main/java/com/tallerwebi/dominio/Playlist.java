@@ -17,7 +17,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 public class Playlist {
-
     @Id
     @GeneratedValue
     private Long id;
@@ -35,4 +34,12 @@ public class Playlist {
     @ManyToOne
     @JoinColumn(name = "comunidad_id")
     private Comunidad comunidad;
+
+    public void agregarCanciones(Set<Cancion> canciones) {
+        for (Cancion cancion : canciones) {
+            this.canciones.add(cancion);
+            cancion.getPlaylists().add(this); // si es bidireccional
+        }
+    }
+
 }

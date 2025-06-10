@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.google.gson.JsonParser;
+import com.tallerwebi.presentacion.dto.CancionDto;
 import com.tallerwebi.presentacion.dto.ChatMessage;
 import com.tallerwebi.presentacion.dto.Sincronizacion;
 import com.tallerwebi.presentacion.dto.UsuarioDto;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.miscellaneous.CurrentlyPlaying;
+import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.requests.data.player.StartResumeUsersPlaybackRequest;
 
 import java.io.IOException;
@@ -23,13 +25,12 @@ import java.util.*;
 public class ServicioComunidadImpl implements ServicioComunidad {
     private static final Map<String, List<String>> canales = new HashMap<>();
 
-    private SpotifyApi spotifyApi;
     private RepositorioComunidad repositorioComunidad;
     private RepositorioUsuario repositorioUsuario;
 
     @Autowired
-    public ServicioComunidadImpl(RepositorioUsuario repositorioUsuario ,RepositorioComunidad repositorioComunidad, SpotifyApi spotifyApi) {
-        this.spotifyApi = spotifyApi;
+    public ServicioComunidadImpl(RepositorioUsuario repositorioUsuario ,RepositorioComunidad repositorioComunidad) {
+
         this.repositorioUsuario = repositorioUsuario;
         this.repositorioComunidad = repositorioComunidad;
     }
@@ -108,6 +109,9 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     @Override
     public String obtenerUsuarioDeLaComunidadActivoDeLaLista(String canal, String user) {
 
+        if(user.isEmpty()){
+            return "";
+        }
         List<String> usuarios = canales.get(canal);
 
         for (String usuario : usuarios) {
@@ -119,77 +123,18 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     }
 
     @Override
+    public List<String> obtenerTodosLosUsuariosActivosDeUnaComunidad(Long idComunidad) {
+        String idd = String.valueOf(idComunidad);
+        if(canales.get(idd) == null){
+            return new ArrayList<>();
+        }
+        return canales.get(idd);
+    }
+
+    @Override
     public Comunidad obtenerComunidad(Long id) {
         return repositorioComunidad.obtenerComunidad(id);
     }
-
-    //falta test
-    @Override
-    public Boolean reproducirCancion(String token) throws Exception {
-
-        try {
-            spotifyApi.setAccessToken(token);
-
-            StartResumeUsersPlaybackRequest star = spotifyApi.startResumeUsersPlayback()
-                    .uris(JsonParser.parseString("[\"spotify:track:4stQ9ma0kqGifqLQQSgOGH\"]").getAsJsonArray())
-                    .position_ms(0)
-                    .build();
-            star.execute();
-            return true;
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        throw new Exception();
-    }
-
-    //falta test
-    @Override
-    public Sincronizacion obtenerSincronizacion(String user, Long idComunidad) throws Exception {
-
-            String token = obtenerTokenDelUsuario(user, idComunidad);
-            int ms = obtenerPosicionEnMsDeLoQueEscucha(token);
-            ms+=500;
-            System.out.println("Ms: " + ms);
-            Sincronizacion synchronize = new Sincronizacion();
-            synchronize.setPositionMs(ms);
-
-            System.out.println("llego esto:" + ms);
-
-            synchronize.setUris(Collections.singletonList("spotify:track:4stQ9ma0kqGifqLQQSgOGH"));
-            return synchronize;
-
-    }
-
-    //falta test
-    @Override
-    public int obtenerPosicionEnMsDeLoQueEscucha(String token) throws IOException, ParseException, SpotifyWebApiException {
-
-        try {
-            spotifyApi = new SpotifyApi.Builder()
-                    .setAccessToken(token)
-                    .build();
-
-            CurrentlyPlaying playing = spotifyApi.getUsersCurrentlyPlayingTrack()
-                    .build().execute();
-
-            System.out.println("Position");
-            return playing.getProgress_ms();
-        }catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error al obtener el token: " + e.getMessage());
-        }
-
-        return 0;
-
-    }
-
-    //falta test
-    @Override
-    public String obtenerTokenDelUsuario(String user, Long idComunidad) {
-        return repositorioComunidad.obtenerTokenDelUsuarioQuePerteneceAUnaComunidad(user, idComunidad);
-    }
-
     //falta test
     @Override
     public Boolean hayAlguienEnLaComunidad(String nombreComunidad, String user) {
@@ -205,6 +150,17 @@ public class ServicioComunidadImpl implements ServicioComunidad {
         return repositorioComunidad.obtenerComunidades();
     }
 
+    @Override
+    public Playlist obtenerLasPlaylistDeUnaComunidad(Long idComunidad) {
+        return null;
+    }
+
+    @Override
+    public void eliminarUsuarioDelCanal(String user) {
+        for (List<String> usuarios : canales.values()) {
+            usuarios.remove(user);
+        }
+    }
 
 }
 

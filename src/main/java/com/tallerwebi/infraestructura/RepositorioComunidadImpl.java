@@ -1,9 +1,6 @@
 package com.tallerwebi.infraestructura;
 
-import com.tallerwebi.dominio.Comunidad;
-import com.tallerwebi.dominio.Mensaje;
-import com.tallerwebi.dominio.RepositorioComunidad;
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -12,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class RepositorioComunidadImpl implements RepositorioComunidad {
@@ -123,4 +121,36 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
 
         return comunidad;
     }
+    @Override
+    public List<Playlist> obtenerPlaylistsPorComunidadId(Long comunidadId) {
+        String hql = "SELECT p FROM Comunidad c JOIN c.playlists p WHERE c.id = :idComunidad";
+        TypedQuery<Playlist> query = sessionFactory.getCurrentSession().createQuery(hql, Playlist.class);
+        query.setParameter("idComunidad", comunidadId);
+        List<Playlist> playlists = query.getResultList();
+
+        return playlists;
+    }
+
+    @Override
+    public Set<Cancion> obtenerCancionesDeUnaPlaylistDeUnaComunidad(Long idComunidad) {
+        String hql = "SELECT p FROM Comunidad c JOIN c.playlists p WHERE c.id = :idComunidad";
+        TypedQuery<Playlist> query = sessionFactory.getCurrentSession().createQuery(hql, Playlist.class);
+        query.setParameter("idComunidad", idComunidad);
+        List<Playlist> playlists = query.getResultList();
+
+        Playlist playlist = playlists.get(0);
+
+        return playlist.getCanciones();
+    }
+
+    @Override
+    public Playlist obtenerPlaylistDeUnaComunidad(Long idComunidad) {
+        String hql = "SELECT p FROM Comunidad c JOIN c.playlists p WHERE c.id = :idComunidad";
+        TypedQuery<Playlist> query = sessionFactory.getCurrentSession().createQuery(hql, Playlist.class);
+        query.setParameter("idComunidad", idComunidad);
+        List<Playlist> playlists = query.getResultList();
+
+        return playlists.get(0);
+    }
+
 }

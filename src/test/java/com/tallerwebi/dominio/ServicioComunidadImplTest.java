@@ -28,7 +28,7 @@ public class ServicioComunidadImplTest {
         repositorioUsuarioMock = mock(RepositorioUsuario.class);
         repositorioComunidadMock = mock(RepositorioComunidad.class);
         spotifyApiMock = mock(SpotifyApi.class);
-        servicioComunidad = new ServicioComunidadImpl(repositorioUsuarioMock,repositorioComunidadMock, spotifyApiMock);
+        servicioComunidad = new ServicioComunidadImpl(repositorioUsuarioMock,repositorioComunidadMock);
     }
 
 

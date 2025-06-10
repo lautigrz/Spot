@@ -10,11 +10,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CancionDto {
-
     private Long id;
     private String spotifyId;
     private String uri;
     private String urlImagen;
     private String titulo;
     private String artista;
+    private Integer duracion;
+    private Integer progreso;
 }
