@@ -1,19 +1,114 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>Detalle del artista</title>
+  <meta charset="UTF-8" />
+  <title th:text="${artista.name}">Detalle del Artista</title>
+  <style>
+    body {
+      background-color: #fff;
+      color: #000;
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+    .bubble {
+      background-color: #000;
+      color: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    img {
+      border-radius: 10px;
+    }
+    h1, h2 {
+      margin-bottom: 10px;
+    }
+    .albums, .top-tracks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .album, .track {
+      background-color: #222;
+      padding: 10px;
+      border-radius: 10px;
+      width: 150px;
+      color: #eee;
+      text-align: center;
+    }
+    .album img, .track img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    button {
+      background-color: #000;
+      color: #fff;
+      border: 1px solid #fff;
+      padding: 8px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #333;
+    }
+    a {
+      color: #000;
+      text-decoration: none;
+      margin-top: 20px;
+      display: inline-block;
+      border: 2px solid #000;   /* borde negro */
+      padding: 8px 16px;        /* espacio interno */
+      border-radius: 6px;       /* esquinas redondeadas */
+      background-color: #fff;   /* fondo blanco */
+      transition: background-color 0.3s, color 0.3s; /* transición suave */
+    }
+
+    a:hover {
+      text-decoration: none;
+      background-color: #000;   /* fondo negro al pasar mouse */
+      color: #fff;              /* texto blanco al pasar mouse */
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-<h1 th:text="${artista.name}">Nombre del Artista</h1>
-<img th:src="${artista.images[0].url}" alt="Imagen del artista" width="300"/>
+<div class="container">
+  <div class="bubble">
+    <h1 th:text="${artista.name}">Nombre del Artista</h1>
+    <img th:src="${artista.images[0].url}" alt="Imagen del artista" width="300" />
+    <form th:action="@{/artistas/{id}/favorito(id=${artista.id})}" method="post" th:if="${!esFavorito}">
+      <button type="submit">Agregar a favoritos</button>
+    </form>
+    <p th:if="${esFavorito}">Ya es tu favorito.</p>
+  </div>
 
+  <div class="bubble">
+    <h2>Álbumes</h2>
+    <div class="albums">
+      <div class="album" th:each="album : ${albums}">
+        <img th:src="${album.images[0].url}" th:alt="${album.name}" />
+        <p th:text="${album.name}">Nombre del álbum</p>
+        <p th:text="${album.releaseDate.substring(0,4)}">Año</p>
+      </div>
+    </div>
+  </div>
 
-<form th:action="@{/artistas/{id}/favorito(id=${artista.id})}" method="post" th:if="${!esFavorito}">
-  <button type="submit">Agregar a favoritos</button>
-</form>
-<p th:if="${esFavorito}">Ya es tu favorito.</p>
+  <div class="bubble">
+    <h2>Canciones principales</h2>
+    <div class="top-tracks">
+      <div class="track" th:each="track : ${topTracks}">
+        <img th:src="${track.album.images[0].url}" th:alt="${track.name}" />
+        <p th:text="${track.name}">Nombre de la canción</p>
+        <p th:text="${#numbers.formatDecimal(track.durationMs / 60000, 1, 2)} + ' min'">Duración</p>
+      </div>
+    </div>
+  </div>
 
-<a href="/perfil">Volver a perfil</a>
+  <a href="/spring/perfil">Volver a perfil</a>
+</div>
 </body>
 </html>

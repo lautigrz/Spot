@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion;
 
+import com.neovisionaries.i18n.CountryCode;
 import com.tallerwebi.dominio.RepositorioUsuario;
 import com.tallerwebi.dominio.ServicioFavorito;
 import com.tallerwebi.dominio.Usuario;
@@ -11,9 +12,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import se.michaelthelin.spotify.SpotifyApi;
+import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
+import se.michaelthelin.spotify.model_objects.specification.Paging;
+import se.michaelthelin.spotify.model_objects.specification.Track;
+
 
 import javax.servlet.http.HttpSession;
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 public class ControladorArtista {
@@ -33,8 +40,13 @@ public class ControladorArtista {
         try{
 
             Artist artist = spotifyApi.getArtist(id).build().execute();
+            AlbumSimplified[] albums = spotifyApi.getArtistsAlbums(id).limit(10).build().execute().getItems();
+            Track[] topTracks = spotifyApi.getArtistsTopTracks(id, CountryCode.US).build().execute();
 
             model.addAttribute("artista", artist);
+            model.addAttribute("albums", albums);
+            model.addAttribute("topTracks", topTracks);
+
 
             Usuario usuario = (Usuario) session.getAttribute("usuario");
             boolean esFavorito = usuario!= null && servicioFavorito.yaEsFavorito(id,usuario);

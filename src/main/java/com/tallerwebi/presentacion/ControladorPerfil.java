@@ -25,6 +25,7 @@ import java.util.List;
 @Controller
 public class ControladorPerfil {
 
+
     private ServicioPerfil servicioPerfil;
     private ServicioEstadoDeAnimo servicioEstadoDeAnimo;
     private ServicioRecomendaciones servicioRecomendaciones;
@@ -64,7 +65,7 @@ public class ControladorPerfil {
             model.addAttribute("playlist", servicioPerfil.obtenerNombreDePlaylistDelUsuario(token, refreshToken));
             model.addAttribute("totalPlaylist", servicioPerfil.obtenerCantidadDePlaylistDelUsuario(token, refreshToken));
             model.addAttribute("escuchando", servicioPerfil.obtenerReproduccionActualDelUsuario(token, refreshToken));
-            model.addAttribute("artista", servicioPerfil.obtenerReproduccionActualDelUsuario(token, refreshToken).getArtists()[0].getName());
+            // DEVUELVE UN NULO NOSE QUE ONDA model.addAttribute("artista", servicioPerfil.obtenerReproduccionActualDelUsuario(token, refreshToken).getArtists()[0].getName());
             model.addAttribute("listaDeEstadosDeAnimo", servicioEstadoDeAnimo.obtenerTodosLosEstadosDeAnimo());
             if (servicioPerfil.obtenerEstadoDeAnimoDelUsuario(token, refreshToken) != null){
                 model.addAttribute("estadoDeAnimoActual", servicioPerfil.obtenerEstadoDeAnimoDelUsuario(token, refreshToken));
@@ -72,6 +73,8 @@ public class ControladorPerfil {
 
 
            if (usuarioId != null) {
+               System.out.println("usuarioId: " + usuarioId);
+               System.out.println("repositorioUsuario: " + (repositorioUsuario != null));
                 Usuario usuario = repositorioUsuario.buscarUsuarioPorId(usuarioId);
                 model.addAttribute("favoritos", servicioFavorito.obtenerFavoritos(usuario));
             }
