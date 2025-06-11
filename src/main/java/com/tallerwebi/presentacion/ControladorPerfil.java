@@ -51,10 +51,11 @@ public class ControladorPerfil {
             model.addAttribute("playlist", servicioPerfil.obtenerNombreDePlaylistDelUsuario(token, refreshToken));
             model.addAttribute("totalPlaylist", servicioPerfil.obtenerCantidadDePlaylistDelUsuario(token, refreshToken));
             model.addAttribute("escuchando", servicioPerfil.obtenerReproduccionActualDelUsuario(token, refreshToken));
-            model.addAttribute("artista", servicioPerfil.obtenerReproduccionActualDelUsuario(token, refreshToken).getArtists()[0].getName());
-
+            // DEVUELVE UN NULO NOSE QUE ONDA model.addAttribute("artista", servicioPerfil.obtenerReproduccionActualDelUsuario(token, refreshToken).getArtists()[0].getName());
 
            if (usuarioId != null) {
+               System.out.println("usuarioId: " + usuarioId);
+               System.out.println("repositorioUsuario: " + (repositorioUsuario != null));
                 Usuario usuario = repositorioUsuario.buscarUsuarioPorId(usuarioId);
                 model.addAttribute("favoritos", servicioFavorito.obtenerFavoritos(usuario));
             }
