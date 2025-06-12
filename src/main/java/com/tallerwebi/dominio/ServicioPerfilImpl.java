@@ -19,15 +19,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Transactional
+
 @Service
 public class ServicioPerfilImpl implements ServicioPerfil {
 
     private ServicioInstancia spotify;
-    private final RepositorioUsuarioImpl repositorioUsuarioImpl;
+    private final RepositorioUsuario repositorioUsuarioImpl;
 
     @Autowired
-    public ServicioPerfilImpl(ServicioInstancia spotify, RepositorioUsuarioImpl repositorioUsuarioImpl) {
+    public ServicioPerfilImpl(ServicioInstancia spotify, RepositorioUsuario repositorioUsuarioImpl) {
         this.spotify = spotify;
         this.repositorioUsuarioImpl = repositorioUsuarioImpl;
     }
@@ -35,7 +35,7 @@ public class ServicioPerfilImpl implements ServicioPerfil {
     private static final ModelObjectType type = ModelObjectType.ARTIST;
 
     @Override
-    public User obtenerPerfilUsuario(String token, String refreshToken) throws Exception {
+    public User obtenerPerfilUsuario(String token) throws Exception {
 
         SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
         User user = spotifyApi.getCurrentUsersProfile().build().execute();
@@ -43,7 +43,7 @@ public class ServicioPerfilImpl implements ServicioPerfil {
     }
 
     @Override
-    public Integer obtenerCantidadDeArtistaQueSigueElUsuario(String token, String refreshToken) throws Exception {
+    public Integer obtenerCantidadDeArtistaQueSigueElUsuario(String token) throws Exception {
         SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
         GetUsersFollowedArtistsRequest followed = spotifyApi.getUsersFollowedArtists(type).build();
 
@@ -53,7 +53,7 @@ public class ServicioPerfilImpl implements ServicioPerfil {
     }
 
     @Override
-    public List<Artist> obtenerMejoresArtistasDelUsuario(String token, String refreshToken) throws Exception {
+    public List<Artist> obtenerMejoresArtistasDelUsuario(String token) throws Exception {
         SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
         GetUsersTopArtistsRequest getUsersTopArtistsRequest = spotifyApi.getUsersTopArtists().limit(10).build();
         Paging<Artist> artists = getUsersTopArtistsRequest.execute();
@@ -66,8 +66,8 @@ public class ServicioPerfilImpl implements ServicioPerfil {
     }
 
     @Override
-    public List<Track> obtenerTopTracksDeLUsuario(String token, String refreshToken) throws Exception{
-        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+    public List<Track> obtenerTopTracksDeLUsuario(String token) throws Exception{
+        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
         GetUsersTopTracksRequest getUsersTopTracksRequest = spotifyApi.getUsersTopTracks().limit(10).build();
         Paging <Track> topTracks = getUsersTopTracksRequest.execute();
         List<Track> mejores = new ArrayList<>();
@@ -76,7 +76,7 @@ public class ServicioPerfilImpl implements ServicioPerfil {
     }
 
     @Override
-    public List<PlaylistSimplified> obtenerNombreDePlaylistDelUsuario(String token, String refreshToken) throws Exception {
+    public List<PlaylistSimplified> obtenerNombreDePlaylistDelUsuario(String token) throws Exception {
 
         SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
 
@@ -93,7 +93,7 @@ public class ServicioPerfilImpl implements ServicioPerfil {
     }
 
     @Override
-    public Integer obtenerCantidadDePlaylistDelUsuario(String token, String refreshToken) throws Exception {
+    public Integer obtenerCantidadDePlaylistDelUsuario(String token) throws Exception {
         SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
 
         GetListOfCurrentUsersPlaylistsRequest playlist = spotifyApi.getListOfCurrentUsersPlaylists().build();
@@ -104,7 +104,7 @@ public class ServicioPerfilImpl implements ServicioPerfil {
     }
 
     @Override
-    public Track obtenerReproduccionActualDelUsuario(String token, String refreshToken) throws Exception {
+    public Track obtenerReproduccionActualDelUsuario(String token) throws Exception {
         Track track = null;
         SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
 
@@ -121,16 +121,16 @@ public class ServicioPerfilImpl implements ServicioPerfil {
     }
 
     @Override
-    public EstadoDeAnimo obtenerEstadoDeAnimoDelUsuario(String token, String refreshToken) throws Exception{
-    SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+    public EstadoDeAnimo obtenerEstadoDeAnimoDelUsuario(String token) throws Exception{
+    SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
     User user = spotifyApi.getCurrentUsersProfile().build().execute();
     Usuario usuario = repositorioUsuarioImpl.buscarUsuarioPorSpotifyID(user.getId());
     return usuario.getEstadoDeAnimo();
     }
 
     @Override
-    public void actualizarEstadoDeAnimoUsuario(String token, String refreshToken, EstadoDeAnimo estadoDeAnimo) throws Exception{
-        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+    public void actualizarEstadoDeAnimoUsuario(String token, EstadoDeAnimo estadoDeAnimo) throws Exception{
+        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
         User user = spotifyApi.getCurrentUsersProfile().build().execute();
         Usuario usuario = repositorioUsuarioImpl.buscarUsuarioPorSpotifyID(user.getId());
         usuario.setEstadoDeAnimo(estadoDeAnimo);

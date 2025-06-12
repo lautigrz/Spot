@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface ServicioRecomendaciones {
 
-    List<Track> generarRecomendaciones(String token, String refreshToken) throws Exception;
+    List<Track> generarRecomendaciones(String token) throws Exception;
 }

@@ -26,7 +26,6 @@ public class ServicioPerfilImplTest {
     @BeforeEach
     public void setUp() {
         servicioSpotify = mock(ServicioInstancia.class);
-        perfil = new ServicioPerfilImpl(servicioSpotify);
         repositorioUsuarioImpl = mock(RepositorioUsuarioImpl.class);
         perfil = new ServicioPerfilImpl(servicioSpotify, repositorioUsuarioImpl);
         spotifyApi = mock(SpotifyApi.class);
@@ -63,7 +62,7 @@ public class ServicioPerfilImplTest {
 
 
         // Ejecutamos el metodo real
-        User userObtenido = perfil.obtenerPerfilUsuario(token, refreshToken);
+        User userObtenido = perfil.obtenerPerfilUsuario(token);
 
         // Verificaciones
         assertNotNull(userObtenido);
@@ -108,7 +107,7 @@ public class ServicioPerfilImplTest {
         when(paging.getItems()).thenReturn(artistasArray);
 
         // Ejecutamos el metodo real que queremos probar
-        List<Artist> resultado = perfil.obtenerMejoresArtistasDelUsuario(token, refreshToken);
+        List<Artist> resultado = perfil.obtenerMejoresArtistasDelUsuario(token);
 
         // Verificaciones
         assertNotNull(resultado);
@@ -155,7 +154,7 @@ public class ServicioPerfilImplTest {
         when(paging.getItems()).thenReturn(playlistsArray);
 
         // Ejecutamos el método real
-        List<PlaylistSimplified> resultado = perfil.obtenerNombreDePlaylistDelUsuario(token, refreshToken);
+        List<PlaylistSimplified> resultado = perfil.obtenerNombreDePlaylistDelUsuario(token);
 
         // Verificaciones
         assertNotNull(resultado);
@@ -193,7 +192,7 @@ public class ServicioPerfilImplTest {
         when(paging.getTotal()).thenReturn(cantidadEsperada);
 
         // Llamada al metodo real
-        Integer cantidadObtenida = perfil.obtenerCantidadDePlaylistDelUsuario(token, refreshToken);
+        Integer cantidadObtenida = perfil.obtenerCantidadDePlaylistDelUsuario(token);
 
         // Verificaciones
         assertNotNull(cantidadObtenida);
@@ -227,7 +226,7 @@ public class ServicioPerfilImplTest {
         when(currentlyPlaying.getItem()).thenReturn(mockTrack);
 
         // Ejecutar metodo real
-        Track trackObtenido = perfil.obtenerReproduccionActualDelUsuario(token, refreshToken);
+        Track trackObtenido = perfil.obtenerReproduccionActualDelUsuario(token);
 
         // Verificaciones
         assertNotNull(trackObtenido);
@@ -247,7 +246,7 @@ public class ServicioPerfilImplTest {
         String spotifyUserID = "1";
         EstadoDeAnimo estadoDeAnimo = new EstadoDeAnimo("Feliz", 0.5f, 0.5f, 0.5f, 0.5f);
 
-        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken)).thenReturn(spotifyApi);
+        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token)).thenReturn(spotifyApi);
 
         when(spotifyApi.getCurrentUsersProfile()).thenReturn(profileRequestBuilder);
         when(profileRequestBuilder.build()).thenReturn(profileRequest);
@@ -260,7 +259,7 @@ public class ServicioPerfilImplTest {
         when(repositorioUsuarioImpl.buscarUsuarioPorSpotifyID(spotifyUserID)).thenReturn(usuarioMock);
         when(usuarioMock.getEstadoDeAnimo()).thenReturn(estadoDeAnimo);
 
-        EstadoDeAnimo resultado = perfil.obtenerEstadoDeAnimoDelUsuario(token, refreshToken);
+        EstadoDeAnimo resultado = perfil.obtenerEstadoDeAnimoDelUsuario(token);
 
         assertNotNull(resultado);
         assertEquals("Feliz", estadoDeAnimo.getNombre());
@@ -272,7 +271,7 @@ public class ServicioPerfilImplTest {
         String refreshToken = "refresh123";
         EstadoDeAnimo estadoDeAnimo = new EstadoDeAnimo("Feliz", 0.5f, 0.5f, 0.5f, 0.5f);
 
-        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken)).thenReturn(spotifyApi);
+        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token)).thenReturn(spotifyApi);
         when(spotifyApi.getCurrentUsersProfile()).thenReturn(profileRequestBuilder);
         when(profileRequestBuilder.build()).thenReturn(profileRequest);
 
@@ -283,7 +282,7 @@ public class ServicioPerfilImplTest {
         Usuario usuarioMock = mock(Usuario.class);
         when(repositorioUsuarioImpl.buscarUsuarioPorSpotifyID("1")).thenReturn(usuarioMock);
 
-        perfil.actualizarEstadoDeAnimoUsuario(token, refreshToken, estadoDeAnimo);
+        perfil.actualizarEstadoDeAnimoUsuario(token, estadoDeAnimo);
 
         verify(usuarioMock).setEstadoDeAnimo(estadoDeAnimo);
     }

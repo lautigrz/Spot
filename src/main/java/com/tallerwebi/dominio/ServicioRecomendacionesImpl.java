@@ -34,52 +34,9 @@ public class ServicioRecomendacionesImpl implements ServicioRecomendaciones {
         this.servicioSpotify = servicioSpotify;
     }
 
-    /*
     @Override
-    public List<Track> generarRecomendaciones(EstadoDeAnimo estado, String token, String refreshToken, List<String> seedArtistsIds, List<String>seedTracksIds) {
-
-        SpotifyApi spotifyApi = servicioSpotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken);
-
-        float valence = estado.getValence();
-        float danceability = estado.getDanceability();
-        float energy = estado.getEnergy();
-        float tempo = estado.getTempo();
-
-        String seedArtists = String.join(",", seedArtistsIds.stream().limit(5).collect(Collectors.toList()));
-        String seedTracks = String.join(",", seedTracksIds.stream().limit(5).collect(Collectors.toList()));
-
-        GetRecommendationsRequest request = spotifyApi.getRecommendations()
-                .limit(20)
-                .seed_artists(seedArtists)
-                .seed_tracks(seedTracks)
-                .target_valence(valence)
-                .target_danceability(danceability)
-                .target_energy(energy)
-                .target_tempo(tempo)
-                .build();
-
-        try{
-            Recommendations recommendations = request.execute();
-            List<Track> tracks = Arrays.stream(recommendations.getTracks())
-                    .filter(t -> t.getPopularity() != null && t.getPopularity() >= 50)
-                    .collect(Collectors.toList());
-            return tracks;
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            e.printStackTrace();
-            return Collections.emptyList();
-        }
-    }
-    */
-
-    @Override
-    public List<Track> generarRecomendaciones(String token, String refreshToken) throws Exception {
-        SpotifyApi spotifyApi = servicioSpotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken);
-        System.out.println("CHECK SERVICIO !!!!!!!!!!");
-        GetUsersTopTracksRequest getUsersTopTracksRequest = spotifyApi.getUsersTopTracks().limit(10).build();
-        Paging <Track> topTracks = getUsersTopTracksRequest.execute();
-        List<Track> mejores = new ArrayList<>();
-        mejores.addAll(Arrays.asList(topTracks.getItems()));
-        return mejores;
+    public List<Track> generarRecomendaciones(String token) throws Exception {
+        return null;
     }
 
 }
