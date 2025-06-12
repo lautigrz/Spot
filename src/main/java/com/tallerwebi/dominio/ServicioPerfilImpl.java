@@ -10,6 +10,7 @@ import se.michaelthelin.spotify.model_objects.miscellaneous.CurrentlyPlaying;
 import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.data.follow.GetUsersFollowedArtistsRequest;
 import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopArtistsRequest;
+import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopTracksRequest;
 import se.michaelthelin.spotify.requests.data.player.GetInformationAboutUsersCurrentPlaybackRequest;
 import se.michaelthelin.spotify.requests.data.player.GetUsersCurrentlyPlayingTrackRequest;
 import se.michaelthelin.spotify.requests.data.playlists.GetListOfCurrentUsersPlaylistsRequest;
@@ -61,6 +62,16 @@ public class ServicioPerfilImpl implements ServicioPerfil {
         
         mejores.addAll(Arrays.asList(artists.getItems()));
 
+        return mejores;
+    }
+
+    @Override
+    public List<Track> obtenerTopTracksDeLUsuario(String token, String refreshToken) throws Exception{
+        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken);
+        GetUsersTopTracksRequest getUsersTopTracksRequest = spotifyApi.getUsersTopTracks().limit(10).build();
+        Paging <Track> topTracks = getUsersTopTracksRequest.execute();
+        List<Track> mejores = new ArrayList<>();
+        mejores.addAll(Arrays.asList(topTracks.getItems()));
         return mejores;
     }
 
@@ -123,6 +134,5 @@ public class ServicioPerfilImpl implements ServicioPerfil {
         User user = spotifyApi.getCurrentUsersProfile().build().execute();
         Usuario usuario = repositorioUsuarioImpl.buscarUsuarioPorSpotifyID(user.getId());
         usuario.setEstadoDeAnimo(estadoDeAnimo);
-        repositorioUsuarioImpl.actualizarUsuario(usuario);
     }
 }

@@ -27,7 +27,7 @@ public class RepositorioUsuarioImplTest {
     private RepositorioUsuario repositorioUsuario;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp()  {
         repositorioUsuario = new RepositorioUsuarioImpl(sessionFactory);
     }
 

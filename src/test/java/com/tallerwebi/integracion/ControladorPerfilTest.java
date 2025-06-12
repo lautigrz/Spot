@@ -1,6 +1,8 @@
 package com.tallerwebi.integracion;
 
+import com.tallerwebi.dominio.ServicioEstadoDeAnimo;
 import com.tallerwebi.dominio.ServicioPerfil;
+import com.tallerwebi.dominio.ServicioRecomendaciones;
 import com.tallerwebi.presentacion.ControladorPerfil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,11 +25,15 @@ public class ControladorPerfilTest {
     private ServicioPerfil servicioPerfil;
     private HttpSession session;
     private Model model;
+    private ServicioEstadoDeAnimo servicioEstadoDeAnimo;
+    private ServicioRecomendaciones servicioRecomendaciones;
 
     @BeforeEach
     public void setup() {
         servicioPerfil = mock(ServicioPerfil.class);
-        controladorPerfil = new ControladorPerfil(servicioPerfil);
+        servicioEstadoDeAnimo = mock(ServicioEstadoDeAnimo.class);
+        servicioRecomendaciones = mock(ServicioRecomendaciones.class);
+        controladorPerfil = new ControladorPerfil(servicioPerfil, servicioEstadoDeAnimo, servicioRecomendaciones);
         session = mock(HttpSession.class);
         model = mock(Model.class);
     }

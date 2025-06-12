@@ -29,7 +29,7 @@ public class Usuario {
     private String refreshToken;
     private String urlFoto;
     private String spotifyID;
-    @ManyToOne
+    @OneToOne
     private EstadoDeAnimo estadoDeAnimo;
 
     @ManyToMany(fetch = FetchType.LAZY)

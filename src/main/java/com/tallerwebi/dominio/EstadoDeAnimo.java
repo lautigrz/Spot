@@ -1,11 +1,9 @@
 package com.tallerwebi.dominio;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
+@Table(name = "estado_de_animo")
 public class EstadoDeAnimo {
 
     @Id
@@ -28,6 +26,12 @@ public class EstadoDeAnimo {
         this.tempo = tempo;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public Long getId() {
+        return id;
+    }
     public String getNombre() {
         return nombre;
     }

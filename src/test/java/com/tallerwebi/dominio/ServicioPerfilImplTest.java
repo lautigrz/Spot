@@ -22,11 +22,11 @@ public class ServicioPerfilImplTest {
     private SpotifyApi spotifyApi;
     private GetCurrentUsersProfileRequest.Builder profileRequestBuilder;
     private GetCurrentUsersProfileRequest profileRequest;
-    private RepositorioUsuarioImpl repositorioUsuario;
+    private RepositorioUsuarioImpl repositorioUsuarioImpl;
     @BeforeEach
     public void setUp() {
         servicioSpotify = mock(ServicioSpotify.class);
-        RepositorioUsuarioImpl repositorioUsuarioImpl = mock(RepositorioUsuarioImpl.class);
+        repositorioUsuarioImpl = mock(RepositorioUsuarioImpl.class);
         perfil = new ServicioPerfilImpl(servicioSpotify, repositorioUsuarioImpl);
         spotifyApi = mock(SpotifyApi.class);
         profileRequestBuilder = mock(GetCurrentUsersProfileRequest.Builder.class);
@@ -239,7 +239,52 @@ public class ServicioPerfilImplTest {
 
     }
 
+    @Test
+    public void obtenerEstadoDeAnimoDelUsuario() throws Exception {
+        String token = "token123";
+        String refreshToken = "refresh123";
+        String spotifyUserID = "1";
+        EstadoDeAnimo estadoDeAnimo = new EstadoDeAnimo("Feliz", 0.5f, 0.5f, 0.5f, 0.5f);
 
+        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken)).thenReturn(spotifyApi);
 
+        when(spotifyApi.getCurrentUsersProfile()).thenReturn(profileRequestBuilder);
+        when(profileRequestBuilder.build()).thenReturn(profileRequest);
+        User userMock = mock(User.class);
+        when(profileRequest.execute()).thenReturn(userMock);
+
+        when(userMock.getId()).thenReturn(spotifyUserID);
+
+        Usuario usuarioMock = mock(Usuario.class);
+        when(repositorioUsuarioImpl.buscarUsuarioPorSpotifyID(spotifyUserID)).thenReturn(usuarioMock);
+        when(usuarioMock.getEstadoDeAnimo()).thenReturn(estadoDeAnimo);
+
+        EstadoDeAnimo resultado = perfil.obtenerEstadoDeAnimoDelUsuario(token, refreshToken);
+
+        assertNotNull(resultado);
+        assertEquals("Feliz", estadoDeAnimo.getNombre());
+    }
+
+    @Test
+    public void actualizarEstadoDeAnimoDelUsuario() throws Exception {
+        String token = "token123";
+        String refreshToken = "refresh123";
+        EstadoDeAnimo estadoDeAnimo = new EstadoDeAnimo("Feliz", 0.5f, 0.5f, 0.5f, 0.5f);
+
+        when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token, refreshToken)).thenReturn(spotifyApi);
+        when(spotifyApi.getCurrentUsersProfile()).thenReturn(profileRequestBuilder);
+        when(profileRequestBuilder.build()).thenReturn(profileRequest);
+
+        User userMock = mock(User.class);
+        when(profileRequest.execute()).thenReturn(userMock);
+        when(userMock.getId()).thenReturn("1");
+
+        Usuario usuarioMock = mock(Usuario.class);
+        when(repositorioUsuarioImpl.buscarUsuarioPorSpotifyID("1")).thenReturn(usuarioMock);
+
+        perfil.actualizarEstadoDeAnimoUsuario(token, refreshToken, estadoDeAnimo);
+
+        verify(usuarioMock).setEstadoDeAnimo(estadoDeAnimo);
+    }
 
 }
