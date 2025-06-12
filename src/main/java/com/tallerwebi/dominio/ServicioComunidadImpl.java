@@ -23,7 +23,7 @@ import java.util.*;
 @Service
 @Transactional
 public class ServicioComunidadImpl implements ServicioComunidad {
-    private static final Map<String, List<String>> canales = new HashMap<>();
+    private static Map<String, List<String>> canales = new HashMap<>();
 
     private RepositorioComunidad repositorioComunidad;
     private RepositorioUsuario repositorioUsuario;
@@ -39,8 +39,8 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     public Boolean guardarUsuarioEnComunidad(Long idUsuario, Long idComunidad) {
 
         Usuario usuarioEncontrado = repositorioUsuario.buscarUsuarioPorId(idUsuario);
-
-        if(usuarioEncontrado == null){
+        Usuario usuarioExisteEnComunidad = repositorioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
+        if(usuarioEncontrado == null || usuarioExisteEnComunidad != null) {
             return false;
         }
         return repositorioComunidad.guardarUsuarioEnComunidad(usuarioEncontrado, idComunidad);
@@ -76,13 +76,10 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
             String username = (String) simpMessageHeaderAccessor.getSessionAttributes().get("usuario");
 
-            // Si el canal no existe, crearlo
-            canales.putIfAbsent(idComunidad, new ArrayList<>());
-
-            // Agregar el usuario a la lista del canal correspondiente
+            crearCanalSiNoExiste(idComunidad);
             List<String> usuarios = canales.get(idComunidad);
             if (username != null && !usuarios.contains(username)) {
-                canales.get(idComunidad).add(username);
+                agregarUserAlCanal(idComunidad, username);
                 System.out.println("agregado " + username + "en canal " + idComunidad);
             }
 
@@ -105,7 +102,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
         return new ChatMessage();
     }
 
-    //falta test
+
     @Override
     public String obtenerUsuarioDeLaComunidadActivoDeLaLista(String canal, String user) {
 
@@ -135,7 +132,8 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     public Comunidad obtenerComunidad(Long id) {
         return repositorioComunidad.obtenerComunidad(id);
     }
-    //falta test
+
+
     @Override
     public Boolean hayAlguienEnLaComunidad(String nombreComunidad, String user) {
         List<String> usuarios = canales.get(nombreComunidad);
@@ -155,12 +153,26 @@ public class ServicioComunidadImpl implements ServicioComunidad {
         return null;
     }
 
+
     @Override
     public void eliminarUsuarioDelCanal(String user) {
         for (List<String> usuarios : canales.values()) {
             usuarios.remove(user);
         }
     }
+    @Override
+    public void agregarUserAlCanal(String idComunidad, String username) {
+        canales.get(idComunidad).add(username);
+    }
+
+    @Override
+    public void crearCanalSiNoExiste(String idComunidad) {
+        canales.putIfAbsent(idComunidad, new ArrayList<>());
+    }
+    public static void limpiarCanales() {
+        canales.clear();
+    }
+
 
 }
 

@@ -1,9 +1,6 @@
 package com.tallerwebi.infraestructura;
 
-import com.tallerwebi.dominio.Comunidad;
-import com.tallerwebi.dominio.Mensaje;
-import com.tallerwebi.dominio.RepositorioComunidad;
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.*;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -18,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.TypedQuery;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -34,9 +33,13 @@ public class RepositorioComunidadImplTest {
 
     private RepositorioComunidad repositorioComunidad;
 
+    private RepositorioPlaylist repositorioPlaylist;
+
+
     @BeforeEach
     public void setUp() {
         repositorioComunidad = new RepositorioComunidadImpl(sessionFactory);
+        repositorioPlaylist = new RepositorioPlaylistImpl(sessionFactory);
     }
 
 
@@ -254,6 +257,159 @@ public class RepositorioComunidadImplTest {
 
         assertThat(comunidadObtenida.getUsuarios(), containsInAnyOrder(usuarios.toArray()));
 
+    }
+
+    @Test
+    @Rollback
+    public void seDebeObtenerElTokenDeUnUsuarioQuePerteneceAUnaComunidad() {
+        Comunidad comunidad = new Comunidad();
+        comunidad.setNombre("Rock");
+        comunidad.setDescripcion("excelente");
+        repositorioComunidad.guardarNuevaComunidad(comunidad);
+
+        Usuario usuario = new Usuario();
+        usuario.setToken("223");
+        usuario.setUrlFoto("https://");
+        usuario.setUser("lauti");
+        usuario.setRefreshToken("das2");
+        sessionFactory.getCurrentSession().save(usuario);
+
+        repositorioComunidad.guardarUsuarioEnComunidad(usuario, comunidad.getId());
+
+        String token = repositorioComunidad.obtenerTokenDelUsuarioQuePerteneceAUnaComunidad(usuario.getUser(), comunidad.getId());
+
+        assertThat(token, equalTo(usuario.getToken()));
+
+
+
+    }
+
+    @Test
+    @Rollback
+    public void seDebeObtenerUnaPlaylistDeUnaComunidad() {
+
+        Cancion cancion = new Cancion();
+        cancion.setArtista("Billie");
+        cancion.setTitulo("Ocean eyes");
+        cancion.setUri("spotify:track:434fjsd");
+        cancion.setSpotifyId("dfsdfds$fDAc");
+
+        Cancion cancion1 = new Cancion();
+        cancion1.setArtista("Harry");
+        cancion1.setTitulo("Golden");
+        cancion1.setUri("spotify:track:43da114fjsd");
+        cancion1.setSpotifyId("d2fsdfds$6RTa");
+
+        sessionFactory.getCurrentSession().save(cancion);
+        sessionFactory.getCurrentSession().save(cancion1);
+
+        List<Cancion> cancionSet = new ArrayList<>();
+        cancionSet.add(cancion);
+        cancionSet.add(cancion1);
+
+        Comunidad comunidad = new Comunidad();
+        comunidad.setNombre("Rock");
+        comunidad.setDescripcion("excelente");
+
+        Playlist playlist = new Playlist();
+        playlist.setNombre("Prueba");
+        repositorioPlaylist.agregarPlaylist(playlist,cancionSet);
+        comunidad.agregarPlaylist(playlist);
+
+        sessionFactory.getCurrentSession().save(playlist);
+        repositorioComunidad.guardarNuevaComunidad(comunidad);
+
+        Playlist playlistDeLaComunidad = repositorioComunidad.obtenerPlaylistDeUnaComunidad(comunidad.getId());
+        assertThat(playlistDeLaComunidad.getNombre(), equalTo(playlist.getNombre()));
+        assertThat(playlistDeLaComunidad.getId(), equalTo(playlist.getId()));
+    }
+    @Test
+    @Rollback
+    public void seDebeObtenerLasCancionesDeUnaPlaylistDeUnaComunidad() {
+
+        Cancion cancion = new Cancion();
+        cancion.setArtista("Billie");
+        cancion.setTitulo("Ocean eyes");
+        cancion.setUri("spotify:track:434fjsd");
+        cancion.setSpotifyId("dfsdfds$fDAc");
+
+        Cancion cancion1 = new Cancion();
+        cancion1.setArtista("Harry");
+        cancion1.setTitulo("Golden");
+        cancion1.setUri("spotify:track:43da114fjsd");
+        cancion1.setSpotifyId("d2fsdfds$6RTa");
+
+        sessionFactory.getCurrentSession().save(cancion);
+        sessionFactory.getCurrentSession().save(cancion1);
+
+        List<Cancion> cancionSet = new ArrayList<>();
+        cancionSet.add(cancion);
+        cancionSet.add(cancion1);
+
+        Comunidad comunidad = new Comunidad();
+        comunidad.setNombre("Rock");
+        comunidad.setDescripcion("excelente");
+
+        Playlist playlist = new Playlist();
+        playlist.setNombre("Prueba");
+
+        repositorioPlaylist.agregarPlaylist(playlist,cancionSet);
+
+        comunidad.agregarPlaylist(playlist);
+
+        sessionFactory.getCurrentSession().save(playlist);
+        repositorioComunidad.guardarNuevaComunidad(comunidad);
+
+        Set<Cancion> cancionesDeLaPLaylist = repositorioComunidad.obtenerCancionesDeUnaPlaylistDeUnaComunidad(comunidad.getId());
+        assertThat(cancionesDeLaPLaylist.size(), equalTo(cancionSet.size()));
+        assertThat(cancionesDeLaPLaylist,containsInAnyOrder(cancionSet.toArray()));
+
+    }
+
+    @Test
+    @Rollback
+    public void seDebenObtenerLasPlaylistDeUnaComunidad() {
+
+        Cancion cancion = new Cancion();
+        cancion.setArtista("Billie");
+        cancion.setTitulo("Ocean eyes");
+        cancion.setUri("spotify:track:434fjsd");
+        cancion.setSpotifyId("dfsdfds$fDAc");
+
+        Cancion cancion1 = new Cancion();
+        cancion1.setArtista("Harry");
+        cancion1.setTitulo("Golden");
+        cancion1.setUri("spotify:track:43da114fjsd");
+        cancion1.setSpotifyId("d2fsdfds$6RTa");
+
+        sessionFactory.getCurrentSession().save(cancion);
+        sessionFactory.getCurrentSession().save(cancion1);
+
+        List<Cancion> cancionSet = new ArrayList<>();
+        cancionSet.add(cancion);
+        cancionSet.add(cancion1);
+
+        Comunidad comunidad = new Comunidad();
+        comunidad.setNombre("Rock");
+        comunidad.setDescripcion("excelente");
+
+        Playlist playlist = new Playlist();
+        playlist.setNombre("Prueba");
+        repositorioPlaylist.agregarPlaylist(playlist,cancionSet);
+        comunidad.agregarPlaylist(playlist);
+
+        Playlist playlist2 = new Playlist();
+        playlist2.setNombre("Lauti");
+        repositorioPlaylist.agregarPlaylist(playlist2,new ArrayList<>(List.of(cancion)));
+        comunidad.agregarPlaylist(playlist2);
+
+        sessionFactory.getCurrentSession().save(playlist);
+        sessionFactory.getCurrentSession().save(playlist2);
+        repositorioComunidad.guardarNuevaComunidad(comunidad);
+
+        List<Playlist> playlistDeLaComunidad = repositorioComunidad.obtenerPlaylistsPorComunidadId(comunidad.getId());
+
+        assertThat(playlistDeLaComunidad, containsInAnyOrder(playlist, playlist2));
     }
 
 }

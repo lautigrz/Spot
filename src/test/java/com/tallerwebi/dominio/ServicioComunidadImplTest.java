@@ -2,16 +2,22 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.presentacion.dto.ChatMessage;
 import com.tallerwebi.presentacion.dto.UsuarioDto;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import se.michaelthelin.spotify.SpotifyApi;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+
 import static org.mockito.Mockito.*;
 
 public class ServicioComunidadImplTest {
@@ -30,7 +36,10 @@ public class ServicioComunidadImplTest {
         spotifyApiMock = mock(SpotifyApi.class);
         servicioComunidad = new ServicioComunidadImpl(repositorioUsuarioMock,repositorioComunidadMock);
     }
-
+    @AfterEach
+    public void limpiarEstadoGlobal() {
+        ServicioComunidadImpl.limpiarCanales();
+    }
 
     @Test
     public void seDebeGuardarUnMensajeDelUsuarioEnUnaComunidad(){
@@ -55,45 +64,6 @@ public class ServicioComunidadImplTest {
 
         verify(repositorioComunidadMock).guardarMensajeDeLaComunidad(anyString(), anyLong(), anyLong());
         assertThat(mensaje.getSender(), equalTo(usuario.getUser()));
-    }
-
-    @Test
-    public void debeRetornarTrueAlGuardarUsuarioEnUnaComunidad(){
-        Usuario usuario = new Usuario();
-        usuario.setId(1L);
-        usuario.setUser("lauti");
-        usuario.setUrlFoto("htt://fds");
-
-        Comunidad comunidad = new Comunidad();
-        comunidad.setId(2L);
-        comunidad.setNombre("Rock");
-        comunidad.setDescripcion("descripcion");
-
-        when(repositorioUsuarioMock.buscarUsuarioPorId(anyLong())).thenReturn(usuario);
-        when(repositorioComunidadMock.guardarUsuarioEnComunidad(any(Usuario.class),anyLong())).thenReturn(true);
-        when(repositorioComunidadMock.obtenerComunidad(anyLong())).thenReturn(comunidad);
-
-        Boolean seAgregoElUsuarioALaComunidad = servicioComunidad.guardarUsuarioEnComunidad(usuario.getId(),comunidad.getId());
-
-        assertThat(seAgregoElUsuarioALaComunidad, equalTo(true));
-    }
-    @Test
-    public void debeRetornarFalseAlGuardarUsuarioEnUnaComunidad(){
-        Usuario usuario = new Usuario();
-        usuario.setId(1L);
-        usuario.setUser("lauti");
-        usuario.setUrlFoto("htt://fds");
-
-        Comunidad comunidad = new Comunidad();
-        comunidad.setId(2L);
-        comunidad.setNombre("Rock");
-        comunidad.setDescripcion("descripcion");
-
-        when(repositorioUsuarioMock.buscarUsuarioPorId(anyLong())).thenReturn(null);
-
-        Boolean seAgregoElUsuarioALaComunidad = servicioComunidad.guardarUsuarioEnComunidad(usuario.getId(),comunidad.getId());
-
-        assertThat(seAgregoElUsuarioALaComunidad, equalTo(false));
     }
 
     @Test
@@ -182,5 +152,124 @@ public class ServicioComunidadImplTest {
 
         assertThat(listaDeComunidades,containsInAnyOrder(comunidades.toArray()));
 
+    }
+
+    @Test
+    public void seDebeguardarUsuarioEnComunidad(){
+        Comunidad comunidad = new Comunidad();
+        comunidad.setId(2L);
+        comunidad.setNombre("Rock");
+        comunidad.setDescripcion("descripcion");
+
+        when(repositorioComunidadMock.obtenerComunidad(anyLong())).thenReturn(comunidad);
+
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setUser("lauti");
+        usuario.setUrlFoto("htt://fds");
+
+        when(repositorioUsuarioMock.buscarUsuarioPorId(anyLong())).thenReturn(usuario);
+        when(repositorioComunidadMock.obtenerUsuarioEnComunidad(anyLong(), anyLong())).thenReturn(null); // No existe aún
+        when(repositorioComunidadMock.guardarUsuarioEnComunidad(any(Usuario.class), anyLong())).thenReturn(true);
+
+        Boolean seAgrego = servicioComunidad.guardarUsuarioEnComunidad(usuario.getId(), comunidad.getId());
+
+        assertThat(seAgrego, equalTo(true)); // Se agrega correctamente
+
+    }
+    @Test
+    public void debeRetornarFalseSiElUsuarioExisteEnComunidadAlAgregarlo(){
+        Comunidad comunidad = new Comunidad();
+        comunidad.setId(2L);
+        comunidad.setNombre("Rock");
+        comunidad.setDescripcion("descripcion");
+
+        when(repositorioComunidadMock.obtenerComunidad(anyLong())).thenReturn(comunidad);
+
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setUser("lauti");
+        usuario.setUrlFoto("htt://fds");
+
+        when(repositorioUsuarioMock.buscarUsuarioPorId(anyLong())).thenReturn(usuario);
+        when(repositorioComunidadMock.obtenerUsuarioEnComunidad(anyLong(), anyLong())).thenReturn(usuario);
+
+        Boolean seAgrego = servicioComunidad.guardarUsuarioEnComunidad(usuario.getId(),comunidad.getId());
+        assertThat(seAgrego,equalTo(false));
+    }
+
+    @Test
+    public void seDebeEliminarUsuarioDelCanal(){
+
+    servicioComunidad.crearCanalSiNoExiste("5");
+
+    servicioComunidad.agregarUserAlCanal("5","Lauti");
+    servicioComunidad.agregarUserAlCanal("5","Messi");
+
+    servicioComunidad.eliminarUsuarioDelCanal("Lauti");
+
+    List<String> user = servicioComunidad.obtenerTodosLosUsuariosActivosDeUnaComunidad(5L);
+
+    assertThat(user.size(),equalTo(1));
+    assertThat(user.get(0),equalTo("Messi"));
+
+
+    }
+
+    @Test
+    public void seDebeVerificarSiHayAlguienActivoEnLaComunidadExceptoElActual(){
+        servicioComunidad.crearCanalSiNoExiste("5");
+        servicioComunidad.agregarUserAlCanal("5","Lauti");
+        servicioComunidad.agregarUserAlCanal("5","Messi");
+
+        Boolean hayAlguien = servicioComunidad.hayAlguienEnLaComunidad("5", "Lauti");
+        assertThat(hayAlguien,equalTo(true));
+
+    }
+
+    @Test
+    public void seDebeObtenerTodosLosUsuariosActivosDeUnCanal(){
+        servicioComunidad.crearCanalSiNoExiste("5");
+        servicioComunidad.agregarUserAlCanal("5","Lauti");
+        servicioComunidad.agregarUserAlCanal("5","Messi");
+
+        List<String> users = servicioComunidad.obtenerTodosLosUsuariosActivosDeUnaComunidad(5L);
+
+        assertThat(users.size(),equalTo(2));
+        assertThat(users,containsInAnyOrder("Messi","Lauti"));
+
+
+    }
+
+    @Test
+    public void seDebeobtenerUsuarioDeLaComunidadActivoDeLaLista(){
+        servicioComunidad.crearCanalSiNoExiste("5");
+        servicioComunidad.agregarUserAlCanal("5","Lauti");
+        servicioComunidad.agregarUserAlCanal("5","Messi");
+
+        String user = servicioComunidad.obtenerUsuarioDeLaComunidadActivoDeLaLista("5","Lauti");
+        assertThat(user,equalTo("Messi"));
+    }
+
+    @Test
+    public void seDebeRegistrarUnUsuarioEnUnCanal(){
+
+        String idComunidad = "123";
+        String usuario = "juanito";
+
+        ChatMessage message = new ChatMessage();
+        message.setSender(usuario);
+
+        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create();
+        Map<String, Object> sessionAttributes = new HashMap<>();
+        headerAccessor.setSessionAttributes(sessionAttributes);
+
+        ChatMessage resultado = servicioComunidad.registrarUsuarioEnCanalDeComunidad(message, headerAccessor, idComunidad);
+
+
+        List<String> usuariosEnCanal = servicioComunidad.obtenerTodosLosUsuariosActivosDeUnaComunidad(Long.valueOf(idComunidad));
+        assertThat(usuariosEnCanal, containsInAnyOrder(usuario));
+        assertThat(usuario, equalTo(headerAccessor.getSessionAttributes().get("usuario")));
+        assertThat(message, equalTo( resultado));
     }
 }

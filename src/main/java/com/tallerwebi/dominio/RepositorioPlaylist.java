@@ -8,7 +8,9 @@ import java.util.Set;
 public interface RepositorioPlaylist {
     void agregarPlaylist(Playlist playlist, List<Cancion> canciones);
     void agregarCancionALaPlaylist(Long id,Cancion cancion);
+    //falta test
     void eliminarCancionALaPlaylist(Long id,Cancion cancion);
+
     List<Cancion> obtenerCancionesDeLaPlaylist(Long id);
     Playlist obtenerPlaylist(Long idPlaylist);
     void crearNuevaPlaylistConCanciones(Comunidad comunidad, Set<Cancion> canciones);

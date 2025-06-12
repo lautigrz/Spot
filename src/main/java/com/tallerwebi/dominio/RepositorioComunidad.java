@@ -18,4 +18,6 @@ public interface RepositorioComunidad {
     List<Playlist> obtenerPlaylistsPorComunidadId(Long comunidadId);
     Set<Cancion> obtenerCancionesDeUnaPlaylistDeUnaComunidad(Long idComunidad);
     Playlist obtenerPlaylistDeUnaComunidad(Long idComunidad);
+
+
 }

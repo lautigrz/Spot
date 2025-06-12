@@ -61,7 +61,7 @@ public class ControladorComunidad {
 
     @PostMapping("/guardar-canciones/{idComunidad}")
     @ResponseBody
-    public String guardarCanciones(@RequestBody List<CancionDto> canciones, HttpSession session, @PathVariable Long idComunidad){
+    public String guardarCanciones(@RequestBody List<CancionDto> canciones, @PathVariable Long idComunidad){
 
         Comunidad comunidad = servicioComunidad.obtenerComunidad(idComunidad);
 
@@ -72,19 +72,13 @@ public class ControladorComunidad {
 
     @PostMapping("/sincronizarme/{idComunidad}")
     @ResponseBody
-    public ResponseEntity<?> sincronizar(@Payload ChatMessage message, @PathVariable Long idComunidad) {
-
-
+    public ResponseEntity<?> sincronizar(@RequestBody ChatMessage message, @PathVariable Long idComunidad) {
         try {
-            System.out.println("Entró a sincronizar");
-
-            //String username = (String) headerAccessor.getSessionAttributes().get("usuario");
 
             String usuario = servicioComunidad.obtenerUsuarioDeLaComunidadActivoDeLaLista(String.valueOf(idComunidad), message.getSender());
 
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    servicioReproduccion.obtenerSincronizacion(usuario, idComunidad)
-            );
+            Sincronizacion sincronizacion = servicioReproduccion.obtenerSincronizacion(usuario, idComunidad);
+            return ResponseEntity.ok(sincronizacion);
 
         } catch (Exception e) {
             e.printStackTrace();

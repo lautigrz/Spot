@@ -38,46 +38,40 @@ public class ServicioReproduccionImpl implements ServicioReproduccion {
 
 
     @Override
-    public Boolean reproducirCancion(String token, Long idComunidad, Long idUsuario) throws Exception {
-        try {
-            SpotifyApi spotifyApi = servicioInstancia.obtenerInstanciaDeSpotifyConToken(token);
-            Usuario usuario = repositorioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
+    public Boolean reproducirCancion(String token, Long idComunidad, Long idUsuario) throws IOException, ParseException, SpotifyWebApiException {
+        SpotifyApi spotifyApi = servicioInstancia.obtenerInstanciaDeSpotifyConToken(token);
+        Usuario usuario = repositorioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
 
-            List<Playlist> playlists = repositorioComunidad.obtenerPlaylistsPorComunidadId(idComunidad);
-            if (playlists == null || playlists.isEmpty()) {
-                throw new IllegalStateException("La comunidad no tiene playlists.");
-            }
-
-            Set<Cancion> canciones = playlists.get(0).getCanciones();
-            if (canciones == null || canciones.isEmpty()) {
-                throw new IllegalStateException("La playlist no tiene canciones.");
-            }
-
-            JsonArray jsonArray = new JsonArray();
-            for (Cancion cancion : canciones) {
-                jsonArray.add(new JsonPrimitive(cancion.getUri()));
-            }
-
-            StartResumeUsersPlaybackRequest star = spotifyApi.startResumeUsersPlayback()
-                    .uris(jsonArray)
-                    .position_ms(0)
-                    .build();
-            star.execute();
-
-            System.out.println("Canciones entro");
-
-           reproduccionDelUsuario.put(usuario.getUser(),playlists.get(0).getNombre());
-
-            return true;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+        List<Playlist> playlists = repositorioComunidad.obtenerPlaylistsPorComunidadId(idComunidad);
+        if (playlists == null || playlists.isEmpty()) {
+            throw new IllegalStateException("La comunidad no tiene playlists.");
         }
+
+        Set<Cancion> canciones = playlists.get(0).getCanciones();
+        if (canciones == null || canciones.isEmpty()) {
+            throw new IllegalStateException("La playlist no tiene canciones.");
+        }
+
+        JsonArray jsonArray = new JsonArray();
+        for (Cancion cancion : canciones) {
+            jsonArray.add(new JsonPrimitive(cancion.getUri()));
+        }
+
+        StartResumeUsersPlaybackRequest star = spotifyApi.startResumeUsersPlayback()
+                .uris(jsonArray)
+                .position_ms(0)
+                .build();
+        star.execute();
+
+        reproduccionDelUsuario.put(usuario.getUser(), playlists.get(0).getNombre());
+
+        return true;
     }
 
     @Override
-    public CancionDto obtenerCancionSonandoEnLaComunidad(Long idComunidad) throws IOException, ParseException, SpotifyWebApiException {
+    public CancionDto obtenerCancionSonandoEnLaComunidad(Long idComunidad)
+            throws IOException, ParseException, SpotifyWebApiException {
+
         List<String> usuariosActivos = servicioComunidad.obtenerTodosLosUsuariosActivosDeUnaComunidad(idComunidad);
 
         if (usuariosActivos == null || usuariosActivos.isEmpty()) {
@@ -85,46 +79,61 @@ public class ServicioReproduccionImpl implements ServicioReproduccion {
         }
 
         for (String usuario : usuariosActivos) {
-            boolean usuarioInvalido = usuario == null || usuario.trim().isEmpty();
-            boolean noEscuchaNada = reproduccionDelUsuario.get(usuario) == null;
-
-            if (usuarioInvalido || noEscuchaNada) {
-                continue; // Ignorar usuarios inválidos o sin reproducción
+            if (esUsuarioInvalido(usuario) || !estaEscuchandoMusica(usuario)) {
+                continue;
             }
 
             try {
-                String token = repositorioComunidad
-                        .obtenerTokenDelUsuarioQuePerteneceAUnaComunidad(usuario, idComunidad);
-
-                SpotifyApi spotifyApi = servicioInstancia
-                        .obtenerInstanciaDeSpotifyConToken(token);
-
-                CurrentlyPlaying playing = spotifyApi.getUsersCurrentlyPlayingTrack()
-                        .build()
-                        .execute();
-
-                if (playing != null && playing.getItem() instanceof Track) {
-                    Track track = (Track) playing.getItem();
-
-                    CancionDto cancionDto = new CancionDto();
-                    cancionDto.setArtista(track.getArtists()[0].getName());
-                    cancionDto.setTitulo(track.getName());
-                    cancionDto.setUrlImagen(track.getAlbum().getImages()[0].getUrl());
-                    cancionDto.setDuracion(track.getDurationMs());
-                    cancionDto.setProgreso(playing.getProgress_ms());
-
-                    return cancionDto;
+                CancionDto cancion = obtenerCancionActualDeUsuario(usuario, idComunidad);
+                if (cancion != null) {
+                    return cancion;
                 }
-
             } catch (Exception e) {
-                // Podés loguear el error para debugging, pero no frenar el bucle por una sola falla
                 System.err.println("Error al obtener canción de usuario " + usuario + ": " + e.getMessage());
             }
         }
 
         return null; // Ningún usuario tenía una canción activa
-
     }
+
+    private boolean esUsuarioInvalido(String usuario) {
+        return usuario == null || usuario.trim().isEmpty();
+    }
+
+    private boolean estaEscuchandoMusica(String usuario) {
+        return reproduccionDelUsuario.get(usuario) != null;
+    }
+
+    private CancionDto obtenerCancionActualDeUsuario(String usuario, Long idComunidad)
+            throws IOException, ParseException, SpotifyWebApiException {
+
+        String token = repositorioComunidad.obtenerTokenDelUsuarioQuePerteneceAUnaComunidad(usuario, idComunidad);
+
+        SpotifyApi spotifyApi = servicioInstancia.obtenerInstanciaDeSpotifyConToken(token);
+
+        CurrentlyPlaying playing = spotifyApi.getUsersCurrentlyPlayingTrack()
+                .build()
+                .execute();
+
+        if (playing != null && playing.getItem() instanceof Track) {
+
+            Track track = (Track) playing.getItem();
+            return mapearTrackACancionDto(track, playing.getProgress_ms());
+        }
+
+        return null;
+    }
+
+    private CancionDto mapearTrackACancionDto(Track track, int progreso) {
+        CancionDto cancionDto = new CancionDto();
+        cancionDto.setArtista(track.getArtists()[0].getName());
+        cancionDto.setTitulo(track.getName());
+        cancionDto.setUrlImagen(track.getAlbum().getImages()[0].getUrl());
+        cancionDto.setDuracion(track.getDurationMs());
+        cancionDto.setProgreso(progreso);
+        return cancionDto;
+    }
+
 
 
     @Override

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -18,4 +20,16 @@ public class CancionDto {
     private String artista;
     private Integer duracion;
     private Integer progreso;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        CancionDto that = (CancionDto) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }
