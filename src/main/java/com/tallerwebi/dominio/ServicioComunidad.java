@@ -26,4 +26,6 @@ public interface ServicioComunidad {
     List<Comunidad> obtenerTodasLasComunidades();
     Playlist obtenerLasPlaylistDeUnaComunidad(Long idComunidad);
     void eliminarUsuarioDelCanal(String user);
+    void agregarUserAlCanal(String idComunidad, String username);
+    void crearCanalSiNoExiste(String idComunidad);
 }

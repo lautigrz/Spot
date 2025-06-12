@@ -57,8 +57,6 @@ public class ServicioPlaylistImpl implements ServicioPlaylist {
     @Override
     public void crearNuevaPlaylistConCanciones(Comunidad comunidad, List<CancionDto> canciones) {
 
-
-
         Set<Cancion> cancionesLista = new HashSet<>();
 
         for (CancionDto cancionDto : canciones) {
