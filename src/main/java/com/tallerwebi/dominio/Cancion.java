@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,9 +20,18 @@ public class Cancion {
     @GeneratedValue
     private Long id;
 
+    @Column(unique=true)
+    private String spotifyId;
+
+    private String uri;
+
+    private String urlImagen;
+
     private String titulo;
 
+    private String artista;
+
     @ManyToMany(mappedBy = "canciones")
-    private List<Playlist> playlists;
+    private Set<Playlist> playlists = new HashSet<>();
 
 }

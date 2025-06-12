@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.presentacion.dto.CancionDto;
 import com.tallerwebi.presentacion.dto.ChatMessage;
 import com.tallerwebi.presentacion.dto.Sincronizacion;
 import com.tallerwebi.presentacion.dto.UsuarioDto;
@@ -19,11 +20,12 @@ public interface ServicioComunidad {
     ChatMessage registrarUsuarioEnCanalDeComunidad(ChatMessage message, SimpMessageHeaderAccessor simpMessageHeaderAccessor,String idComunidad);
     ChatMessage guardarMensaje(ChatMessage message, Long idUsuario, Long idComunidad);
     String obtenerUsuarioDeLaComunidadActivoDeLaLista(String canal,String user);
+    List<String> obtenerTodosLosUsuariosActivosDeUnaComunidad(Long idComunidad);
     Comunidad obtenerComunidad(Long id);
-    Boolean reproducirCancion(String token) throws Exception;
-    Sincronizacion obtenerSincronizacion(String user,Long id) throws Exception;
-    int obtenerPosicionEnMsDeLoQueEscucha(String token) throws IOException, ParseException, SpotifyWebApiException;
-    String obtenerTokenDelUsuario(String user, Long idComunidad);
     Boolean hayAlguienEnLaComunidad (String nombreComunidad, String user);
     List<Comunidad> obtenerTodasLasComunidades();
+    Playlist obtenerLasPlaylistDeUnaComunidad(Long idComunidad);
+    void eliminarUsuarioDelCanal(String user);
+    void agregarUserAlCanal(String idComunidad, String username);
+    void crearCanalSiNoExiste(String idComunidad);
 }

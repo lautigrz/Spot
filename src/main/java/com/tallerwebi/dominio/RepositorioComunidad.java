@@ -3,6 +3,7 @@ package com.tallerwebi.dominio;
 import com.tallerwebi.presentacion.dto.UsuarioDto;
 
 import java.util.List;
+import java.util.Set;
 
 public interface RepositorioComunidad {
     void guardarMensajeDeLaComunidad(String mensaje, Long idUsuario, Long idComunidad);
@@ -14,4 +15,9 @@ public interface RepositorioComunidad {
     Boolean guardarUsuarioEnComunidad(Usuario usuario,Long idComunidad);
     Usuario obtenerUsuarioEnComunidad(Long idUsuario, Long idComunidad);
     Comunidad  obtenerComunidadConUsuarios(Long idComunidad);
+    List<Playlist> obtenerPlaylistsPorComunidadId(Long comunidadId);
+    Set<Cancion> obtenerCancionesDeUnaPlaylistDeUnaComunidad(Long idComunidad);
+    Playlist obtenerPlaylistDeUnaComunidad(Long idComunidad);
+
+
 }
