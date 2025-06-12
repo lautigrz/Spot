@@ -34,5 +34,15 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
         return (Usuario) sessionFactory.getCurrentSession().get(Usuario.class, id);
     }
 
+    @Override
+    public Usuario buscarUsuarioPorSpotifyID(String spotifyID) {
+        return (Usuario) sessionFactory.getCurrentSession().createCriteria(Usuario.class)
+                .add(Restrictions.eq("spotifyID", spotifyID))
+                .uniqueResult();
+    }
 
+    @Override
+    public void actualizarUsuario(Usuario usuario) {
+        sessionFactory.getCurrentSession().update(usuario);
+    }
 }
