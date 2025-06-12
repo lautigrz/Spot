@@ -17,6 +17,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 
@@ -89,19 +90,19 @@ public class ControladorComunidad {
     }
 
     @GetMapping("/reproducir/{idComunidad}")
-    public String reproducirMusica(HttpSession session, @PathVariable Long idComunidad) {
+    public String reproducirMusica(HttpSession session, @PathVariable Long idComunidad,
+                                   RedirectAttributes redirectAttributes) {
         try {
             String token = (String) session.getAttribute("token");
             Long idUsuario = (Long) session.getAttribute("user");
             servicioReproduccion.reproducirCancion(token, idComunidad, idUsuario);
-
         } catch (Exception e) {
             e.printStackTrace();
-            return "redirect:/error";
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
 
-        // Redirigir a la página de la comunidad usando el idComunidad recibido
         return "redirect:/comunidad/" + idComunidad;
+
     }
 
 

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import se.michaelthelin.spotify.exceptions.detailed.BadGatewayException;
+import se.michaelthelin.spotify.exceptions.detailed.UnauthorizedException;
 import se.michaelthelin.spotify.model_objects.miscellaneous.CurrentlyPlaying;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.requests.data.player.StartResumeUsersPlaybackRequest;
@@ -57,11 +59,19 @@ public class ServicioReproduccionImpl implements ServicioReproduccion {
             jsonArray.add(new JsonPrimitive(cancion.getUri()));
         }
 
-        StartResumeUsersPlaybackRequest star = spotifyApi.startResumeUsersPlayback()
-                .uris(jsonArray)
-                .position_ms(0)
-                .build();
-        star.execute();
+        try {
+            StartResumeUsersPlaybackRequest star = spotifyApi.startResumeUsersPlayback()
+                    .uris(jsonArray)
+                    .position_ms(0)
+                    .build();
+            star.execute();
+        } catch (SpotifyWebApiException e) {
+            if (e instanceof BadGatewayException) {
+                throw new RuntimeException("Spotify respondió con error 502 (Bad Gateway). ¿Hay algún dispositivo activo?", e);
+            }
+
+            throw new RuntimeException("Error al intentar reproducir desde Spotify.", e);
+        }
 
         reproduccionDelUsuario.put(usuario.getUser(), playlists.get(0).getNombre());
 
