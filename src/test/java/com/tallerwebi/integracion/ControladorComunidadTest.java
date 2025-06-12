@@ -303,7 +303,7 @@ public class ControladorComunidadTest {
                         .sessionAttr("token", token)
                         .sessionAttr("user", idUsuario))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/error"));
+                .andExpect(redirectedUrl("/comunidad/" + idComunidad));
 
 
         verify(servicioReproduccion).reproducirCancion(token, idComunidad, idUsuario);
