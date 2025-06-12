@@ -6,6 +6,8 @@ import com.tallerwebi.dominio.ServicioPerfil;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.infraestructura.RepositorioUsuarioImpl;
 import com.tallerwebi.dominio.*;
+import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.infraestructura.RepositorioUsuarioImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,7 +26,6 @@ import java.util.List;
 
 @Controller
 public class ControladorPerfil {
-
 
     private ServicioPerfil servicioPerfil;
     private ServicioEstadoDeAnimo servicioEstadoDeAnimo;
