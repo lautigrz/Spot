@@ -1,0 +1,19 @@
+[33m6db745f[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/thomi_branch[m[33m, [m[1;31morigin/feature/thomi_branch[m[33m)[m Preparacion para sprint 12-06
+[33m918d133[m creacion de estado de animo con servicio y repositorio + funcionamiento desde el servicio de perfil
+[33m6a14228[m[33m ([m[1;31morigin/feature/sincronizacion[m[33m)[m sincronizacion y test hechos, exceptos los que necesitan cambio
+[33m25b462f[m sincronizacion de musica en comunidades, el usuario podra sincronizarse con otros usuarios para poder escuchar la misma musica y al mismo tiempo
+[33meede64d[m se arreglo el envio de mensajes por websocket
+[33m3a429e1[m se implemento sincronizacion de musica entre usuarios
+[33m19764bc[m[33m ([m[1;31morigin/feature/comunidad[m[33m)[m test terminados
+[33m5e41ef3[m test hechos
+[33mebbd2f5[m chat en una comunidad, se implemento web socket
+[33m57a9ee6[m se agrego entidad mensaje para guardar los mensajes en la bd y recuperarlos
+[33m44771d0[m se agrego vista de comunidad, se implemento websocket para el chat, falta pulir
+[33m8bcbe5c[m docker file
+[33mcf2aeda[m Merge branch 'feature/login-spotify'
+[33me84bc8f[m[33m ([m[1;31morigin/feature/login-spotify[m[33m)[m algunos test hechos
+[33meb55fc5[m login y perfil del usuario
+[33mc6e6b32[m Merge pull request #1 from lautigrz/feature/home-service-albums
+[33m237e933[m[33m ([m[1;31morigin/feature/home-service-albums[m[33m)[m Se implemento HomeService y HomeController para obtener álbumes en una vista albums
+[33mde13ba5[m bean de spotify
+[33mae56523[m first commit
