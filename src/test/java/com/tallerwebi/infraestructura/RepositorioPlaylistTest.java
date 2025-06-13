@@ -175,7 +175,7 @@ public class RepositorioPlaylistTest {
 
         sessionFactory.getCurrentSession().save(comunidad);
 
-        repositorioPlaylist.crearNuevaPlaylistConCanciones(comunidad,cancionSet);
+        repositorioPlaylist.crearNuevaPlaylistConCanciones(comunidad,cancionSet, "d","D");
 
         String hql = "FROM Playlist p WHERE p.comunidad.id = :idComunidad";
         Query query = sessionFactory.getCurrentSession().createQuery(hql);

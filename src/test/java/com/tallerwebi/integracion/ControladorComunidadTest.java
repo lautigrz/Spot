@@ -198,7 +198,7 @@ public class ControladorComunidadTest {
 
         assertThat(comunidadMock, equalTo(servicioComunidadMock.obtenerComunidad(idComunidad)));
 
-        verify(servicioPlaylist).crearNuevaPlaylistConCanciones(comunidadMock, listaSimulada);
+        verify(servicioPlaylist).crearNuevaPlaylistConCanciones(comunidadMock, listaSimulada, "d", "d");
     }
 
     @Test

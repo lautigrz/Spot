@@ -153,4 +153,13 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
         return playlists.get(0);
     }
 
+    @Override
+    public List<Usuario> obtenerUsuariosPorComunidad(Long idComunidad) {
+        String hql = "SELECT u FROM Comunidad c JOIN c.usuarios u WHERE c.id = :idComunidad";
+        TypedQuery<Usuario> query = sessionFactory.getCurrentSession().createQuery(hql, Usuario.class);
+        query.setParameter("idComunidad", idComunidad);
+        return query.getResultList();
+    }
+
+
 }

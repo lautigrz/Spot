@@ -115,15 +115,44 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 
-    const crearPlaylist = document.getElementById('crearPlaylistBtn');
-    const idComunidad = document.getElementById('comunidad').value;
-    crearPlaylist.addEventListener('click', (event) => {
+    // Mostrar preview de la imagen cuando se selecciona
+    document.getElementById('imagenPlaylist').addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        console.log('Archivo seleccionado:', file);
+        const preview = document.getElementById('previewImagen');
+        if (file) {
+            const url = URL.createObjectURL(file);
+            preview.src = url;
+        } else {
+            preview.src = "https://via.placeholder.com/200x200?text=+";
+        }
+    });
+
+// Enviar formulario al backend con FormData al clickear crear playlist
+    document.getElementById('btnCrearPlaylist').addEventListener('click', (event) => {
+        const idComunidad = document.getElementById('comunidad').value;
+        const nombrePlaylist = document.getElementById('nombrePlaylist').value;
+        const imagenInput = document.getElementById("imagenPlaylist");
+        const imagen = imagenInput.files[0];
+
+        console.log('Input imagenPlaylist:', imagenInput);
+        console.log('Archivos seleccionados:', imagenInput.files);
+        console.log('Primer archivo:', imagen);
+
+        console.log('nombre:', nombrePlaylist);
+        if (!nombrePlaylist || !imagen) {
+            alert("Faltan datos para crear la playlist.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('nombre', nombrePlaylist);
+        formData.append('imagen', imagen);
+        formData.append('canciones', JSON.stringify(arregloDeCanciones));
+
         fetch(`/spring/guardar-canciones/${idComunidad}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(arregloDeCanciones)
+            body: formData
         })
             .then(response => {
                 if (!response.ok) {
@@ -132,15 +161,74 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.text();
             })
             .then(data => {
-                console.log("url:" + data);
-               window.location.href = data
+                console.log("URL:", data);
+                window.location.href = data;
                 arregloDeCanciones = [];
             })
             .catch(error => {
                 console.error('Error:', error);
             });
+    });
 
+
+    document.getElementById('listaPlaylists').addEventListener('click', (event) => {
+
+        const playlistDiv = event.target.closest('.playlist-item');
+        if (!playlistDiv) return;
+
+        const idCompleto = playlistDiv.id;
+        const nombreElemento = playlistDiv.querySelector('h5');
+        const idPlaylist = idCompleto ? idCompleto.replace('playlist-', '') : null;
+
+        console.log('Playlist clickeada con id:', idPlaylist);
+        document.getElementById('listaPlaylists').classList.add('d-none');
+        document.getElementById('detallePlaylist').classList.remove('d-none');
+
+
+        obtenerCancionesDeUnaPlaylist(idPlaylist)
+            .then(canciones => {
+                const contenido = document.getElementById('contenidoCanciones');
+
+                if (!canciones || canciones.length === 0) {
+                    contenido.innerHTML = '<p>No hay canciones en esta playlist.</p>';
+                    return;
+                }
+
+                let html = `<h5>${nombreElemento.textContent}</h5>`; // si tienes nombre playlist en el DTO, si no, solo 'Playlist'
+                html += `<div class="list-group">`;
+
+                canciones.forEach(c => {
+                    html += `
+  <div class="d-flex align-items-center bg-dark text-white mb-1 p-3 rounded shadow-sm" style="box-shadow: 0 2px 8px rgba(58,55,55,0.17);">
+    <img src="${c.urlImagen || '/images/default.jpg'}" alt="${c.artista}" class="me-3 rounded" style="width: 60px; height: 60px; object-fit: cover;">
+    <div>
+      <div class="fw-bold">${c.titulo}</div>
+      <small class="text-white-80">${c.artista}</small>
+    </div>
+  </div>
+`;
+                });
+
+                html += `</div>`;
+                contenido.innerHTML = html;
+            })
+            .catch(error => console.error(error));
+
+    });
+    document.getElementById('volver').addEventListener('click', function () {
+        document.getElementById('detallePlaylist').classList.add('d-none');
+        document.getElementById('listaPlaylists').classList.remove('d-none');
     });
 
 });
+
+function obtenerCancionesDeUnaPlaylist(idPlaylist) {
+    return fetch(`/spring/canciones-de-playlist/${idPlaylist}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error en la búsqueda');
+        }
+        return response.json();
+    });
+}
 

@@ -24,7 +24,7 @@ function connect() {
     stompClient.connect({}, function(frame) {
         onConnected(datos);
     }, onError);
-
+    marcarUsuarioComoActivo(datos.username);
 
 }
 
@@ -42,6 +42,8 @@ function onConnected(datos) {
         {},
         JSON.stringify({sender: datos.username, type: "JOIN"}),
     );
+
+
     obtenerCancionActualDesdeServidor(datos.idComunidad);
 }
 
@@ -79,6 +81,7 @@ function onMessageReceived(payload) {
         messageArea.appendChild(nuevoMensaje);
         messageArea.scrollTop = messageArea.scrollHeight;
     }
+
 }
 
 function crearMensajeHTML(message) {
@@ -182,6 +185,21 @@ function sincronizarSpotify(payload) {
         .catch(error => console.error('Error al sincronizar la canción:', error));
 
 }
+function marcarUsuarioComoActivo(username) {
+    console.log("user:" + username);
+    const usuarios = document.querySelectorAll('li');
+    usuarios.forEach(li => {
+        const nombre = li.querySelector('strong')?.textContent?.trim();
+        if (nombre === username) {
+            const indicador = li.querySelector('.status-indicator');
+            if (indicador) {
+                indicador.classList.remove('bg-danger');
+                indicador.classList.add('bg-success');
+            }
+        }
+    });
+}
+
 
 messageForm.addEventListener("click", send, true);
 window.addEventListener("load", function () {

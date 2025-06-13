@@ -43,6 +43,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
         if(usuarioEncontrado == null || usuarioExisteEnComunidad != null) {
             return false;
         }
+
         return repositorioComunidad.guardarUsuarioEnComunidad(usuarioEncontrado, idComunidad);
     }
 
@@ -75,7 +76,6 @@ public class ServicioComunidadImpl implements ServicioComunidad {
             simpMessageHeaderAccessor.getSessionAttributes().put("usuario", message.getSender());
 
             String username = (String) simpMessageHeaderAccessor.getSessionAttributes().get("usuario");
-
             crearCanalSiNoExiste(idComunidad);
             List<String> usuarios = canales.get(idComunidad);
             if (username != null && !usuarios.contains(username)) {
@@ -150,6 +150,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
     @Override
     public Playlist obtenerLasPlaylistDeUnaComunidad(Long idComunidad) {
+
         return null;
     }
 
@@ -162,6 +163,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     }
     @Override
     public void agregarUserAlCanal(String idComunidad, String username) {
+
         canales.get(idComunidad).add(username);
     }
 
@@ -169,6 +171,37 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     public void crearCanalSiNoExiste(String idComunidad) {
         canales.putIfAbsent(idComunidad, new ArrayList<>());
     }
+
+    @Override
+    public List<UsuarioDto> obtenerUsuariosDeLaComunidad(Long idComunidad) {
+
+        List<UsuarioDto> usuariosDto = new ArrayList<>();
+
+        List<Usuario> usuarios = repositorioComunidad.obtenerUsuariosPorComunidad(idComunidad);
+
+        System.out.println("usuarios del repo" + usuarios.size());
+
+        List<String> usuariosEnCanalActivos = obtenerTodosLosUsuariosActivosDeUnaComunidad(idComunidad);
+
+        System.out.println("usuarios del canal" + usuariosEnCanalActivos.size());
+
+        for (Usuario usuario : usuarios) {
+            UsuarioDto usuarioDto = new UsuarioDto();
+            if(usuariosEnCanalActivos.contains(usuario.getUser())){
+
+                usuarioDto.setActivo(true);
+
+            }
+
+            usuarioDto.setUser(usuario.getUser());
+            usuarioDto.setId(usuario.getId());
+            usuarioDto.setUrlFoto(usuario.getUrlFoto());
+            usuariosDto.add(usuarioDto);
+
+        }
+        return usuariosDto;
+    }
+
     public static void limpiarCanales() {
         canales.clear();
     }

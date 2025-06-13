@@ -17,8 +17,8 @@ public class Playlist {
     @Id
     @GeneratedValue
     private Long id;
-
     private String nombre;
+    private String urlImagen;
 
     @ManyToMany
     @JoinTable(

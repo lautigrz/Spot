@@ -6,110 +6,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-
-    <style>
-        body {
-            background-color: #fff;
-        }
-        aside, section {
-            background-color: #f8f9fa;
-            height: 100vh;
-            overflow-y: auto;
-        }
-        .rounded-profile {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .action-icons i {
-            cursor: pointer;
-            margin-right: 15px;
-        }
-        aside {
-            height: 100vh; /* Full height */
-            background-color: red;
-            border-radius: 20px;
-            margin-left: 1rem;         /* Margen para que no esté pegado */
-            padding: 1rem;             /* Espacio interior */
-            width: 60%;                /* Hace que sea más chico dentro del col-md-2 */
-        }
-        .friends-feed-fixed {
-            position: fixed;
-            top: 2%;
-            right: 0;
-            height: 100vh;
-            background-color: #ffffff;
-            padding: 1rem;
-            width: 25%;
-            display: flex;
-            flex-direction: column;
-        }aside {
-             height: 80vh; /* Full height */
-             background-color: rgb(255, 255, 255);
-             border-radius: 20px;
-             margin-left: 1rem;
-             margin-top: 20px !important;       /* Margen para que no esté pegado */
-             /* Espacio interior */
-             width: 60%;                /* Hace que sea más chico dentro del col-md-2 */
-             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Sombra agregada */
-         }
-        .notificacion {
-            background-color: white;
-            margin-right: 13px;
-        }
-        .lista-friends {
-            flex: 1;
-            overflow-y: auto;
-            border-radius: 30px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            max-height: 100%; /* importante para que respete el alto disponible */
-        }
-        .btn-spotify {
-            background-color: #390657; /* verde Spotify */
-            color: white;
-            border: none;
-            border-radius: 10px;
-        }
-        .btn-spotify:hover {
-            background-color: #5917a4;
-            color: white;
-        }
-
-        nav > a.nav-link {
-            color: black;
-            font-weight: 600;
-        }
-
-        #backToTop{
-            display: none;
-        }
-
-        #fixed-message-box {
-            margin-bottom: 6%;
-        }
-
-        .fixed-message-box input {
-
-            height: 60px; /* más alto como pediste */
-        }
-
-        .btn-white-border {
-            background-color: white;
-            color: black;
-            border: 1px solid black;
-            font-weight: bold;
-        }
-        .btn-success-checked {
-            background-color: green !important;
-            color: white !important;
-            border-color: green !important;
-        }
-
-
-
-    </style>
+    <link rel="stylesheet" th:href="@{/css/comunidad.css}"/>
 </head>
 <body>
 <input type="hidden" id="username" th:value="${usuario}">
@@ -126,8 +23,12 @@
             <nav class="nav flex-column mt-3">
 
                 <a class="nav-link" href="#" id="playlist" data-bs-toggle="modal" data-bs-target="#modalPlaylist"><i class="bi bi-plus-circle"></i> Crear nueva playlist</a>
+                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#modalPlaylists">
+                    <i class="fas fa-users me-2"></i>Ver Playlists de la comunidad
+                </a>
+
                 <a class="nav-link active" href="#"><i class="fas fa-music me-2"></i>Recomendar Canción</a>
-                <a class="nav-link" href="#"><i class="fas fa-users me-2"></i>Ver Playlists de la comunidad</a>
+
                 <a class="nav-link" href="#"><i class="fas fa-star me-2"></i>Top Tracks de la Comunidad</a>
                 <a class="nav-link" href="#"><i class="fas fa-calendar-alt me-2"></i>Eventos proximos</a>
 
@@ -245,97 +146,21 @@
             <!-- Lista de amigos -->
             <div class="lista-friends">
                 <ul class="list-unstyled">
-                    <li class="d-flex align-items-center mb-3">
-                        <img src="" class="rounded-profile me-3">
+                    <li class="d-flex align-items-center mb-3" th:each="usuarios : ${usuariosActivos}">
+                        <div class="position-relative me-3">
+                            <img th:src="${usuarios.getUrlFoto()}" class="rounded-profile">
+                            <span
+                                    class="status-indicator position-absolute rounded-circle"
+                                    th:classappend="${usuarios.getActivo()} ? 'bg-success' : 'bg-danger'"
+                                    style="top: 0; right: 0; width: 12px; height: 12px; border: 2px solid white;">
+    </span>
+                        </div>
                         <div>
-                            <strong>Alexandra Beats</strong><br>
+                            <strong th:text="${usuarios.getUser()}"></strong><br>
                             <small>🎧 Listening to Latest Hits</small>
                         </div>
                     </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <img src="" class="rounded-profile me-3">
-                        <div>
-                            <strong>Lucas Groove</strong><br>
-                            <small>⬇️ Downloading Summer Vibes Mix</small>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <img src="" class="rounded-profile me-3">
-                        <div>
-                            <strong>Max Power</strong><br>
-                            <small>📢 Published: Tech Talk Episode</small>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <img src="" class="rounded-profile me-3">
-                        <div>
-                            <strong>Sarah Sounds</strong><br>
-                            <small>▶️ Currently playing: Chill Beats Mix</small>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <img src="R.jpeg" class="rounded-profile me-3">
-                        <div>
-                            <strong>Sarah Sounds</strong><br>
-                            <small>▶️ Currently playing: Chill Beats Mix</small>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
-                        <div>
-                            <strong>Sarah Sounds</strong><br>
-                            <small>▶️ Currently playing: Chill Beats Mix</small>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
-                        <div>
-                            <strong>Sarah Sounds</strong><br>
-                            <small>▶️ Currently playing: Chill Beats Mix</small>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
-                        <div>
-                            <strong>Sarah Sounds</strong><br>
-                            <small>▶️ Currently playing: Chill Beats Mix</small>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
-                        <div>
-                            <strong>Sarah Sounds</strong><br>
-                            <small>▶️ Currently playing: Chill Beats Mix</small>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
-                        <div>
-                            <strong>Sarah Sounds</strong><br>
-                            <small>▶️ Currently playing: Chill Beats Mix</small>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
-                        <div>
-                            <strong>Sarah Sounds</strong><br>
-                            <small>▶️ Currently playing: Chill Beats Mix</small>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
-                        <div>
-                            <strong>Sarah Sounds</strong><br>
-                            <small>▶️ Currently playing: Chill Beats Mix</small>
-                        </div>
-                    </li>
-                    <li class="d-flex align-items-center mb-3">
-                        <img src="https://via.placeholder.com/40" class="rounded-profile me-3">
-                        <div>
-                            <strong>Sarah Sounds</strong><br>
-                            <small>▶️ Currently playing: Chill Beats Mix</small>
-                        </div>
-                    </li>
+
                 </ul>
             </div>
         </section>
@@ -343,6 +168,7 @@
 
     </div>
 </div>
+
 
 
 <footer class="music-player-footer text-white fixed-bottom px-4 d-flex align-items-center justify-content-between shadow-lg" id="footer"  style="height: 50px !important; padding: 35px !important; display: none !important;">
@@ -382,33 +208,121 @@
 </a>
 
 
-<!-- Modal -->
+<!-- Modal nueva playlist -->
+
 <div class="modal fade" id="modalPlaylist" tabindex="-1" aria-labelledby="modalPlaylistLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
+        <div class="modal-content bg-dark text-white rounded-4 shadow-lg border-0">
 
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalPlaylistLabel">Agregar canciones a tu nueva playlist</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold" id="modalPlaylistLabel">
+                    <i class="fas fa-music me-2"></i>Crear nueva playlist
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
 
-            <div class="modal-body">
-                <!-- Input de búsqueda -->
-                <input type="text" id="inputBusqueda" class="form-control mb-3" placeholder="Buscar canción...">
+            <div class="modal-body px-4 py-3">
+                <!-- Paso 1: Datos de la playlist -->
+                <div id="paso1">
+                    <div class="text-center mb-4">
+                        <div class="preview-img mb-3">
+                            <img id="previewImagen" src="https://via.placeholder.com/200x200?text=+" class="rounded-3 shadow" width="200" height="200">
+                        </div>
+                        <div class="text-center mb-4">
+                            <!-- Contenedor de preview e input -->
+                            <label for="imagenPlaylist" id="selectorImagen" class="custom-img-upload">
 
-                <!-- Lista de canciones -->
-                <div id="contenedorCanciones" class="list-group">
+                                <div class="overlay-text">
+                                    <i class="fas fa-camera fa-2x"></i>
+                                    <p class="mb-0">Subir imagen</p>
+                                </div>
+                            </label>
+                            <!-- Input real, oculto -->
+                            <input type="file" id="imagenPlaylist" class="d-none" accept="image/*">
+                        </div>
 
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nombrePlaylist" class="form-label">Nombre de la playlist</label>
+                        <input type="text" class="form-control bg-dark text-white border-secondary" id="nombrePlaylist" placeholder="Ej: Mi playlist chill">
+                    </div>
                 </div>
-            </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button id="crearPlaylistBtn" type="button" class="btn btn-primary">Crear Playlist</button>
+                <!-- Paso 2: Selección de canciones -->
+                <div class="modal-body d-none" id="paso2">
+                    <!-- Input de búsqueda -->
+                    <input type="text" id="inputBusqueda" class="form-control mb-3" placeholder="Buscar canción...">
+
+                    <!-- Lista de canciones -->
+                    <div id="contenedorCanciones" class="list-group">
+
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 justify-content-between">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancelar</button>
+                    <div class="ms-auto">
+                        <button id="btnSiguiente" type="button" class="btn btn-success">Siguiente</button>
+                        <button id="btnCrearPlaylist" type="button" class="btn btn-primary d-none">Crear Playlist</button>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modalPlaylists" tabindex="-1" aria-labelledby="modalPlaylistsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark text-white rounded-4 shadow-lg border-0">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalPlaylistsLabel">Playlists de la Comunidad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Vista principal: Lista de playlists -->
+                <div id="listaPlaylists" class="row g-4" >
+
+                    <div class="col-sm-6 col-lg-4" th:each="playlist : ${playlistsDeLaComunidad}">
+                        <div class="playlist-item ver-canciones" th:id="${playlist.getId()}" role="button" tabindex="0" aria-label="Ver canciones Electrónica Chill">
+
+                            <div class="playlist-thumb position-relative">
+                                <img th:src="${playlist.getUrlImagen()}" alt="Electrónica Chill" class="img-fluid rounded">
+                                <div class="playlist-overlay">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                            </div>
+
+                            <div class="playlist-info mt-2">
+                                <h5 id="name-playlist" class="mb-1" th:text="${playlist.getNombre()}"></h5>
+                                <p class="mb-0 text-muted">Sonidos suaves para relajarte</p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="detallePlaylist" class="d-none">
+                    <button class="btn btn-sm btn-outline-secondary mb-3" id="volver">← Volver a playlists</button>
+                    <div id="contenidoCanciones">
+                        <!-- Canciones cargadas dinámicamente según la playlist -->
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
 
 <!-- Modal de error -->
 <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true"
@@ -450,9 +364,6 @@
             document.getElementById('backToTop').style.setProperty('display', 'flex' ,'important');
             document.getElementById('fixed-message-box').classList.remove('mb-5');
             document.getElementById('fixed-message-box').classList.add('mb-0');
-
-
-
             console.log('Footer closed');
         });
 
@@ -480,9 +391,48 @@
     function validarMensaje() {
         return input.value.trim().length > 0;
     }
+
+    document.getElementById('btnSiguiente').addEventListener('click', function () {
+        const nombre = document.getElementById('nombrePlaylist').value.trim();
+        if (!nombre) {
+            alert('Por favor ingresá un nombre para la playlist');
+            return;
+        }
+
+        document.getElementById('paso1').classList.add('d-none');
+        document.getElementById('paso2').classList.remove('d-none');
+
+        document.getElementById('modalPlaylistLabel').innerHTML = '<i class="fas fa-headphones me-2"></i>Agregar canciones a la playlist';
+        this.classList.add('d-none');
+        document.getElementById('btnCrearPlaylist').classList.remove('d-none');
+    });
+
+    document.getElementById('btnCrearPlaylist').addEventListener('click', function () {
+        alert('Playlist creada!');
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalPlaylist'));
+        modal.hide();
+
+        // Reset
+        document.getElementById('paso1').classList.remove('d-none');
+        document.getElementById('paso2').classList.add('d-none');
+        document.getElementById('btnCrearPlaylist').classList.add('d-none');
+        document.getElementById('btnSiguiente').classList.remove('d-none');
+
+        document.getElementById('previewImagen').src = 'https://via.placeholder.com/200x200?text=+';
+    });
+
+    document.getElementById('imagenPlaylist').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('previewImagen').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+
 </script>
-
-
-
 </body>
 </html>

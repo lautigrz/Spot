@@ -1,4 +1,6 @@
 package com.tallerwebi.presentacion;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tallerwebi.dominio.*;
 
 import com.tallerwebi.presentacion.dto.CancionDto;
@@ -17,14 +19,19 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
 public class ControladorComunidad {
@@ -62,14 +69,35 @@ public class ControladorComunidad {
 
     @PostMapping("/guardar-canciones/{idComunidad}")
     @ResponseBody
-    public String guardarCanciones(@RequestBody List<CancionDto> canciones, @PathVariable Long idComunidad){
+    public String guardarCanciones(
+            @PathVariable Long idComunidad,
+            @RequestParam("nombre") String nombrePlaylist,
+            @RequestParam("imagen") MultipartFile imagen,
+            @RequestParam("canciones") String cancionesJson) {
 
-        Comunidad comunidad = servicioComunidad.obtenerComunidad(idComunidad);
+        try {
+            Comunidad comunidad = servicioComunidad.obtenerComunidad(idComunidad);
 
-        servicioPlaylist.crearNuevaPlaylistConCanciones(comunidad, canciones);
+            // Guardar imagen
+            String nombreArchivo = UUID.randomUUID() + "-" + imagen.getOriginalFilename();
+            String ruta = "src/main/webapp/resources/core/uploads/" + nombreArchivo;
+            imagen.transferTo(new File(ruta));
+            String urlImagen = "../uploads/" + nombreArchivo;
 
-        return "/spring/comunidad/" + idComunidad;
+            ObjectMapper mapper = new ObjectMapper();
+            List<CancionDto> cancionesDto = mapper.readValue(cancionesJson, new TypeReference<List<CancionDto>>() {});
+
+            // Llamar al servicio
+            servicioPlaylist.crearNuevaPlaylistConCanciones(comunidad, cancionesDto, nombrePlaylist, urlImagen);
+
+            return "/spring/comunidad/" + idComunidad;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "error";
+        }
     }
+
 
     @PostMapping("/sincronizarme/{idComunidad}")
     @ResponseBody
@@ -146,15 +174,18 @@ public class ControladorComunidad {
             model.addAttribute("id", usuarioDto.getId());
             model.addAttribute("token", usuarioDto.getToken());
             model.addAttribute("hayUsuarios", servicioComunidad.hayAlguienEnLaComunidad(idComunidad, usuarioDto.getUser()));
-
+            model.addAttribute("playlistsDeLaComunidad", servicioPlaylist.obtenerPlaylistsRelacionadasAUnaComunidad(id));
             model.addAttribute("mensajes", servicioComunidad.obtenerMensajes(id));
+
             System.out.println("usuario:" + servicioComunidad.hayAlguienEnLaComunidad(idComunidad, usuarioDto.getUser()));
+            System.out.println("ususadario:" + servicioComunidad.obtenerUsuariosDeLaComunidad(id).toString());
             estaEnComunidad = true;
         }
 
+
         model.addAttribute("comunidad", id);
         model.addAttribute("estaEnComunidad", estaEnComunidad);
-
+        model.addAttribute("usuariosActivos", servicioComunidad.obtenerUsuariosDeLaComunidad(id));
         return "comunidad-general";
     }
 
@@ -186,6 +217,14 @@ public class ControladorComunidad {
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+
+    @GetMapping("/canciones-de-playlist/{idPlaylist}")
+    @ResponseBody
+    public List<CancionDto> cancionesDePlaylist(@PathVariable Long idPlaylist) {
+        return servicioPlaylist.obtenerCancionesDeLaPlaylist(idPlaylist);
+    }
+
 
     @GetMapping("/cancion/{idComunidad}")
     @ResponseBody

@@ -10,8 +10,8 @@ public interface RepositorioPlaylist {
     void agregarCancionALaPlaylist(Long id,Cancion cancion);
     //falta test
     void eliminarCancionALaPlaylist(Long id,Cancion cancion);
-
+    List<Playlist> obtenerPlaylistsRelacionadasAUnaComunidad(Long idComuniadad);
     List<Cancion> obtenerCancionesDeLaPlaylist(Long id);
     Playlist obtenerPlaylist(Long idPlaylist);
-    void crearNuevaPlaylistConCanciones(Comunidad comunidad, Set<Cancion> canciones);
+    void crearNuevaPlaylistConCanciones(Comunidad comunidad, Set<Cancion> canciones,String nombre, String urlImagen);
 }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -48,14 +49,29 @@ public class ServicioPlaylistImpl implements ServicioPlaylist {
     }
 
     @Override
-    public List<Cancion> obtenerCancionesDeLaPlaylist(Long id) {
-        return repositorioPlaylist.obtenerCancionesDeLaPlaylist(id);
+    public List<CancionDto> obtenerCancionesDeLaPlaylist(Long id) {
+        List<Cancion> canciones = repositorioPlaylist.obtenerCancionesDeLaPlaylist(id);
+        return canciones.stream()
+                .map(c -> {
+                    CancionDto dto = new CancionDto();
+                    dto.setId(c.getId());
+                    dto.setTitulo(c.getTitulo());
+                    dto.setArtista(c.getArtista());
+                    dto.setUrlImagen(c.getUrlImagen());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
 
+    @Override
+    public List<Playlist> obtenerPlaylistsRelacionadasAUnaComunidad(Long idComuniadad) {
+        return repositorioPlaylist.obtenerPlaylistsRelacionadasAUnaComunidad(idComuniadad);
+    }
+
 
     @Override
-    public void crearNuevaPlaylistConCanciones(Comunidad comunidad, List<CancionDto> canciones) {
+    public void crearNuevaPlaylistConCanciones(Comunidad comunidad, List<CancionDto> canciones,String nombre, String urlImagen) {
 
         Set<Cancion> cancionesLista = new HashSet<>();
 
@@ -76,7 +92,7 @@ public class ServicioPlaylistImpl implements ServicioPlaylist {
             cancionesLista.add(cancion);
         }
 
-        repositorioPlaylist.crearNuevaPlaylistConCanciones(comunidad, cancionesLista);
+        repositorioPlaylist.crearNuevaPlaylistConCanciones(comunidad, cancionesLista, nombre, urlImagen);
 
     }
 

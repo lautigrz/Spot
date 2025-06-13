@@ -7,6 +7,7 @@ import java.util.List;
 public interface ServicioPlaylist {
     void agregarCancionALaPlaylist(Long idPlaylist,String idSpotify, String uri);
     void eliminarCancionALaPlaylist(Long idPlaylist, Long idCancion) throws Exception;
-    List<Cancion> obtenerCancionesDeLaPlaylist(Long id);
-    void crearNuevaPlaylistConCanciones(Comunidad comunidad, List<CancionDto> canciones);
+    List<CancionDto>  obtenerCancionesDeLaPlaylist(Long id);
+    List<Playlist> obtenerPlaylistsRelacionadasAUnaComunidad(Long idComuniadad);
+    void crearNuevaPlaylistConCanciones(Comunidad comunidad, List<CancionDto> canciones, String nombre, String urlImagen);
 }

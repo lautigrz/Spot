@@ -55,6 +55,17 @@ public class RepositorioPlaylistImpl implements RepositorioPlaylist {
     }
 
     @Override
+    public List<Playlist> obtenerPlaylistsRelacionadasAUnaComunidad(Long idComuniadad) {
+
+        String hql = "from Playlist where comunidad.id = :idComuniadad";
+        Query query = sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("idComuniadad", idComuniadad);
+
+        List<Playlist> playlists = query.list();
+        return playlists;
+    }
+
+    @Override
     public List<Cancion> obtenerCancionesDeLaPlaylist(Long id) {
 
         String hql = "SELECT c FROM Playlist p JOIN p.canciones c WHERE p.id = :id";
@@ -71,13 +82,14 @@ public class RepositorioPlaylistImpl implements RepositorioPlaylist {
     }
 
     @Override
-    public void crearNuevaPlaylistConCanciones(Comunidad comunidad, Set<Cancion> canciones) {
+    public void crearNuevaPlaylistConCanciones(Comunidad comunidad, Set<Cancion> canciones,String nombre, String urlImagen) {
 
         Comunidad comunidadManaged = sessionFactory.getCurrentSession().get(Comunidad.class, comunidad.getId());
 
         Playlist playlist = new Playlist();
-        playlist.setNombre("Samo");
+        playlist.setNombre(nombre);
         playlist.setComunidad(comunidad);
+        playlist.setUrlImagen(urlImagen);
         playlist.agregarCanciones(canciones);
         comunidadManaged.agregarPlaylist(playlist);
 

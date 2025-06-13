@@ -15,5 +15,6 @@ public class UsuarioDto {
     private String user;
     private String urlFoto;
     private String token;
+    private Boolean activo;
 
 }
