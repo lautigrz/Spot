@@ -6,4 +6,6 @@ import java.io.IOException;
 
 public interface ServicioGuardarImagen {
     String guardarImagenDePlaylist(MultipartFile imagen) throws IOException;
+    String guardarImagenPerfilDeComunidad(MultipartFile imagen) throws IOException;
+    String guardarImagenPortadaDeComunidad(MultipartFile imagen) throws IOException;
 }

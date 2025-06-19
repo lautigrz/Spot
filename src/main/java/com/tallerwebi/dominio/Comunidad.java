@@ -19,7 +19,8 @@ public class Comunidad {
     private Long id;
     private String nombre;
     private String descripcion;
-   // private String nombreCancion;
+    private String urlFoto;
+    private String urlPortada;
 
     @OneToMany(mappedBy = "comunidad", fetch = FetchType.LAZY)
     private List<Mensaje> mensajes = new ArrayList<>();
