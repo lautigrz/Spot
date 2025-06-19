@@ -165,7 +165,7 @@ public class ControladorComunidad {
         Long idUsuario = (Long) session.getAttribute("user");
         String idComunidad = String.valueOf(id);
         UsuarioDto usuarioDto = servicioComunidad.obtenerUsuarioDeLaComunidad(idUsuario, id);
-
+        Comunidad comunidad = servicioComunidad.obtenerComunidad(id);
         boolean estaEnComunidad = false;
 
         if(usuarioDto != null){
@@ -183,7 +183,7 @@ public class ControladorComunidad {
         }
 
 
-        model.addAttribute("comunidad", id);
+        model.addAttribute("comunidad", comunidad);
         model.addAttribute("estaEnComunidad", estaEnComunidad);
         model.addAttribute("usuariosActivos", servicioComunidad.obtenerUsuariosDeLaComunidad(id));
         return "comunidad-general";

@@ -13,7 +13,7 @@
 <input type="hidden" id="id" th:value="${id}">
 <input type="hidden" id="urlFoto" th:value="${urlFoto}">
 <input type="hidden" id="token" th:value="${token}">
-<input type="hidden" id="comunidad" th:value="${comunidad}">
+<input type="hidden" id="comunidad" th:value="${comunidad.getId()}">
 <div class="container-fluid">
     <div class="row mt-10">
 
@@ -47,7 +47,7 @@
 
             <!-- Track Content -->
             <article class="billie-community text-white p-4 rounded"
-                     style="background: url('https://www.nme.com/wp-content/uploads/2021/07/Billie-Eilish.jpg') no-repeat center center / cover; position: relative; overflow: hidden;">
+                     th:style="'background: url(' + ${comunidad.getUrlPortada()} + ') no-repeat center center / cover; position: relative; overflow: hidden;'">
 
                 <!-- Capa oscura encima del fondo -->
                 <div style="position: absolute; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 1;"></div>
@@ -57,16 +57,14 @@
                     <a href="#" class="text-decoration-none text-light mb-3 d-inline-block">&larr; Back</a>
 
                     <div class="d-flex align-items-center mb-3">
-                        <img src="" alt="Billie Eilish" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover; border: 2px solid white;">
+                        <img th:src="${comunidad.getUrlFoto()}" alt="Billie Eilish" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover; border: 2px solid white;">
                         <div>
-                            <h3 class="mb-0">Billie Eilish Community</h3>
+                            <h3 class="mb-0" th:text="${comunidad.getNombre()}"></h3>
                             <small class="text-white">Est. 2020 · +120k fans</small>
                         </div>
                     </div>
 
-                    <p class="mb-3">
-                        Unite a la comunidad oficial de fans de <strong>Billie Eilish</strong>. Compartí arte, música, experiencias y todo lo que te inspira de una de las artistas más influyentes del mundo. 🎤🌑
-                    </p>
+                    <p class="mb-3" th:text="${comunidad.getDescripcion()}"></p>
 
                     <div class="stats d-flex gap-4 mb-3 text-white">
                         <small>🎧 56 playlists compartidas</small>
@@ -77,7 +75,7 @@
                     <div class="d-flex justify-content-between">
                         <a href="#" class="btn btn-light btn-sm" th:if="${estaEnComunidad}">Miembro</a>
 
-                        <a th:href="@{/unirme/{idComunidad}(idComunidad=${comunidad})}" class="btn btn-light btn-sm" th:unless="${estaEnComunidad}">Unirme a la comunidad</a>
+                        <a th:href="@{/unirme/{idComunidad}(idComunidad=${comunidad.getId()})}" class="btn btn-light btn-sm" th:unless="${estaEnComunidad}">Unirme a la comunidad</a>
                         <div th:if="${estaEnComunidad}">
                         <button id="sincronizarse" class="btn btn-spotify btn-sm" th:if="${hayUsuarios}">
                             <i class="fas fa-headphones me-2"></i> Sincronizarme a escuchar
