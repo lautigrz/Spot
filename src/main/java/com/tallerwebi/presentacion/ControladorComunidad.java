@@ -41,9 +41,12 @@ public class ControladorComunidad {
     private ServicioSpotify servicioSpotify;
     private ServicioPlaylist servicioPlaylist;
     private ServicioReproduccion servicioReproduccion;
-
-    public ControladorComunidad(ServicioComunidad servicioComunidad, ServicioSpotify servicioSpotify, ServicioPlaylist servicioPlaylist, ServicioReproduccion servicioReproduccion) {
+    private ServicioGuardarImagen servicioGuardarImagen;
+    public ControladorComunidad(ServicioComunidad servicioComunidad, ServicioSpotify
+            servicioSpotify, ServicioPlaylist servicioPlaylist,
+                                ServicioReproduccion servicioReproduccion, ServicioGuardarImagen servicioGuardarImagen) {
         this.servicioPlaylist = servicioPlaylist;
+        this.servicioGuardarImagen = servicioGuardarImagen;
         this.servicioReproduccion = servicioReproduccion;
         this.servicioComunidad = servicioComunidad;
         this.servicioSpotify = servicioSpotify;
@@ -78,16 +81,13 @@ public class ControladorComunidad {
         try {
             Comunidad comunidad = servicioComunidad.obtenerComunidad(idComunidad);
 
-            // Guardar imagen
-            String nombreArchivo = UUID.randomUUID() + "-" + imagen.getOriginalFilename();
-            String ruta = "src/main/webapp/resources/core/uploads/" + nombreArchivo;
-            imagen.transferTo(new File(ruta));
-            String urlImagen = "../uploads/" + nombreArchivo;
+
+            String urlImagen = servicioGuardarImagen.guardarImagenDePlaylist(imagen);
 
             ObjectMapper mapper = new ObjectMapper();
             List<CancionDto> cancionesDto = mapper.readValue(cancionesJson, new TypeReference<List<CancionDto>>() {});
 
-            // Llamar al servicio
+
             servicioPlaylist.crearNuevaPlaylistConCanciones(comunidad, cancionesDto, nombrePlaylist, urlImagen);
 
             return "/spring/comunidad/" + idComunidad;
@@ -228,7 +228,7 @@ public class ControladorComunidad {
 
     @GetMapping("/cancion/{idComunidad}")
     @ResponseBody
-    public ResponseEntity<?> cambiarCancion(@PathVariable Long idComunidad) {
+    public ResponseEntity<?> cancionSonando(@PathVariable Long idComunidad) {
         try {
 
             CancionDto cancion = servicioReproduccion.obtenerCancionSonandoEnLaComunidad(idComunidad);

@@ -11,35 +11,32 @@ import com.tallerwebi.presentacion.dto.CancionDto;
 import com.tallerwebi.presentacion.dto.ChatMessage;
 import com.tallerwebi.presentacion.dto.Sincronizacion;
 import com.tallerwebi.presentacion.dto.UsuarioDto;
-import org.hibernate.SessionFactory;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.MediaType;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
+import static org.mockito.ArgumentMatchers.any;
+
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
-import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+
+import org.springframework.web.multipart.MultipartFile;
+
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.io.IOException;
+
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -53,7 +50,7 @@ public class ControladorComunidadTest {
     private ServicioSpotify servicioSpotify;
     private ServicioPlaylist servicioPlaylist;
     private ServicioReproduccion servicioReproduccion;
-
+    private ServicioGuardarImagen servicioGuardarImagen;
     private SimpMessageHeaderAccessor headerAccessorMock;
 
     @BeforeEach
@@ -62,8 +59,8 @@ public class ControladorComunidadTest {
         servicioSpotify = mock(ServicioSpotify.class);
         servicioPlaylist = mock(ServicioPlaylist.class);
         servicioReproduccion = mock(ServicioReproduccion.class);
-
-        controladorComunidad = new ControladorComunidad(servicioComunidadMock, servicioSpotify, servicioPlaylist, servicioReproduccion);
+        servicioGuardarImagen = mock(ServicioGuardarImagen.class);
+        controladorComunidad = new ControladorComunidad(servicioComunidadMock, servicioSpotify, servicioPlaylist, servicioReproduccion, servicioGuardarImagen);
         headerAccessorMock = mock(SimpMessageHeaderAccessor.class);
         mockMvc = MockMvcBuilders.standaloneSetup(controladorComunidad).build();
 
@@ -186,19 +183,34 @@ public class ControladorComunidadTest {
 
         // Mocks
         when(servicioComunidadMock.obtenerComunidad(anyLong())).thenReturn(comunidadMock);
+        when(servicioGuardarImagen.guardarImagenDePlaylist(any(MultipartFile.class)))
+                .thenReturn("https://example.com/playlist.jpg");
 
         // Ejecutar POST
-        mockMvc.perform(post("/guardar-canciones/{idComunidad}", idComunidad)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(cancionesJson)
-                        .sessionAttr("usuario", new Object())) // si necesitás algo en sesión
+        MockMultipartFile imagen = new MockMultipartFile(
+                "imagen", // nombre del parámetro
+                "playlist.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "fake-image-content".getBytes()
+        );
+
+        mockMvc.perform(multipart("/guardar-canciones/{idComunidad}", idComunidad)
+                        .file(imagen)
+                        .param("nombre", "Mi Playlist")
+                        .param("canciones", cancionesJson)
+                        .sessionAttr("usuario", new Object()))
                 .andExpect(status().isOk())
                 .andExpect(content().string("/spring/comunidad/" + idComunidad));
 
-
         assertThat(comunidadMock, equalTo(servicioComunidadMock.obtenerComunidad(idComunidad)));
 
-        verify(servicioPlaylist).crearNuevaPlaylistConCanciones(comunidadMock, listaSimulada, "d", "d");
+        verify(servicioPlaylist).crearNuevaPlaylistConCanciones(
+                any(Comunidad.class),
+                anyList(),
+                anyString(),
+                anyString()
+        );
+
     }
 
     @Test

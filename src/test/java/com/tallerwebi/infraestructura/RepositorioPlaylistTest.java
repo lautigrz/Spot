@@ -100,8 +100,8 @@ public class RepositorioPlaylistTest {
         query.setParameter("idPlaylist", playlist.getId());
         Playlist playlistBuscada = (Playlist) query.uniqueResult();
 
-        assertThat(playlist.getCanciones(),containsInAnyOrder(cancion));
-        assertThat(playlist.getCanciones().iterator().next().getId(),equalTo(cancion.getId()));
+        assertThat(playlistBuscada.getCanciones(),containsInAnyOrder(cancion));
+        assertThat(playlistBuscada.getCanciones().iterator().next().getId(),equalTo(cancion.getId()));
     }
 
     @Test
@@ -185,6 +185,44 @@ public class RepositorioPlaylistTest {
         assertThat(playlists.getComunidad(),equalTo(comunidad));
         assertThat(playlists.getCanciones(),containsInAnyOrder(cancion, cancion1));
 
+
+    }
+
+    @Test
+    @Rollback
+    public void seDebeObtenerPlaylistsRelacionadasAUnaComunidad(){
+        Comunidad comunidad = new Comunidad();
+        comunidad.setDescripcion("Rock");
+        comunidad.setNombre("Nioe");
+
+        sessionFactory.getCurrentSession().save(comunidad);
+
+        Cancion cancion = new Cancion();
+        cancion.setArtista("Billie");
+        cancion.setTitulo("Ocean eyes");
+        cancion.setUri("spotify:track:434fjsd");
+        cancion.setSpotifyId("dfsdfds$fDAc");
+
+        Cancion cancion1 = new Cancion();
+        cancion1.setArtista("Harry");
+        cancion1.setTitulo("Golden");
+        cancion1.setUri("spotify:track:43da114fjsd");
+        cancion1.setSpotifyId("d2fsdfds$6RTa");
+
+        sessionFactory.getCurrentSession().save(cancion);
+        sessionFactory.getCurrentSession().save(cancion1);
+
+        Set<Cancion> cancionSet = new HashSet<>();
+        cancionSet.add(cancion);
+        cancionSet.add(cancion1);
+
+        repositorioPlaylist.crearNuevaPlaylistConCanciones(comunidad,cancionSet, "d","D");
+
+        List<Playlist> playlists = repositorioPlaylist.obtenerPlaylistsRelacionadasAUnaComunidad(comunidad.getId());
+
+        assertThat(playlists.isEmpty(),equalTo(false));
+        assertThat(playlists.get(0).getCanciones(),containsInAnyOrder(cancion, cancion1));
+        assertThat(comunidad.getPlaylists().get(0), equalTo(playlists.get(0)));
 
     }
 }

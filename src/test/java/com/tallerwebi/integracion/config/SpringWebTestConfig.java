@@ -104,9 +104,6 @@ public class SpringWebTestConfig implements WebMvcConfigurer {
         return mock(ServicioComunidad.class);
     }
 
-    @Bean
-    public ControladorComunidad controladorComunidad(ServicioComunidad servicioComunidad) {
-        return new ControladorComunidad(servicioComunidad, null, null, null);
-    }
+
 
 }
