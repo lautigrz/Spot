@@ -15,7 +15,7 @@ public class ServicioGuardarImagenImpl implements ServicioGuardarImagen {
         String nombreArchivo = UUID.randomUUID() + "-" + imagen.getOriginalFilename();
         String ruta = "src/main/webapp/resources/core/uploads/foto-playlist/" + nombreArchivo;
         imagen.transferTo(new File(ruta));
-        String urlImagen = "../uploads/perfil-comunidad/" + nombreArchivo;
+        String urlImagen = "../uploads/foto-playlist/" + nombreArchivo;
 
         return urlImagen;
     }

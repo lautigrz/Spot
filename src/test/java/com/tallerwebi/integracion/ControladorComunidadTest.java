@@ -101,6 +101,7 @@ public class ControladorComunidadTest {
 
         when(servicioComunidadMock.obtenerMensajes(comunidadMock.getId()))
                 .thenReturn(mensajesMock);
+        when(servicioComunidadMock.obtenerComunidad(comunidadMock.getId())).thenReturn(comunidadMock);
 
         // Ejecutar y verificar
         mockMvc.perform(get("/comunidad/{id}", comunidadMock.getId())
@@ -113,7 +114,7 @@ public class ControladorComunidadTest {
                 .andExpect(model().attribute("token", usuarioMock.getToken()))
                 .andExpect(model().attribute("mensajes", mensajesMock))
                 .andExpect(model().attribute("hayUsuarios", true))
-                .andExpect(model().attribute("comunidad", comunidadMock.getId()))
+                .andExpect(model().attribute("comunidad", comunidadMock))
                 .andExpect(model().attribute("estaEnComunidad", true));
 
         UsuarioDto usuarioObtenido = servicioComunidadMock.obtenerUsuarioDeLaComunidad(usuarioMock.getId(), comunidadMock.getId());
