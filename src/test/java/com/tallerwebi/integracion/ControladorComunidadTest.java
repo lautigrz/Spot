@@ -7,6 +7,7 @@ import com.tallerwebi.dominio.*;
 import com.tallerwebi.integracion.config.HibernateTestConfig;
 import com.tallerwebi.integracion.config.SpringWebTestConfig;
 import com.tallerwebi.presentacion.ControladorComunidad;
+import com.tallerwebi.presentacion.ControladorHome;
 import com.tallerwebi.presentacion.dto.CancionDto;
 import com.tallerwebi.presentacion.dto.ChatMessage;
 import com.tallerwebi.presentacion.dto.Sincronizacion;
@@ -25,12 +26,19 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import org.springframework.ui.ModelMap;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
+import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
+
+import javax.servlet.http.HttpSession;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
 
@@ -46,82 +54,74 @@ public class ControladorComunidadTest {
     private MockMvc mockMvc;
     private ControladorComunidad controladorComunidad;
 
+    private ServicioUsuario servicioUsuarioMock;
     private ServicioComunidad servicioComunidadMock;
     private ServicioSpotify servicioSpotify;
-    private ServicioPlaylist servicioPlaylist;
+    private ServicioPlaylist servicioPlaylistMock;
     private ServicioReproduccion servicioReproduccion;
     private ServicioGuardarImagen servicioGuardarImagen;
-    private SimpMessageHeaderAccessor headerAccessorMock;
+    private HttpSession sessionMock;
 
     @BeforeEach
     public void setUp() {
         servicioComunidadMock = mock(ServicioComunidad.class);
         servicioSpotify = mock(ServicioSpotify.class);
-        servicioPlaylist = mock(ServicioPlaylist.class);
+        servicioPlaylistMock = mock(ServicioPlaylist.class);
         servicioReproduccion = mock(ServicioReproduccion.class);
         servicioGuardarImagen = mock(ServicioGuardarImagen.class);
-        controladorComunidad = new ControladorComunidad(servicioComunidadMock, servicioSpotify, servicioPlaylist, servicioReproduccion, servicioGuardarImagen);
-        headerAccessorMock = mock(SimpMessageHeaderAccessor.class);
+        servicioUsuarioMock = mock(ServicioUsuario.class);
+        controladorComunidad = new ControladorComunidad(servicioComunidadMock, servicioSpotify, servicioPlaylistMock, servicioReproduccion, servicioGuardarImagen,
+                servicioUsuarioMock);
+
         mockMvc = MockMvcBuilders.standaloneSetup(controladorComunidad).build();
 
+        sessionMock = mock(HttpSession.class);
     }
 
     @Test
-    public void debeMostrarVistaComunidadConDatosDelUsuario() throws Exception {
-        // Preparar datos mock
-        Usuario usuarioMock = new Usuario();
-        usuarioMock.setUser("lauti");
-        usuarioMock.setUrlFoto("https://foto.jpg");
-        usuarioMock.setToken("token123");
-        usuarioMock.setId(42L);
+    public void testComunidadConUsuarioEnComunidad() throws IOException, ParseException, SpotifyWebApiException, org.apache.hc.core5.http.ParseException {
+        Long idUsuario = 1L;
+        Long idComunidad = 100L;
+
+        // Simulamos datos
+        UsuarioDto usuarioDtoMock = new UsuarioDto();
+        usuarioDtoMock.setId(idUsuario);
+        usuarioDtoMock.setUser("usuarioTest");
+        usuarioDtoMock.setUrlFoto("urlFotoTest");
+        usuarioDtoMock.setToken("tokenTest");
 
         Comunidad comunidadMock = new Comunidad();
-        comunidadMock.setNombre("Rock");
-        comunidadMock.setId(4L);
-        comunidadMock.getUsuarios().add(usuarioMock);
-        usuarioMock.getComunidades().add(comunidadMock);
+        List<Playlist> playlistsMock = List.of(new Playlist());
+        List<Mensaje> mensajesMock = List.of(new Mensaje());
+        List<UsuarioDto> usuariosActivosMock = List.of(new UsuarioDto());
 
-        List<Mensaje> mensajesMock = List.of(
-                new Mensaje(2L, "Hola", usuarioMock, comunidadMock),
-                new Mensaje(3L, "Hola", usuarioMock, comunidadMock)
-        );
+        when(sessionMock.getAttribute("user")).thenReturn(idUsuario);
+        when(servicioComunidadMock.obtenerUsuarioDeLaComunidad(idUsuario, idComunidad)).thenReturn(usuarioDtoMock);
+        when(servicioComunidadMock.obtenerComunidad(idComunidad)).thenReturn(comunidadMock);
+        when(servicioComunidadMock.hayAlguienEnLaComunidad(String.valueOf(idComunidad), usuarioDtoMock.getUser())).thenReturn(true);
+        when(servicioPlaylistMock.obtenerPlaylistsRelacionadasAUnaComunidad(idComunidad)).thenReturn(playlistsMock);
+        when(servicioComunidadMock.obtenerMensajes(idComunidad)).thenReturn(mensajesMock);
+        when(servicioUsuarioMock.obtenerUsuarioPorId(idUsuario)).thenReturn(usuarioDtoMock);
+        when(servicioComunidadMock.obtenerUsuariosDeLaComunidad(idComunidad)).thenReturn(usuariosActivosMock);
 
-        UsuarioDto usuarioDto = new UsuarioDto();
-        usuarioDto.setId(usuarioMock.getId());
-        usuarioDto.setUser(usuarioMock.getUser());
-        usuarioDto.setUrlFoto(usuarioMock.getUrlFoto());
-        usuarioDto.setToken(usuarioMock.getToken());
+        ModelMap model = new ModelMap();
+        ModelAndView mav = controladorComunidad.comunidad(sessionMock, idComunidad, model);
 
-        // Definir comportamiento del mock
-        when(servicioComunidadMock.obtenerUsuarioDeLaComunidad(usuarioMock.getId(), comunidadMock.getId()))
-                .thenReturn(usuarioDto);
+        // Verificar nombre de la vista
+        assertThat(mav.getViewName(), equalTo("comunidad-general"));
 
-        when(servicioComunidadMock.hayAlguienEnLaComunidad(String.valueOf(comunidadMock.getId()), usuarioMock.getUser()))
-                .thenReturn(true);
-
-        when(servicioComunidadMock.obtenerMensajes(comunidadMock.getId()))
-                .thenReturn(mensajesMock);
-        when(servicioComunidadMock.obtenerComunidad(comunidadMock.getId())).thenReturn(comunidadMock);
-
-        // Ejecutar y verificar
-        mockMvc.perform(get("/comunidad/{id}", comunidadMock.getId())
-                        .sessionAttr("user", usuarioMock.getId()))
-                .andExpect(status().isOk())
-                .andExpect(view().name("comunidad-general"))
-                .andExpect(model().attribute("usuario", usuarioMock.getUser()))
-                .andExpect(model().attribute("urlFoto", usuarioMock.getUrlFoto()))
-                .andExpect(model().attribute("id", usuarioMock.getId()))
-                .andExpect(model().attribute("token", usuarioMock.getToken()))
-                .andExpect(model().attribute("mensajes", mensajesMock))
-                .andExpect(model().attribute("hayUsuarios", true))
-                .andExpect(model().attribute("comunidad", comunidadMock))
-                .andExpect(model().attribute("estaEnComunidad", true));
-
-        UsuarioDto usuarioObtenido = servicioComunidadMock.obtenerUsuarioDeLaComunidad(usuarioMock.getId(), comunidadMock.getId());
-        List<Mensaje> mensajesObtenidos = servicioComunidadMock.obtenerMensajes(comunidadMock.getId());
-
-        assertThat(usuarioDto, equalTo(usuarioObtenido));
-        assertThat(mensajesMock, equalTo(mensajesObtenidos));
+        // Verificar que el modelo tenga los atributos correctos
+        assertThat(mav.getModel(), hasEntry("usuario", usuarioDtoMock.getUser()));
+        assertThat(mav.getModel(), hasEntry("urlFoto", usuarioDtoMock.getUrlFoto()));
+        assertThat(mav.getModel(), hasEntry("id", usuarioDtoMock.getId()));
+        assertThat(mav.getModel(), hasEntry("token", usuarioDtoMock.getToken()));
+        assertThat(mav.getModel(), hasEntry("hayUsuarios", true));
+        assertThat(mav.getModel(), hasEntry("playlistsDeLaComunidad", playlistsMock));
+        assertThat(mav.getModel(), hasEntry("mensajes", mensajesMock));
+        assertThat(mav.getModel(), hasEntry("fotoUsuario", usuarioDtoMock.getUrlFoto()));
+        assertThat(mav.getModel(), hasEntry("comunidad", comunidadMock));
+        assertThat(mav.getModel(), hasEntry("estaEnComunidad", true));
+        assertThat(mav.getModel(), hasEntry("usuariosActivos", usuariosActivosMock));
     }
 
     @Test
@@ -205,7 +205,7 @@ public class ControladorComunidadTest {
 
         assertThat(comunidadMock, equalTo(servicioComunidadMock.obtenerComunidad(idComunidad)));
 
-        verify(servicioPlaylist).crearNuevaPlaylistConCanciones(
+        verify(servicioPlaylistMock).crearNuevaPlaylistConCanciones(
                 any(Comunidad.class),
                 anyList(),
                 anyString(),
