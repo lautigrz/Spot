@@ -22,4 +22,3 @@ hs_err_pid*
 application.properties
 
 src/main/webapp/resources/core/js/node_modules
-uploads/
