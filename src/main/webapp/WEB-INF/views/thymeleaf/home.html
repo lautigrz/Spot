@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>NeonBeats Feed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/home.css}"/>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <div id="sidebar" class="sidebar d-flex flex-column align-items-center text-center py-4 "
+             style="position: fixed; top: 0; left: 0; height: 100vh; width: 220px; background-color: #f8f9fa; transition: width 0.3s;">
+            <img th:src="${usuario.getUrlFoto()}" id="toggleSidebar" alt="Perfil"
+                 class="rounded-circle mb-3 sidebar-avatar" />
+
+
+            <nav class="nav flex-column w-100 px-2" style="padding-left: 0 !important;">
+                <a class="nav-link active d-flex align-items-center px-3 py-2 text-start" th:href="@{/perfil}">
+                    <i class="bi bi-person me-2 fs-5"></i> <span class="link-text">Perfil</span>
+                </a>
+                <a class="nav-link d-flex align-items-center px-3 py-2 text-start" href="#">
+                    <i class="bi bi-bell me-2 fs-5"></i> <span class="link-text">Notificaciones</span>
+                </a>
+                <a class="nav-link d-flex align-items-center px-3 py-2 text-start" href="#">
+                    <i class="bi bi-star me-2 fs-5"></i> <span class="link-text">Mis artistas favoritos</span>
+                </a>
+                <a class="nav-link d-flex align-items-center px-3 py-2 text-start" href="#">
+                    <i class="bi bi-people me-2 fs-5"></i> <span class="link-text">Mis comunidades</span>
+                </a>
+
+                <a class="nav-link d-flex align-items-center px-3 py-2 text-start" th:href="@{/cerrar}">
+                    <i class="bi bi-box-arrow-left me-2 fs-5"></i> <span class="link-text">Cerrar sesión</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Feed -->
+        <div class="col-md-7 p-4 feed-col">
+            <div class="search-bar mb-4">
+                <input type="text" class="form-control" placeholder="Search for tracks, artists or playlists...">
+            </div>
+
+            <!-- Publicar nuevo post -->
+            <div class="card feed-card p-3 mb-4" style="background-color: #181818;">
+                <div class="d-flex mb-3">
+                    <img src="https://i.pravatar.cc/50" class="rounded-circle me-3 avatar-user" alt="Avatar">
+                    <input
+                            type="text"
+                            class="form-control border-0"
+                            placeholder="Compartí lo que estás escuchando..."
+                            style="border-radius: 20px; padding: 12px 20px; height: 80px; background-color: #fff; color: #000;"
+                    >
+
+                </div>
+                <div class="d-flex justify-content-between px-2">
+                    <div class="d-flex gap-4">
+                        <a href="#" class="text-decoration-none text-secondary"><i class="bi bi-image me-1"></i> Foto</a>
+                        <a href="#" class="text-decoration-none text-secondary"><i class="bi bi-mic-fill me-1"></i> Audio</a>
+                        <a href="#" class="text-decoration-none text-secondary"><i class="bi bi-emoji-smile me-1"></i> Emojis</a>
+                    </div>
+                    <button class="btn btn-success btn-sm px-4">Publicar</button>
+                </div>
+            </div>
+
+
+            <!-- Card: Post 2 -->
+            <!-- Posteo 1 -->
+            <div class="card feed-card p-3 mb-4" style="background-color: #1e1e1e;">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="https://i.pravatar.cc/40" class="rounded-circle me-2 avatar-user"  alt="Avatar">
+                    <div>
+                        <strong>@neonvibes</strong><br>
+                        <small class="text-secondary">Hace 2 horas</small>
+                    </div>
+                </div>
+                <p class="text-white">🎶 Explorando lo nuevo de Synthwave. Estas dos joyas son arte puro.</p>
+                <div class="row img-post">
+                    <div class="col-md-6 mb-2">
+                        <img src="billie.jpeg" class="img-fluid rounded" alt="Synth 1">
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <img src="billie.jpeg" class="img-fluid rounded" alt="Synth 2">
+                    </div>
+                </div>
+
+                <!-- Footer con botones sin hover -->
+                <div class="d-flex justify-content-start gap-3 mt-3 px-1">
+                    <button class="btn btn-sm d-flex align-items-center rounded-pill px-3"
+                            style="background-color: #f5f5f5; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd;">
+                        <i class="bi bi-hand-thumbs-up me-2"></i> Me gusta
+                    </button>
+                    <button class="btn btn-sm d-flex align-items-center rounded-pill px-3"
+                            style="background-color: #f5f5f5; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd;">
+                        <i class="bi bi-share me-2"></i> Compartir
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- Posteo 2 -->
+            <div class="card feed-card p-3 mb-4" style="background-color: #1e1e1e;">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="https://i.pravatar.cc/41" class="rounded-circle me-2 avatar-user" alt="Avatar">
+                    <div>
+                        <strong>@beatlover</strong><br>
+                        <small class="text-secondary">Ayer</small>
+                    </div>
+                </div>
+                <p>🎧 Este mix está 🔥 para arrancar la semana con toda.</p>
+                <div class="d-flex gap-3">
+                    <img src="https://i.imgur.com/AV3YzLJ.jpeg" class="rounded" width="100" height="100" style="object-fit: cover;" alt="Mix Cover">
+                    <img src="https://i.imgur.com/w1S7L7R.jpeg" class="rounded" width="100" height="100" style="object-fit: cover;" alt="Mix Cover 2">
+                    <img src="https://i.imgur.com/vZl0OAJ.jpeg" class="rounded" width="100" height="100" style="object-fit: cover;" alt="Mix Cover 3">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right column -->
+        <!-- Explorador de comunidades -->
+        <div class="col-md-3 right-col">
+            <h6 class="text-uppercase text-secondary mb-3">Explorar comunidades</h6>
+
+            <a th:href="@{/nueva-comunidad}"
+               class="d-flex align-items-center fw-semibold rounded-pill text-dark text-decoration-none"
+               style="box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);padding: 4px; min-width: 180px;">
+                <i class="bi bi-plus me-2"></i> Crear nueva comunidad
+            </a>
+
+            <!-- Comunidad 1 -->
+            <div th:each="comunidad : ${comunidades}">
+            <a th:href="@{/comunidad/{id}(id=${comunidad.getId()})}" class="d-flex align-items-center mb-3 text-decoration-none text-white mt-3">
+                <div style="width: 45px; height: 45px;" class="me-3">
+                    <img th:src="${comunidad.getUrlFoto()}" alt="Synthwave" class="rounded-circle border border-light" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="d-flex flex-column justify-content-center">
+                    <span th:text="${comunidad.getNombre()}" class="fw-semibold text-dark"></span>
+                    <small class="text-muted">24.1k miembros</small>
+                </div>
+            </a>
+            </div>
+            <!-- Ver más -->
+            <div class="text-center mt-4">
+                <a href="/comunidades" class="btn btn-sm btn-outline-secondary w-100">Ver más comunidades</a>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+<script>
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const sidebar = document.getElementById('sidebar');
+
+    // Al cargar la página: ocultar sidebar por defecto
+    window.addEventListener('DOMContentLoaded', () => {
+        sidebar.classList.add('collapsed');
+        document.body.classList.add('sidebar-collapsed');
+
+
+    });
+
+    // Al hacer clic en la imagen: mostrar/ocultar sidebar
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        document.body.classList.toggle('sidebar-collapsed');
+
+    });
+</script>
+
+
+</body>
+
+</html>

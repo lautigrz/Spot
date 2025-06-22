@@ -42,6 +42,9 @@ public class ControladorComunidad {
     private ServicioPlaylist servicioPlaylist;
     private ServicioReproduccion servicioReproduccion;
     private ServicioGuardarImagen servicioGuardarImagen;
+    @Autowired
+    private ServicioUsuario servicioUsuario;
+
     public ControladorComunidad(ServicioComunidad servicioComunidad, ServicioSpotify
             servicioSpotify, ServicioPlaylist servicioPlaylist,
                                 ServicioReproduccion servicioReproduccion, ServicioGuardarImagen servicioGuardarImagen) {
@@ -182,7 +185,7 @@ public class ControladorComunidad {
             estaEnComunidad = true;
         }
 
-
+        model.addAttribute("fotoUsuario",servicioUsuario.obtenerUsuarioPorId(idUsuario).getUrlFoto());
         model.addAttribute("comunidad", comunidad);
         model.addAttribute("estaEnComunidad", estaEnComunidad);
         model.addAttribute("usuariosActivos", servicioComunidad.obtenerUsuariosDeLaComunidad(id));

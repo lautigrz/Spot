@@ -186,3 +186,8 @@ nav > a.nav-link {
 .card button {
     font-size: 0.8rem;
 }
+.barra{
+    position: absolute;
+    width: 70% !important;
+
+}

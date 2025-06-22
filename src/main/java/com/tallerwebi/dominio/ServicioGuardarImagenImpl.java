@@ -13,9 +13,9 @@ public class ServicioGuardarImagenImpl implements ServicioGuardarImagen {
     @Override
     public String guardarImagenDePlaylist(MultipartFile imagen) throws IOException {
         String nombreArchivo = UUID.randomUUID() + "-" + imagen.getOriginalFilename();
-        String ruta = "src/main/webapp/resources/core/uploads/foto-playlist/" + nombreArchivo;
+        String ruta = "uploads/foto-playlist/" + nombreArchivo;
         imagen.transferTo(new File(ruta));
-        String urlImagen = "../uploads/foto-playlist/" + nombreArchivo;
+        String urlImagen = "/spring/uploads/foto-playlist/" + nombreArchivo;
 
         return urlImagen;
     }
@@ -23,9 +23,9 @@ public class ServicioGuardarImagenImpl implements ServicioGuardarImagen {
     @Override
     public String guardarImagenPerfilDeComunidad(MultipartFile imagen) throws IOException {
         String nombreArchivo = UUID.randomUUID() + "-" + imagen.getOriginalFilename();
-        String ruta = "src/main/webapp/resources/core/uploads/perfil-comunidad/" + nombreArchivo;
+        String ruta = "uploads/perfil-comunidad/" + nombreArchivo;
         imagen.transferTo(new File(ruta));
-        String urlImagen = "../uploads/perfil-comunidad/" + nombreArchivo;
+        String urlImagen = "/spring/uploads/perfil-comunidad/" + nombreArchivo;
 
         return urlImagen;
     }
@@ -33,9 +33,9 @@ public class ServicioGuardarImagenImpl implements ServicioGuardarImagen {
     @Override
     public String guardarImagenPortadaDeComunidad(MultipartFile imagen) throws IOException {
         String nombreArchivo = UUID.randomUUID() + "-" + imagen.getOriginalFilename();
-        String ruta = "src/main/webapp/resources/core/uploads/portada-comunidad/" + nombreArchivo;
+        String ruta = "uploads/portada-comunidad/" + nombreArchivo;
         imagen.transferTo(new File(ruta));
-        String urlImagen = "../uploads/portada-comunidad/" + nombreArchivo;
+        String urlImagen = "/spring/uploads/portada-comunidad/" + nombreArchivo;
 
         return urlImagen;
     }

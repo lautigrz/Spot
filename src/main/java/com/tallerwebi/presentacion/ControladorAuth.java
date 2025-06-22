@@ -64,7 +64,7 @@ public class ControladorAuth {
 
         }
 
-        return "redirect:/lista";
+        return "redirect:/home";
     }
 
 
