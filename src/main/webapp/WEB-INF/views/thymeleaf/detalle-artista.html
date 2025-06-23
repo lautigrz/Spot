@@ -5,88 +5,133 @@
   <title th:text="${artista.name}">Detalle del Artista</title>
   <style>
     body {
-      background-color: #fff;
-      color: #000;
-      font-family: Arial, sans-serif;
-      margin: 20px;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      color: #222;
     }
+
     .container {
-      max-width: 900px;
-      margin: auto;
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
     }
-    .bubble {
-      background-color: #000;
-      color: #fff;
+
+    .card {
+      background-color: #fff;
       border-radius: 15px;
       padding: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
-    img {
-      border-radius: 10px;
+
+    .perfil-header {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+      text-align: center;
     }
-    h1, h2 {
-      margin-bottom: 10px;
+
+    .perfil-header img {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
+
+    .perfil-info {
+      flex: 1;
+    }
+
+    .perfil-info h1 {
+      font-size: 32px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      background-color: #d66b0e;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #a14e00;
+    }
+
+    .favorito-info {
+      margin-top: 10px;
+      font-style: italic;
+    }
+
     .albums, .top-tracks {
       display: flex;
       flex-wrap: wrap;
-      gap: 15px;
+      gap: 20px;
+      justify-content: center;
     }
+
     .album, .track {
-      background-color: #222;
+      width: 160px;
+      background-color: #fafafa;
+      border-radius: 12px;
       padding: 10px;
-      border-radius: 10px;
-      width: 150px;
-      color: #eee;
       text-align: center;
+      transition: transform 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
+
+    .album:hover, .track:hover {
+      transform: scale(1.05);
+    }
+
     .album img, .track img {
       width: 100%;
+      height: auto;
       border-radius: 10px;
     }
-    button {
-      background-color: #000;
-      color: #fff;
-      border: 1px solid #fff;
-      padding: 8px 15px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #333;
-    }
+
     a {
-      color: #000;
-      text-decoration: none;
-      margin-top: 20px;
       display: inline-block;
-      border: 2px solid #000;   /* borde negro */
-      padding: 8px 16px;        /* espacio interno */
-      border-radius: 6px;       /* esquinas redondeadas */
-      background-color: #fff;   /* fondo blanco */
-      transition: background-color 0.3s, color 0.3s; /* transición suave */
+      margin-top: 20px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      background-color: #d66b0e;
+      color: white;
+      transition: background-color 0.3s ease;
     }
 
     a:hover {
-      text-decoration: none;
-      background-color: #000;   /* fondo negro al pasar mouse */
-      color: #fff;              /* texto blanco al pasar mouse */
-      cursor: pointer;
+      background-color: #a14e00;
     }
   </style>
 </head>
 <body>
+
 <div class="container">
-  <div class="bubble">
-    <h1 th:text="${artista.name}">Nombre del Artista</h1>
-    <img th:src="${artista.images[0].url}" alt="Imagen del artista" width="300" />
-    <form th:action="@{/artistas/{id}/favorito(id=${artista.id})}" method="post" th:if="${!esFavorito}">
-      <button type="submit">Agregar a favoritos</button>
-    </form>
-    <p th:if="${esFavorito}">Ya es tu favorito.</p>
+
+  <!-- Perfil artista -->
+  <div class="card perfil-header">
+    <img th:src="${artista.images[0].url}" alt="Imagen del artista" />
+    <div class="perfil-info">
+      <h1 th:text="${artista.name}">Nombre del Artista</h1>
+      <form th:action="@{/artistas/{id}/favorito(id=${artista.id})}" method="post" th:if="${!esFavorito}">
+        <button type="submit">Agregar a favoritos</button>
+      </form>
+      <p class="favorito-info" th:if="${esFavorito}">Ya es tu favorito.</p>
+    </div>
   </div>
 
-  <div class="bubble">
+  <!-- Álbumes -->
+  <div class="card">
     <h2>Álbumes</h2>
     <div class="albums">
       <div class="album" th:each="album : ${albums}">
@@ -97,7 +142,8 @@
     </div>
   </div>
 
-  <div class="bubble">
+  <!-- Canciones principales -->
+  <div class="card">
     <h2>Canciones principales</h2>
     <div class="top-tracks">
       <div class="track" th:each="track : ${topTracks}">
@@ -108,7 +154,33 @@
     </div>
   </div>
 
+  <!-- Pre-escucha disponible -->
+  <div class="album" th:if="${albumReciente != null}">
+    <h2>Pre-escucha disponible</h2>
+
+    <div th:if="${albumReciente.images.length > 0}">
+      <img th:src="${albumReciente.images[0].url}" th:alt="${albumReciente.name}" />
+    </div>
+
+    <p th:text="${albumReciente.name}">Nombre del álbum</p>
+    <p th:text="${albumReciente.releaseDate.substring(0,4)}">Año</p>
+
+    <form th:action="@{/artistas/{id}/comprar-preescucha(id=${artista.id})}" method="post"
+          th:if="${not #lists.contains(albumesComprados, albumReciente.id)}">
+      <input type="hidden" name="albumId" th:value="${albumReciente.id}" />
+      <button type="submit">Comprar pre-escucha</button>
+    </form>
+
+    <p class="favorito-info" th:if="${#lists.contains(albumesComprados, albumReciente.id)}">
+      Ya compraste la pre-escucha
+    </p>
+  </div>
+
+  <!-- Volver -->
   <a href="/spring/perfil">Volver a perfil</a>
+
 </div>
+
 </body>
 </html>
+

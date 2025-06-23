@@ -3,6 +3,7 @@ package com.tallerwebi.presentacion;
 import com.neovisionaries.i18n.CountryCode;
 import com.tallerwebi.dominio.RepositorioUsuario;
 import com.tallerwebi.dominio.ServicioFavorito;
+import com.tallerwebi.dominio.ServicioPreescucha;
 import com.tallerwebi.dominio.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,12 +28,14 @@ public class ControladorArtista {
     private final ServicioFavorito servicioFavorito;
     private final SpotifyApi spotifyApi;
     private final RepositorioUsuario repositorioUsuario;
+    private final ServicioPreescucha servicioPreescucha;
 
 
-    public ControladorArtista(ServicioFavorito servicioFavorito, SpotifyApi spotifyApi, RepositorioUsuario repositorioUsuario) {
+    public ControladorArtista(ServicioFavorito servicioFavorito, SpotifyApi spotifyApi, RepositorioUsuario repositorioUsuario, ServicioPreescucha servicioPreescucha) {
         this.servicioFavorito = servicioFavorito;
         this.spotifyApi = spotifyApi;
         this.repositorioUsuario = repositorioUsuario;
+        this.servicioPreescucha = servicioPreescucha;
     }
 
     @GetMapping("/artistas/{id}")
@@ -52,6 +55,27 @@ public class ControladorArtista {
             boolean esFavorito = usuario!= null && servicioFavorito.yaEsFavorito(id,usuario);
             model.addAttribute("esFavorito", esFavorito);
 
+            List<String> albumesComprados = List.of();
+            if (usuario != null) {
+                albumesComprados = servicioPreescucha.obtenerAlbumesComprados(usuario);
+            }
+            model.addAttribute("albumesComprados", albumesComprados);
+
+            AlbumSimplified albumMasReciente = Arrays.stream(albums)
+                    .filter(a -> a.getReleaseDate() != null)
+                    .sorted((a1, a2) -> a2.getReleaseDate().compareTo(a1.getReleaseDate())) // Descendente
+                    .findFirst()
+                    .orElse(null);
+
+            model.addAttribute("albumReciente", albumMasReciente);
+
+            // Cargar mensaje si hubo compra
+            String preescuchaExitosa = (String) session.getAttribute("preescuchaExitosa");
+            if (preescuchaExitosa != null) {
+                model.addAttribute("preescuchaExitosa", preescuchaExitosa);
+                session.removeAttribute("preescuchaExitosa");
+            }
+
             return "detalle-artista";
         } catch(Exception e){
             return "error";
@@ -70,4 +94,22 @@ public class ControladorArtista {
         return "redirect:/perfil";
 
     }
+
+    @PostMapping("/artistas/{id}/comprar-preescucha")
+    public String comprarPreescucha(@PathVariable String id, HttpSession session, String albumId) {
+        Object usuarioIdObj = session.getAttribute("user");
+
+        if (usuarioIdObj != null) {
+            Long usuarioId = Long.valueOf(usuarioIdObj.toString());
+            Usuario usuario = repositorioUsuario.buscarUsuarioPorId(usuarioId);
+
+            if(!servicioPreescucha.yaComproPreescucha(albumId, usuario)){
+                servicioPreescucha.comprarPreescucha(albumId, usuario);
+            }
+        }
+
+        return "redirect:/perfil";
+    }
+
+
 }
