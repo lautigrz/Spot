@@ -39,7 +39,7 @@ public class ServicioGuardarImagenTest {
         // Act
         String resultado = servicioGuardarImagen.guardarImagenDePlaylist(imagen);
 
-        assertThat(resultado, containsString("../uploads/foto-playlist/"));
+        assertThat(resultado, containsString("/uploads/foto-playlist/"));
 
     }
     @Test
@@ -59,7 +59,7 @@ public class ServicioGuardarImagenTest {
         // Act
         String resultado = servicioGuardarImagen.guardarImagenPerfilDeComunidad(imagen);
 
-        assertThat(resultado, containsString("../uploads/perfil-comunidad/"));
+        assertThat(resultado, containsString("/uploads/perfil-comunidad/"));
 
     }
     @Test
@@ -79,7 +79,7 @@ public class ServicioGuardarImagenTest {
         // Act
         String resultado = servicioGuardarImagen.guardarImagenPortadaDeComunidad(imagen);
 
-        assertThat(resultado, containsString("../uploads/portada-comunidad/"));
+        assertThat(resultado, containsString("/uploads/portada-comunidad/"));
 
     }
 

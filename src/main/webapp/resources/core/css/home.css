@@ -1,0 +1,148 @@
+body {
+    background-color: #ffffff;
+    color: #000000;
+    font-family: 'Segoe UI', sans-serif;
+}
+.sidebar {
+    background-color: #d32f2f;
+    min-height: 100vh;
+    padding-top: 2rem;
+}
+.sidebar .nav-link {
+    color: rgb(0, 0, 0);
+    font-weight: 500;
+    padding: 1rem 1.5rem;
+}
+.sidebar .nav-link.active,
+.sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 0.5rem;
+}
+.profile-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+}
+/* Posts con fondo blanco y box shadow */
+.feed-card {
+    position: relative;
+    z-index: 1;
+    background-color: #ffffff !important; /* fuerza fondo blanco */
+    border: none;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.feed-card img {
+    border-radius: 10px;
+    object-fit: cover;
+    height: 45px;
+    width: 7%;
+}
+/* Explorador de comunidades fondo blanco con sombra */
+.right-col {
+    background-color: #ffffff !important;
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+    position: fixed;
+    top: 20px;
+    right: 4px;
+    width: 280px;
+    max-height: 100vh;
+    overflow-y: auto;
+    padding-right: 15px;
+    z-index: 1000;
+}
+.search-bar input {
+    border-radius: 50px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    padding: 0.7rem 1.5rem;
+    background-color: #f7f4f4;
+    color: #c2bebe;
+}
+.search-bar input::placeholder {
+    color: #aaa;
+}
+.upgrade-btn {
+    background-color: #ff4081;
+    color: white;
+    font-weight: bold;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.9rem;
+    border-radius: 1rem;
+    border: none;
+}
+.playlist-link {
+    color: #ccc;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+.playlist-link:hover {
+    color: #fff;
+}
+.sidebar {
+    background-color: #f1efef; /* ahora es blanca */
+    min-height: 100vh;
+    padding-top: 2rem;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+    z-index: 1040; /* mayor que feed */
+    /* sombra a la derecha */
+}
+.img-post img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.sidebar.collapsed {
+    width: 70px !important;
+}
+
+.sidebar.collapsed .link-text {
+    display: none;
+}
+
+.feed-col {
+    transition: margin-left 0.3s ease, width 0.3s ease;
+    margin-left: 70px; /* espacio para sidebar colapsado */
+    width: calc(100% - 70px - 280px); /* ancho total menos sidebar y right-col */
+}
+
+body.sidebar-collapsed .feed-col {
+    margin-left: 70px;
+}
+
+body:not(.sidebar-collapsed) .feed-col {
+    margin-left: 220px; /* sidebar expandido */
+    width: calc(100% - 220px - 280px);
+}
+.sidebar-avatar {
+    width: 80px;
+    height: 80px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.sidebar.collapsed .sidebar-avatar {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+}
+.avatar-user {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    transition: width 0.3s ease, height 0.3s ease;
+
+}
+
+body.sidebar-collapsed .avatar-user {
+    width: 45px;
+    height: 45px;
+}

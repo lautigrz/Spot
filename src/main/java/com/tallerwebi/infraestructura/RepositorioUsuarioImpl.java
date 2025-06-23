@@ -19,7 +19,7 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
     public RepositorioUsuarioImpl(SessionFactory sessionFactory){
         this.sessionFactory = sessionFactory;
     }
-    //falta testear
+
 
     @Override
     public Usuario buscar(String user) {
@@ -31,7 +31,7 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
     @Override
     public Usuario buscarUsuarioPorId(Long id) {
 
-        return (Usuario) sessionFactory.getCurrentSession().get(Usuario.class, id);
+        return sessionFactory.getCurrentSession().get(Usuario.class, id);
     }
 
     @Override

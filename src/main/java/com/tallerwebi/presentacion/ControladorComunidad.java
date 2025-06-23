@@ -18,8 +18,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
@@ -42,14 +44,18 @@ public class ControladorComunidad {
     private ServicioPlaylist servicioPlaylist;
     private ServicioReproduccion servicioReproduccion;
     private ServicioGuardarImagen servicioGuardarImagen;
+
+    private ServicioUsuario servicioUsuario;
+
     public ControladorComunidad(ServicioComunidad servicioComunidad, ServicioSpotify
             servicioSpotify, ServicioPlaylist servicioPlaylist,
-                                ServicioReproduccion servicioReproduccion, ServicioGuardarImagen servicioGuardarImagen) {
+                                ServicioReproduccion servicioReproduccion, ServicioGuardarImagen servicioGuardarImagen,ServicioUsuario servicioUsuario) {
         this.servicioPlaylist = servicioPlaylist;
         this.servicioGuardarImagen = servicioGuardarImagen;
         this.servicioReproduccion = servicioReproduccion;
         this.servicioComunidad = servicioComunidad;
         this.servicioSpotify = servicioSpotify;
+        this.servicioUsuario = servicioUsuario;
     }
 
 
@@ -160,7 +166,7 @@ public class ControladorComunidad {
     }
 
     @GetMapping("/comunidad/{id}")
-    public String comunidad(Model model, HttpSession session, @PathVariable Long id) throws IOException, ParseException, SpotifyWebApiException {
+    public ModelAndView comunidad(HttpSession session, @PathVariable Long id, ModelMap model) throws IOException, ParseException, SpotifyWebApiException {
 
         Long idUsuario = (Long) session.getAttribute("user");
         String idComunidad = String.valueOf(id);
@@ -168,26 +174,28 @@ public class ControladorComunidad {
         Comunidad comunidad = servicioComunidad.obtenerComunidad(id);
         boolean estaEnComunidad = false;
 
-        if(usuarioDto != null){
-            model.addAttribute("usuario", usuarioDto.getUser());
-            model.addAttribute("urlFoto", usuarioDto.getUrlFoto());
-            model.addAttribute("id", usuarioDto.getId());
-            model.addAttribute("token", usuarioDto.getToken());
-            model.addAttribute("hayUsuarios", servicioComunidad.hayAlguienEnLaComunidad(idComunidad, usuarioDto.getUser()));
-            model.addAttribute("playlistsDeLaComunidad", servicioPlaylist.obtenerPlaylistsRelacionadasAUnaComunidad(id));
-            model.addAttribute("mensajes", servicioComunidad.obtenerMensajes(id));
+        if (usuarioDto != null) {
+            model.put("usuario", usuarioDto.getUser());
+            model.put("urlFoto", usuarioDto.getUrlFoto());
+            model.put("id", usuarioDto.getId());
+            model.put("token", usuarioDto.getToken());
+            model.put("hayUsuarios", servicioComunidad.hayAlguienEnLaComunidad(idComunidad, usuarioDto.getUser()));
+            model.put("playlistsDeLaComunidad", servicioPlaylist.obtenerPlaylistsRelacionadasAUnaComunidad(id));
+            model.put("mensajes", servicioComunidad.obtenerMensajes(id));
 
             System.out.println("usuario:" + servicioComunidad.hayAlguienEnLaComunidad(idComunidad, usuarioDto.getUser()));
             System.out.println("ususadario:" + servicioComunidad.obtenerUsuariosDeLaComunidad(id).toString());
             estaEnComunidad = true;
         }
 
+        model.put("fotoUsuario", servicioUsuario.obtenerUsuarioPorId(idUsuario).getUrlFoto());
+        model.put("comunidad", comunidad);
+        model.put("estaEnComunidad", estaEnComunidad);
+        model.put("usuariosActivos", servicioComunidad.obtenerUsuariosDeLaComunidad(id));
 
-        model.addAttribute("comunidad", comunidad);
-        model.addAttribute("estaEnComunidad", estaEnComunidad);
-        model.addAttribute("usuariosActivos", servicioComunidad.obtenerUsuariosDeLaComunidad(id));
-        return "comunidad-general";
+        return new ModelAndView("comunidad-general", model);
     }
+
 
 
     //ResponseEntity clase de Spring que representa toda la respuesta HTTP

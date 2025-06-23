@@ -1,0 +1,82 @@
+package com.tallerwebi.integracion;
+
+import com.tallerwebi.dominio.Comunidad;
+import com.tallerwebi.dominio.ServicioComunidad;
+import com.tallerwebi.dominio.ServicioUsuario;
+import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.integracion.config.SpringWebTestConfig;
+import com.tallerwebi.presentacion.ControladorHome;
+import com.tallerwebi.presentacion.dto.UsuarioDto;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpSession;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+public class ControladorHomeTest {
+
+    private ServicioUsuario servicioUsuarioMock;
+    private ServicioComunidad servicioComunidadMock;
+    private ControladorHome controladorHome;
+
+    @BeforeEach
+    public void setup() {
+        servicioUsuarioMock = mock(ServicioUsuario.class);
+        servicioComunidadMock = mock(ServicioComunidad.class);
+        controladorHome = new ControladorHome(servicioUsuarioMock, servicioComunidadMock);
+
+    }
+
+    @Test
+    public void debeRetornarVistaHome() {
+
+        Long idUsuario = 1L;
+        UsuarioDto usuarioMock = new UsuarioDto();
+        usuarioMock.setId(idUsuario);
+        usuarioMock.setUser("Ejemplo");
+
+
+        HttpSession sessionMock = mock(HttpSession.class);
+        when(sessionMock.getAttribute("user")).thenReturn(idUsuario);
+
+        List<Comunidad> comunidadesMock = List.of(new Comunidad(), new Comunidad());
+
+
+        when(servicioUsuarioMock.obtenerUsuarioPorId(idUsuario)).thenReturn(usuarioMock);
+        when(servicioComunidadMock.obtenerTodasLasComunidades()).thenReturn(comunidadesMock);
+
+
+        ModelAndView modelAndView = controladorHome.vistaHome(sessionMock);
+
+
+        assertThat(modelAndView.getViewName(), equalTo("home"));
+        assertThat(modelAndView.getModel().get("usuario"), equalTo(usuarioMock));
+        assertThat(((List<?>) modelAndView.getModel().get("comunidades")).size(), equalTo(2));
+    }
+    @Test
+    public void debeCerrarSesionYRedirigirAlLogin() {
+        // Mockear HttpSession
+        HttpSession sessionMock = mock(HttpSession.class);
+
+
+        String resultado = controladorHome.cerrarSesion(sessionMock);
+
+
+        verify(sessionMock).invalidate();
+
+
+        assertThat("redirect:/login", equalTo(resultado));
+    }
+
+
+}
