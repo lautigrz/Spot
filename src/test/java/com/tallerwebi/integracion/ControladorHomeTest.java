@@ -41,7 +41,7 @@ public class ControladorHomeTest {
     public void debeRetornarVistaHome() {
 
         Long idUsuario = 1L;
-        UsuarioDto usuarioMock = new UsuarioDto();
+        Usuario usuarioMock = new Usuario();
         usuarioMock.setId(idUsuario);
         usuarioMock.setUser("Ejemplo");
 

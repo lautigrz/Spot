@@ -71,7 +71,7 @@ public class ControladorComunidadTest {
         servicioGuardarImagen = mock(ServicioGuardarImagen.class);
         servicioUsuarioMock = mock(ServicioUsuario.class);
         controladorComunidad = new ControladorComunidad(servicioComunidadMock, servicioSpotify, servicioPlaylistMock, servicioReproduccion, servicioGuardarImagen,
-                servicioUsuarioMock);
+                servicioUsuarioMock, null);
 
         mockMvc = MockMvcBuilders.standaloneSetup(controladorComunidad).build();
 
@@ -101,7 +101,7 @@ public class ControladorComunidadTest {
         when(servicioComunidadMock.hayAlguienEnLaComunidad(String.valueOf(idComunidad), usuarioDtoMock.getUser())).thenReturn(true);
         when(servicioPlaylistMock.obtenerPlaylistsRelacionadasAUnaComunidad(idComunidad)).thenReturn(playlistsMock);
         when(servicioComunidadMock.obtenerMensajes(idComunidad)).thenReturn(mensajesMock);
-        when(servicioUsuarioMock.obtenerUsuarioPorId(idUsuario)).thenReturn(usuarioDtoMock);
+       // when(servicioUsuarioMock.obtenerUsuarioPorId(idUsuario)).thenReturn(usuarioDtoMock);
         when(servicioComunidadMock.obtenerUsuariosDeLaComunidad(idComunidad)).thenReturn(usuariosActivosMock);
 
         ModelMap model = new ModelMap();

@@ -14,18 +14,13 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
     }
 
     @Override
-    public UsuarioDto obtenerUsuarioPorId(Long idUsuario) {
+    public Usuario obtenerUsuarioPorId(Long idUsuario) {
     Usuario usuario = repositorioUsuario.buscarUsuarioPorId(idUsuario);
         if (usuario == null) {
             return null; // O lanzar una excepción si el usuario no se encuentra
         }
 
-        UsuarioDto usuarioDto = new UsuarioDto();
-        usuarioDto.setId(usuario.getId());
-        usuarioDto.setUser(usuario.getUser());
-        usuarioDto.setUrlFoto(usuario.getUrlFoto());
-
-        return usuarioDto;
+        return usuario;
 
     }
 }

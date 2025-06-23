@@ -42,12 +42,6 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
         comunidad.getMensajes().size();  // forzamos la carga
         return comunidad.getMensajes();
     }
-
-    @Override
-    public void guardarNuevaComunidad(Comunidad comunidad) {
-        sessionFactory.getCurrentSession().save(comunidad);
-    }
-
     @Override
     public List<Comunidad> obtenerComunidades() {
         String hql = "FROM Comunidad";
@@ -81,8 +75,7 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
             Comunidad comunidad = obtenerComunidad(idComunidad);
             if (comunidad == null) return false;
 
-            usuario.getComunidades().add(comunidad);
-            comunidad.getUsuarios().add(usuario);
+
 
             sessionFactory.getCurrentSession().saveOrUpdate(comunidad);
 
@@ -102,9 +95,7 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
             return null;
         }
 
-        for (Usuario usuario : comunidad.getUsuarios()) {
-            if (usuario.getId().equals(idUsuario)) return usuario;
-        }
+
 
         return null;
     }
@@ -155,11 +146,12 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
 
     @Override
     public List<Usuario> obtenerUsuariosPorComunidad(Long idComunidad) {
-        String hql = "SELECT u FROM Comunidad c JOIN c.usuarios u WHERE c.id = :idComunidad";
+        String hql = "SELECT uc.usuario FROM Comunidad c JOIN c.usuarios uc WHERE c.id = :idComunidad";
         TypedQuery<Usuario> query = sessionFactory.getCurrentSession().createQuery(hql, Usuario.class);
         query.setParameter("idComunidad", idComunidad);
         return query.getResultList();
     }
+
 
 
 }

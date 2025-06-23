@@ -36,34 +36,6 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     }
 
     @Override
-    public Boolean guardarUsuarioEnComunidad(Long idUsuario, Long idComunidad) {
-
-        Usuario usuarioEncontrado = repositorioUsuario.buscarUsuarioPorId(idUsuario);
-        Usuario usuarioExisteEnComunidad = repositorioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
-        if(usuarioEncontrado == null || usuarioExisteEnComunidad != null) {
-            return false;
-        }
-
-        return repositorioComunidad.guardarUsuarioEnComunidad(usuarioEncontrado, idComunidad);
-    }
-
-    @Override
-    public UsuarioDto obtenerUsuarioDeLaComunidad(Long idUsuario, Long idComunidad) {
-        Usuario usuario = repositorioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
-
-        if(usuario == null){
-            return null;
-        }
-        UsuarioDto usuarioDto = new UsuarioDto();
-        usuarioDto.setId(usuario.getId());
-        usuarioDto.setUser(usuario.getUser());
-        usuarioDto.setToken(usuario.getToken());
-        usuarioDto.setUrlFoto(usuario.getUrlFoto());
-
-        return usuarioDto;
-    }
-
-    @Override
     public List<Mensaje> obtenerMensajes(Long id) {
         return repositorioComunidad.obtenerMensajesDeComunidad(id);
     }
@@ -146,12 +118,6 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     public List<Comunidad> obtenerTodasLasComunidades() {
 
         return repositorioComunidad.obtenerComunidades();
-    }
-
-    @Override
-    public Playlist obtenerLasPlaylistDeUnaComunidad(Long idComunidad) {
-
-        return null;
     }
 
 
