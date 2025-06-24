@@ -22,14 +22,13 @@ public class ControladorHome {
 
     private ServicioUsuario servicioUsuario;
     private ServicioComunidad servicioComunidad;
-
-    @Autowired
     private ServicioInstancia spotify;
 
 
-    public ControladorHome(ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad) {
+    public ControladorHome(ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify) {
         this.servicioUsuario = servicioUsuario;
         this.servicioComunidad = servicioComunidad;
+        this.spotify = spotify;
     }
 
     @GetMapping("/home")

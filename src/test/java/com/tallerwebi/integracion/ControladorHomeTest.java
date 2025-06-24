@@ -1,18 +1,20 @@
 package com.tallerwebi.integracion;
 
-import com.tallerwebi.dominio.Comunidad;
-import com.tallerwebi.dominio.ServicioComunidad;
-import com.tallerwebi.dominio.ServicioUsuario;
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.*;
 import com.tallerwebi.integracion.config.SpringWebTestConfig;
 import com.tallerwebi.presentacion.ControladorHome;
 import com.tallerwebi.presentacion.dto.UsuarioDto;
+import javafx.scene.effect.Light;
+import org.apache.maven.model.Model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ModelAndView;
+import se.michaelthelin.spotify.SpotifyApi;
+import se.michaelthelin.spotify.model_objects.specification.Artist;
+import se.michaelthelin.spotify.model_objects.specification.Paging;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -27,13 +29,16 @@ public class ControladorHomeTest {
 
     private ServicioUsuario servicioUsuarioMock;
     private ServicioComunidad servicioComunidadMock;
+    private ServicioInstancia servicioInstanciaMock;
     private ControladorHome controladorHome;
 
     @BeforeEach
     public void setup() {
         servicioUsuarioMock = mock(ServicioUsuario.class);
         servicioComunidadMock = mock(ServicioComunidad.class);
-        controladorHome = new ControladorHome(servicioUsuarioMock, servicioComunidadMock);
+        servicioInstanciaMock = mock(ServicioInstancia.class);
+
+        controladorHome = new ControladorHome(servicioUsuarioMock, servicioComunidadMock, servicioInstanciaMock);
 
     }
 
@@ -63,6 +68,8 @@ public class ControladorHomeTest {
         assertThat(modelAndView.getModel().get("usuario"), equalTo(usuarioMock));
         assertThat(((List<?>) modelAndView.getModel().get("comunidades")).size(), equalTo(2));
     }
+
+
     @Test
     public void debeCerrarSesionYRedirigirAlLogin() {
         // Mockear HttpSession

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         body {
             background-color: #f4f4f4;
@@ -64,28 +65,26 @@
 
 
         .volver-link {
+            color: black;
+            font-size: 35px;
             position: absolute;
             top: 20px;
             left: 30px;
             z-index: 100;
+            text-decoration: none;
+            transition: color 0.3s ease, transform 0.3s ease;
         }
 
-        .volver-link img {
-            width: 32px;
-            height: 32px;
-            transition: transform 0.2s ease;
-            cursor: pointer;
-        }
-
-        .volver-link img:hover {
-            transform: scale(1.1);
+        .volver-link:hover {
+            color: #d66b0e;
+            transform: translateX(-5px);
         }
     </style>
 </head>
 <body>
 
 <a href="/spring/home" class="volver-link">
-    <img src="/spring/uploads/flecha-volver.png" alt="Volver" />
+    <i class="bi bi-arrow-left"></i>
 </a>
 
 
