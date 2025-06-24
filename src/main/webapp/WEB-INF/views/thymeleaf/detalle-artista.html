@@ -98,23 +98,35 @@
       border-radius: 10px;
     }
 
-    a {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 10px 20px;
-      border-radius: 8px;
-      text-decoration: none;
-      background-color: #d66b0e;
-      color: white;
-      transition: background-color 0.3s ease;
+    .volver-link {
+      position: absolute;
+      top: 20px;
+      left: 30px;
+      z-index: 100;
     }
 
-    a:hover {
-      background-color: #a14e00;
+    .volver-link img {
+      width: 32px;
+      height: 32px;
+      transition: transform 0.2s ease;
+      cursor: pointer;
     }
+
+    .volver-link img:hover {
+      transform: scale(1.1);
+    }
+
   </style>
 </head>
 <body>
+
+<a href="/spring/home" class="volver-link">
+  <img src="/spring/uploads/flecha-volver.png" alt="Volver" />
+</a>
+
+<div th:if="${errorBusqueda}" class="alert alert-warning" style="margin-bottom: 1em;">
+  <p th:text="${errorBusqueda}"></p>
+</div>
 
 <div class="container">
 
@@ -176,8 +188,6 @@
     </p>
   </div>
 
-  <!-- Volver -->
-  <a href="/spring/perfil">Volver a perfil</a>
 
 </div>
 

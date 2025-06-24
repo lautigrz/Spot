@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import se.michaelthelin.spotify.model_objects.specification.Artist;
-import se.michaelthelin.spotify.model_objects.specification.Track;
-import se.michaelthelin.spotify.model_objects.specification.User;
+import se.michaelthelin.spotify.model_objects.specification.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
@@ -27,11 +25,13 @@ import java.util.List;
 @Controller
 public class ControladorPerfil {
 
+
     private ServicioPerfil servicioPerfil;
     private ServicioEstadoDeAnimo servicioEstadoDeAnimo;
     private ServicioRecomendaciones servicioRecomendaciones;
 
     private ServicioFavorito servicioFavorito;
+    private ServicioPreescucha servicioPreescucha;
     private RepositorioUsuario repositorioUsuario;
 
     @Autowired
@@ -46,11 +46,17 @@ public class ControladorPerfil {
         this.servicioFavorito = servicioFavorito;
     }
 
+    @Autowired
+    public void setServicioPreescucha(ServicioPreescucha servicioPreescucha) {
+        this.servicioPreescucha = servicioPreescucha;
+    }
+
     @GetMapping("/perfil")
     public String perfil(HttpSession session, Model model) throws Exception {
         String token = (String) session.getAttribute("token");
         String refreshToken = (String) session.getAttribute("refreshToken");
         Long usuarioId = (Long) session.getAttribute("user");
+        Usuario usuario = repositorioUsuario.buscarUsuarioPorId(usuarioId);
 
 
 
@@ -72,17 +78,18 @@ public class ControladorPerfil {
                 model.addAttribute("estadoDeAnimoActual", servicioPerfil.obtenerEstadoDeAnimoDelUsuario(token));
             }
 
-
            if (usuarioId != null) {
-               System.out.println("usuarioId: " + usuarioId);
-               System.out.println("repositorioUsuario: " + (repositorioUsuario != null));
-                Usuario usuario = repositorioUsuario.buscarUsuarioPorId(usuarioId);
                 model.addAttribute("favoritos", servicioFavorito.obtenerFavoritos(usuario));
             }
 
             if (!model.containsAttribute("recomendaciones")) {
                 model.addAttribute("recomendaciones", new ArrayList<Track>());
             }
+
+            List<String> albumsId = servicioPreescucha.obtenerAlbumesComprados(usuario);
+            List<Album> albumesComprados = servicioPerfil.obtenerAlbumesDePreescuchaCompradosPorElUsuario(albumsId, token);
+            model.addAttribute("albumesCompradosDetalle", albumesComprados);
+
         }catch (Exception e) {
             e.printStackTrace();
 

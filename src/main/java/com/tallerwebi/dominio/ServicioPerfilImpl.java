@@ -75,6 +75,8 @@ public class ServicioPerfilImpl implements ServicioPerfil {
         return mejores;
     }
 
+
+
     @Override
     public List<PlaylistSimplified> obtenerNombreDePlaylistDelUsuario(String token) throws Exception {
 
@@ -134,5 +136,23 @@ public class ServicioPerfilImpl implements ServicioPerfil {
         User user = spotifyApi.getCurrentUsersProfile().build().execute();
         Usuario usuario = repositorioUsuarioImpl.buscarUsuarioPorSpotifyID(user.getId());
         usuario.setEstadoDeAnimo(estadoDeAnimo);
+    }
+
+    @Override
+    public List<Album> obtenerAlbumesDePreescuchaCompradosPorElUsuario(List<String> albumIds, String token) throws Exception {
+        SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
+        List<Album> albums = new ArrayList<>();
+
+        for (String id : albumIds) {
+            try{
+                Album album = spotifyApi.getAlbum(id).build().execute();
+                albums.add(album);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        return albums;
+
     }
 }

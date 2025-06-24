@@ -40,9 +40,12 @@
         </div>
 
         <!-- Feed -->
-        <div class="col-md-7 p-4 feed-col">
+        <div class="col-md-7 offset-md-2 p-4 feed-col">
+            <!-- Barra de búsqueda -->
             <div class="search-bar mb-4">
-                <input type="text" class="form-control" placeholder="Search for tracks, artists or playlists...">
+                <form th:action="@{/buscar-artista}" method="get">
+                    <input type="text" class="form-control" name="nombre" placeholder="Buscar artistas...">
+                </form>
             </div>
 
             <!-- Publicar nuevo post -->

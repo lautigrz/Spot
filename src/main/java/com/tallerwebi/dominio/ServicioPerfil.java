@@ -14,4 +14,5 @@ public interface ServicioPerfil {
     EstadoDeAnimo obtenerEstadoDeAnimoDelUsuario(String token) throws Exception;
     void actualizarEstadoDeAnimoUsuario(String token, EstadoDeAnimo estadoDeAnimo) throws Exception;
     List<Track> obtenerTopTracksDeLUsuario(String token) throws Exception;
+    List<Album> obtenerAlbumesDePreescuchaCompradosPorElUsuario(List<String> albumIds, String token) throws Exception;
 }
