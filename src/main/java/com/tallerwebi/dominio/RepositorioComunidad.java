@@ -6,13 +6,11 @@ import java.util.List;
 import java.util.Set;
 
 public interface RepositorioComunidad {
-    void guardarMensajeDeLaComunidad(String mensaje, Long idUsuario, Long idComunidad);
+    void guardarMensajeDeLaComunidad(String mensaje, Comunidad comunidad, Usuario usuario);
     List<Mensaje> obtenerMensajesDeComunidad(Long id);
     List<Comunidad> obtenerComunidades();
     Comunidad obtenerComunidad(Long id);
     String obtenerTokenDelUsuarioQuePerteneceAUnaComunidad(String user, Long idComunidad);
-    Boolean guardarUsuarioEnComunidad(Usuario usuario,Long idComunidad);
-    Usuario obtenerUsuarioEnComunidad(Long idUsuario, Long idComunidad);
     Comunidad  obtenerComunidadConUsuarios(Long idComunidad);
     List<Playlist> obtenerPlaylistsPorComunidadId(Long comunidadId);
     Set<Cancion> obtenerCancionesDeUnaPlaylistDeUnaComunidad(Long idComunidad);

@@ -14,10 +14,7 @@ public class ServicioUsuarioComunidadImpl implements ServicioUsuarioComunidad {
         this.repositorioUsuarioComunidad = repositorioUsuarioComunidad;
     }
 
-    @Override
-    public Long nuevaComunidad(Comunidad comunidad, Usuario usuario, String rol) {
-        return repositorioUsuarioComunidad.nuevaComunidad(comunidad, usuario, rol);
-    }
+
 
     @Override
     public String obtenerRolDelUsuarioEnComunidad(Long idUsuario, Long idComunidad) {

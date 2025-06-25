@@ -1,6 +1,6 @@
 package com.tallerwebi.dominio;
 
 public interface RepositorioNuevaComunidad {
-    Comunidad nuevaComunidad(Comunidad comunidad);
+    Long nuevaComunidad(Comunidad comunidad, Usuario usuario, String rol);
 
 }

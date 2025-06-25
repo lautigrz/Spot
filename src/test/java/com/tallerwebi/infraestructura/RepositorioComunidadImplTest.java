@@ -59,12 +59,13 @@ public class RepositorioComunidadImplTest {
         comunidad.setDescripcion("excelente");
         sessionFactory.getCurrentSession().save(comunidad);
 
+        UsuarioComunidad usuarioComunidad = new UsuarioComunidad();
+        usuarioComunidad.setUsuario(usuario);
+        usuarioComunidad.setComunidad(comunidad);
+        sessionFactory.getCurrentSession().save(usuarioComunidad);
         String textoMensaje = "Hola como estas";
 
-        repositorioComunidad.guardarUsuarioEnComunidad(usuario,comunidad.getId());
-
-        repositorioComunidad.guardarMensajeDeLaComunidad(textoMensaje, usuario.getId(), comunidad.getId());
-
+        repositorioComunidad.guardarMensajeDeLaComunidad(textoMensaje, comunidad,usuario);
 
         Comunidad comunidadObtenida = sessionFactory.getCurrentSession()
                 .get(Comunidad.class, comunidad.getId());
@@ -92,7 +93,12 @@ public class RepositorioComunidadImplTest {
         comunidad.setDescripcion("excelente");
         sessionFactory.getCurrentSession().save(comunidad);
 
-        repositorioComunidad.guardarUsuarioEnComunidad(usuario1,comunidad.getId());
+        UsuarioComunidad usuarioComunidad = new UsuarioComunidad();
+        usuarioComunidad.setUsuario(usuario1);
+        usuarioComunidad.setComunidad(comunidad);
+        sessionFactory.getCurrentSession().save(usuarioComunidad);
+
+
 
         String textoMensaje = "Hola como estas";
         String textoMensaje2 = "Muy bien";
@@ -101,8 +107,8 @@ public class RepositorioComunidadImplTest {
         mensajes.add(textoMensaje);
         mensajes.add(textoMensaje2);
 
-        repositorioComunidad.guardarMensajeDeLaComunidad(textoMensaje, usuario1.getId(), comunidad.getId());
-        repositorioComunidad.guardarMensajeDeLaComunidad(textoMensaje2, usuario1.getId(), comunidad.getId());
+         repositorioComunidad.guardarMensajeDeLaComunidad(textoMensaje, comunidad, usuario1);
+        repositorioComunidad.guardarMensajeDeLaComunidad(textoMensaje2, comunidad, usuario1);
 
         List<Mensaje> mensajesDeComunidad = repositorioComunidad.obtenerMensajesDeComunidad(comunidad.getId());
 
@@ -114,24 +120,7 @@ public class RepositorioComunidadImplTest {
 
     }
 
-    @Test
-    @Rollback
-    public void seDebeGuardarUnaComunidad() {
-        Comunidad comunidad = new Comunidad();
-        comunidad.setNombre("Rock");
-        comunidad.setDescripcion("excelente");
-       repositorioComunidad.guardarNuevaComunidad(comunidad);
 
-        String hql = "FROM Comunidad";
-
-        Query query = sessionFactory.getCurrentSession().createQuery(hql);
-
-        Comunidad comunidad2 = (Comunidad) query.uniqueResult();
-
-        assertThat(comunidad2.getNombre(), equalTo(comunidad.getNombre()));
-        assertThat(comunidad2.getDescripcion(), equalTo(comunidad.getDescripcion()));
-        assertThat(comunidad2.getId(), equalTo(comunidad.getId()));
-    }
 
     @Test
     @Rollback
@@ -176,88 +165,7 @@ public class RepositorioComunidadImplTest {
     }
 
 
-    @Test
-    @Rollback
-    public void seDebeGuardarUnUsuarioEnLaComunidad() {
-        Comunidad comunidad = new Comunidad();
-        comunidad.setNombre("Rock");
-        comunidad.setDescripcion("excelente");
-        sessionFactory.getCurrentSession().save(comunidad);
 
-        Usuario usuario = new Usuario();
-        usuario.setToken("223");
-        usuario.setUrlFoto("https://");
-        usuario.setUser("lauti");
-        usuario.setRefreshToken("das2");
-        sessionFactory.getCurrentSession().save(usuario);
-
-        Boolean seGuardo = repositorioComunidad.guardarUsuarioEnComunidad(usuario, comunidad.getId());
-
-        sessionFactory.getCurrentSession().flush();
-        sessionFactory.getCurrentSession().clear();
-
-        Usuario usuarioEnComunidad = repositorioComunidad.obtenerUsuarioEnComunidad(usuario.getId(),comunidad.getId());
-
-        assertThat(usuarioEnComunidad.getId(), equalTo(usuario.getId()));
-        assertThat(seGuardo, equalTo(true));
-
-    }
-
-    @Test
-    @Rollback
-    public void seDebeObtenerUnUsuarioDeUnaComunidad() {
-        Comunidad comunidad = new Comunidad();
-        comunidad.setNombre("Rock");
-        comunidad.setDescripcion("excelente");
-        sessionFactory.getCurrentSession().save(comunidad);
-
-        Usuario usuario = new Usuario();
-        usuario.setToken("223");
-        usuario.setUrlFoto("https://");
-        usuario.setUser("lauti");
-        usuario.setRefreshToken("das2");
-        sessionFactory.getCurrentSession().save(usuario);
-
-        repositorioComunidad.guardarUsuarioEnComunidad(usuario, comunidad.getId());
-
-        Usuario usuarioBuscado = repositorioComunidad.obtenerUsuarioEnComunidad(usuario.getId(), comunidad.getId());
-
-        assertThat(usuarioBuscado.getId(),equalTo(usuario.getId()));
-    }
-
-    @Test
-    @Rollback
-    public void seDebeObtenerUnaComunidadConUsuarios(){
-        Comunidad comunidad = new Comunidad();
-        comunidad.setNombre("Rock");
-        comunidad.setDescripcion("excelente");
-        sessionFactory.getCurrentSession().save(comunidad);
-
-        Usuario usuario = new Usuario();
-        usuario.setToken("223");
-        usuario.setUrlFoto("https://");
-        usuario.setUser("lauti");
-        usuario.setRefreshToken("das2");
-        sessionFactory.getCurrentSession().save(usuario);
-
-        Usuario usuario1 = new Usuario();
-        usuario1.setToken("223");
-        usuario1.setUrlFoto("https://");
-        usuario1.setUser("lauti");
-        usuario1.setRefreshToken("das2");
-        sessionFactory.getCurrentSession().save(usuario1);
-
-        List<Usuario> usuarios = List.of(usuario, usuario1);
-
-        repositorioComunidad.guardarUsuarioEnComunidad(usuario, comunidad.getId());
-        repositorioComunidad.guardarUsuarioEnComunidad(usuario1, comunidad.getId());
-
-        Comunidad comunidadObtenida = repositorioComunidad.obtenerComunidadConUsuarios(comunidad.getId());
-        assertThat(comunidadObtenida, equalTo(comunidad));
-
-        assertThat(comunidadObtenida.getUsuarios(), containsInAnyOrder(usuarios.toArray()));
-
-    }
 
     @Test
     @Rollback
@@ -265,7 +173,7 @@ public class RepositorioComunidadImplTest {
         Comunidad comunidad = new Comunidad();
         comunidad.setNombre("Rock");
         comunidad.setDescripcion("excelente");
-        repositorioComunidad.guardarNuevaComunidad(comunidad);
+        sessionFactory.getCurrentSession().save(comunidad);
 
         Usuario usuario = new Usuario();
         usuario.setToken("223");
@@ -274,7 +182,10 @@ public class RepositorioComunidadImplTest {
         usuario.setRefreshToken("das2");
         sessionFactory.getCurrentSession().save(usuario);
 
-        repositorioComunidad.guardarUsuarioEnComunidad(usuario, comunidad.getId());
+        UsuarioComunidad usuarioComunidad = new UsuarioComunidad();
+        usuarioComunidad.setUsuario(usuario);
+        usuarioComunidad.setComunidad(comunidad);
+        sessionFactory.getCurrentSession().save(usuarioComunidad);
 
         String token = repositorioComunidad.obtenerTokenDelUsuarioQuePerteneceAUnaComunidad(usuario.getUser(), comunidad.getId());
 
@@ -317,7 +228,7 @@ public class RepositorioComunidadImplTest {
         comunidad.agregarPlaylist(playlist);
 
         sessionFactory.getCurrentSession().save(playlist);
-        repositorioComunidad.guardarNuevaComunidad(comunidad);
+        sessionFactory.getCurrentSession().save(comunidad);
 
         Playlist playlistDeLaComunidad = repositorioComunidad.obtenerPlaylistDeUnaComunidad(comunidad.getId());
         assertThat(playlistDeLaComunidad.getNombre(), equalTo(playlist.getNombre()));
@@ -358,7 +269,7 @@ public class RepositorioComunidadImplTest {
         comunidad.agregarPlaylist(playlist);
 
         sessionFactory.getCurrentSession().save(playlist);
-        repositorioComunidad.guardarNuevaComunidad(comunidad);
+        sessionFactory.getCurrentSession().save(comunidad);
 
         Set<Cancion> cancionesDeLaPLaylist = repositorioComunidad.obtenerCancionesDeUnaPlaylistDeUnaComunidad(comunidad.getId());
         assertThat(cancionesDeLaPLaylist.size(), equalTo(cancionSet.size()));
@@ -405,11 +316,13 @@ public class RepositorioComunidadImplTest {
 
         sessionFactory.getCurrentSession().save(playlist);
         sessionFactory.getCurrentSession().save(playlist2);
-        repositorioComunidad.guardarNuevaComunidad(comunidad);
+       sessionFactory.getCurrentSession().save(comunidad);
 
         List<Playlist> playlistDeLaComunidad = repositorioComunidad.obtenerPlaylistsPorComunidadId(comunidad.getId());
 
         assertThat(playlistDeLaComunidad, containsInAnyOrder(playlist, playlist2));
     }
+
+
 
 }

@@ -29,11 +29,13 @@ public class ServicioReproduccionImpl implements ServicioReproduccion {
     private ServicioSpotify servicioSpotify;
     private ServicioComunidad servicioComunidad;
     private RepositorioComunidad repositorioComunidad;
-
+    private RepositorioUsuarioComunidad repositorioUsuarioComunidad;
     @Autowired
-    public ServicioReproduccionImpl(ServicioInstancia servicioInstancia, ServicioSpotify servicioSpotify, RepositorioComunidad repositorioComunidad, ServicioComunidad servicioComunidad) {
+    public ServicioReproduccionImpl(ServicioInstancia servicioInstancia, ServicioSpotify servicioSpotify, RepositorioComunidad repositorioComunidad
+            , ServicioComunidad servicioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad) {
         this.servicioInstancia = servicioInstancia;
         this.servicioSpotify = servicioSpotify;
+        this.repositorioUsuarioComunidad = repositorioUsuarioComunidad;
         this.repositorioComunidad = repositorioComunidad;
         this.servicioComunidad = servicioComunidad;
     }
@@ -42,7 +44,8 @@ public class ServicioReproduccionImpl implements ServicioReproduccion {
     @Override
     public Boolean reproducirCancion(String token, Long idComunidad, Long idUsuario) throws IOException, ParseException, SpotifyWebApiException {
         SpotifyApi spotifyApi = servicioInstancia.obtenerInstanciaDeSpotifyConToken(token);
-        Usuario usuario = repositorioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
+        Usuario usuario = repositorioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad).getUsuario();
+
 
         List<Playlist> playlists = repositorioComunidad.obtenerPlaylistsPorComunidadId(idComunidad);
         if (playlists == null || playlists.isEmpty()) {

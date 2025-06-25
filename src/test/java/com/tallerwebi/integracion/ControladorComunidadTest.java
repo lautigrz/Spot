@@ -16,6 +16,7 @@ import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.mock.web.MockMultipartFile;
@@ -60,7 +61,9 @@ public class ControladorComunidadTest {
     private ServicioPlaylist servicioPlaylistMock;
     private ServicioReproduccion servicioReproduccion;
     private ServicioGuardarImagen servicioGuardarImagen;
+    private ServicioUsuarioComunidad servicioUsuarioComunidadMock;
     private HttpSession sessionMock;
+
 
     @BeforeEach
     public void setUp() {
@@ -70,8 +73,9 @@ public class ControladorComunidadTest {
         servicioReproduccion = mock(ServicioReproduccion.class);
         servicioGuardarImagen = mock(ServicioGuardarImagen.class);
         servicioUsuarioMock = mock(ServicioUsuario.class);
+        servicioUsuarioComunidadMock = mock(ServicioUsuarioComunidad.class);
         controladorComunidad = new ControladorComunidad(servicioComunidadMock, servicioSpotify, servicioPlaylistMock, servicioReproduccion, servicioGuardarImagen,
-                servicioUsuarioMock, null);
+                servicioUsuarioMock, servicioUsuarioComunidadMock);
 
         mockMvc = MockMvcBuilders.standaloneSetup(controladorComunidad).build();
 
@@ -84,24 +88,33 @@ public class ControladorComunidadTest {
         Long idComunidad = 100L;
 
         // Simulamos datos
+
+        Usuario usuario = mock(Usuario.class);
+        when(usuario.getId()).thenReturn(idUsuario);
+        when(usuario.getUser()).thenReturn("usuarioTest");
+        when(usuario.getUrlFoto()).thenReturn("urlFotoTest");
+        when(usuario.getToken()).thenReturn("tokenTest");
+
         UsuarioDto usuarioDtoMock = new UsuarioDto();
         usuarioDtoMock.setId(idUsuario);
         usuarioDtoMock.setUser("usuarioTest");
         usuarioDtoMock.setUrlFoto("urlFotoTest");
         usuarioDtoMock.setToken("tokenTest");
 
+        UsuarioComunidad usuarioComunidadMock = mock(UsuarioComunidad.class);
         Comunidad comunidadMock = new Comunidad();
         List<Playlist> playlistsMock = List.of(new Playlist());
         List<Mensaje> mensajesMock = List.of(new Mensaje());
         List<UsuarioDto> usuariosActivosMock = List.of(new UsuarioDto());
 
         when(sessionMock.getAttribute("user")).thenReturn(idUsuario);
-        when(servicioComunidadMock.obtenerUsuarioDeLaComunidad(idUsuario, idComunidad)).thenReturn(usuarioDtoMock);
+        when(servicioUsuarioComunidadMock.obtenerUsuarioEnComunidad(anyLong(),anyLong())).thenReturn(usuarioComunidadMock);
+        when(servicioUsuarioComunidadMock.obtenerUsuarioEnComunidad(anyLong(),anyLong()).getUsuario()).thenReturn(usuario);
         when(servicioComunidadMock.obtenerComunidad(idComunidad)).thenReturn(comunidadMock);
         when(servicioComunidadMock.hayAlguienEnLaComunidad(String.valueOf(idComunidad), usuarioDtoMock.getUser())).thenReturn(true);
         when(servicioPlaylistMock.obtenerPlaylistsRelacionadasAUnaComunidad(idComunidad)).thenReturn(playlistsMock);
         when(servicioComunidadMock.obtenerMensajes(idComunidad)).thenReturn(mensajesMock);
-       // when(servicioUsuarioMock.obtenerUsuarioPorId(idUsuario)).thenReturn(usuarioDtoMock);
+         when(servicioUsuarioMock.obtenerUsuarioDtoPorId(idUsuario)).thenReturn(usuarioDtoMock);
         when(servicioComunidadMock.obtenerUsuariosDeLaComunidad(idComunidad)).thenReturn(usuariosActivosMock);
 
         ModelMap model = new ModelMap();
@@ -326,8 +339,13 @@ public class ControladorComunidadTest {
         Long idComunidad = 10L;
         Long idUsuario = 100L;
 
+        Usuario usuarioMock = mock(Usuario.class);
+        Comunidad comunidadMock = mock(Comunidad.class);
 
-        when(servicioComunidadMock.guardarUsuarioEnComunidad(idUsuario, idComunidad))
+        when(servicioUsuarioMock.obtenerUsuarioPorId(anyLong())).thenReturn(usuarioMock);
+        when(servicioComunidadMock.obtenerComunidad(anyLong())).thenReturn(comunidadMock);
+
+        when(servicioUsuarioComunidadMock.agregarUsuarioAComunidad(any(Usuario.class), any(Comunidad.class), anyString()))
                 .thenReturn(true);
 
         mockMvc.perform(get("/unirme/{idComunidad}", idComunidad)
@@ -335,7 +353,7 @@ public class ControladorComunidadTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/comunidad/" + idComunidad));
 
-        verify(servicioComunidadMock).guardarUsuarioEnComunidad(idUsuario, idComunidad);
+        verify(servicioUsuarioComunidadMock).agregarUsuarioAComunidad(any(Usuario.class), any(Comunidad.class), anyString());
     }
 
     @Test
@@ -343,8 +361,13 @@ public class ControladorComunidadTest {
         Long idComunidad = 10L;
         Long idUsuario = 100L;
 
-        // Simulamos que falla el guardado
-        when(servicioComunidadMock.guardarUsuarioEnComunidad(idUsuario, idComunidad))
+        Usuario usuarioMock = mock(Usuario.class);
+        Comunidad comunidadMock = mock(Comunidad.class);
+
+        when(servicioUsuarioMock.obtenerUsuarioPorId(idUsuario)).thenReturn(usuarioMock);
+        when(servicioComunidadMock.obtenerComunidad(idComunidad)).thenReturn(comunidadMock);
+
+        when(servicioUsuarioComunidadMock.agregarUsuarioAComunidad(any(Usuario.class), any(Comunidad.class), anyString()))
                 .thenReturn(false);
 
         mockMvc.perform(get("/unirme/{idComunidad}", idComunidad)
@@ -352,21 +375,21 @@ public class ControladorComunidadTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/error"));
 
-        verify(servicioComunidadMock).guardarUsuarioEnComunidad(idUsuario, idComunidad);
+        verify(servicioUsuarioComunidadMock).agregarUsuarioAComunidad(any(Usuario.class), any(Comunidad.class), anyString());
     }
     @Test
     public void debeEncontrarUsuarioEnComunidad() throws Exception {
         Long idUsuario = 1L;
         Long idComunidad = 2L;
 
-
-        when(servicioComunidadMock.obtenerUsuarioDeLaComunidad(idUsuario, idComunidad))
-                .thenReturn(new UsuarioDto());
+        UsuarioComunidad usuarioComunidadMock = mock(UsuarioComunidad.class);
+        when(servicioUsuarioComunidadMock.obtenerUsuarioEnComunidad(idUsuario, idComunidad))
+                .thenReturn(usuarioComunidadMock);
 
         mockMvc.perform(get("/usuario-en-comunidad/{idUsuario}/{idComunidad}", idUsuario, idComunidad))
                 .andExpect(status().isOk());
 
-        verify(servicioComunidadMock).obtenerUsuarioDeLaComunidad(idUsuario, idComunidad);
+        verify(servicioUsuarioComunidadMock).obtenerUsuarioEnComunidad(idUsuario, idComunidad);
     }
 
     @Test
@@ -374,14 +397,14 @@ public class ControladorComunidadTest {
         Long idUsuario = 1L;
         Long idComunidad = 2L;
 
-
-        when(servicioComunidadMock.obtenerUsuarioDeLaComunidad(idUsuario, idComunidad))
+        UsuarioComunidad usuarioComunidadMock = mock(UsuarioComunidad.class);
+        when(servicioUsuarioComunidadMock.obtenerUsuarioEnComunidad(idUsuario, idComunidad))
                 .thenReturn(null);
 
         mockMvc.perform(get("/usuario-en-comunidad/{idUsuario}/{idComunidad}", idUsuario, idComunidad))
                 .andExpect(status().isUnauthorized());
 
-        verify(servicioComunidadMock).obtenerUsuarioDeLaComunidad(idUsuario, idComunidad);
+        verify(servicioUsuarioComunidadMock).obtenerUsuarioEnComunidad(idUsuario, idComunidad);
     }
 
     @Test
@@ -407,6 +430,8 @@ public class ControladorComunidadTest {
 
         verify(servicioReproduccion).obtenerCancionSonandoEnLaComunidad(idComunidad);
     }
+
+
 
 }
 

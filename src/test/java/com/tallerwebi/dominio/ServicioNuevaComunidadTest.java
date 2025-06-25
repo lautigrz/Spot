@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,10 +30,22 @@ public class ServicioNuevaComunidadTest {
         comunidad.setUrlPortada("http://comunidad-de-prueba.com");
         comunidad.setUrlFoto("http://comunidad-de-prueba.com/imagen.jpg");
 
-        when(repositorioNuevaComunidadMock.nuevaComunidad(comunidad)).thenReturn(comunidad);
-        Long idComunidad = servicioNuevaComunidad.nuevaComunidad(comunidad);
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setUser("Usuario de prueba");
 
-        assertThat(idComunidad, equalTo(3L));
+        UsuarioComunidad usuarioComunidad = new UsuarioComunidad();
+        usuarioComunidad.setId(2L);
+        usuarioComunidad.setUsuario(usuario);
+        usuarioComunidad.setComunidad(comunidad);
+
+
+
+
+        when(repositorioNuevaComunidadMock.nuevaComunidad(any(Comunidad.class), any(Usuario.class), anyString())).thenReturn(usuarioComunidad.getId());
+        Long idComunidad = servicioNuevaComunidad.nuevaComunidad(comunidad, usuario, "ADMIN");
+
+        assertThat(idComunidad, equalTo(usuarioComunidad.getId()));
 
     }
 

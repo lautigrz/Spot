@@ -22,10 +22,7 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
     }
 
     @Override
-    public void guardarMensajeDeLaComunidad(String contenido, Long idUsuario,Long idComunidad) {
-
-        Usuario usuario = obtenerUsuarioEnComunidad(idUsuario,idComunidad);
-        Comunidad comunidad = obtenerComunidad(idComunidad);
+    public void guardarMensajeDeLaComunidad(String contenido, Comunidad comunidad,Usuario usuario) {
 
         Mensaje mensaje = new Mensaje();
         mensaje.setTexto(contenido);
@@ -54,12 +51,10 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
         return sessionFactory.getCurrentSession().get(Comunidad.class, id);
     }
 
-    //falta test
     @Override
     public String obtenerTokenDelUsuarioQuePerteneceAUnaComunidad(String user, Long idComunidad) {
-        String hql = "SELECT u.token FROM Usuario u " +
-                "JOIN u.comunidades c " +
-                "WHERE u.user = :username AND c.id = :idComunidad";
+
+        String hql = "SELECT u.token FROM UsuarioComunidad uc JOIN uc.usuario u WHERE uc.comunidad.id = :idComunidad AND u.user = :username";
 
         return sessionFactory.getCurrentSession()
                 .createQuery(hql, String.class)
@@ -67,37 +62,6 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
                 .setParameter("idComunidad", idComunidad)
                 .uniqueResult();
 
-    }
-
-    @Override
-    public Boolean guardarUsuarioEnComunidad(Usuario usuario, Long idComunidad) {
-        try {
-            Comunidad comunidad = obtenerComunidad(idComunidad);
-            if (comunidad == null) return false;
-
-
-
-            sessionFactory.getCurrentSession().saveOrUpdate(comunidad);
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    @Override
-    public Usuario obtenerUsuarioEnComunidad(Long idUsuario,Long idComunidad) {
-
-        Comunidad comunidad = obtenerComunidadConUsuarios(idComunidad);
-
-        if (comunidad == null) {
-            return null;
-        }
-
-
-
-        return null;
     }
 
     @Override

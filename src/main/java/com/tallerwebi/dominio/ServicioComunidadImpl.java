@@ -27,10 +27,10 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
     private RepositorioComunidad repositorioComunidad;
     private RepositorioUsuario repositorioUsuario;
-
+    private RepositorioUsuarioComunidad repositorioUsuarioComunidad;
     @Autowired
-    public ServicioComunidadImpl(RepositorioUsuario repositorioUsuario ,RepositorioComunidad repositorioComunidad) {
-
+    public ServicioComunidadImpl(RepositorioUsuario repositorioUsuario ,RepositorioComunidad repositorioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad) {
+        this.repositorioUsuarioComunidad = repositorioUsuarioComunidad;
         this.repositorioUsuario = repositorioUsuario;
         this.repositorioComunidad = repositorioComunidad;
     }
@@ -65,7 +65,8 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     @Override
     public ChatMessage guardarMensaje(ChatMessage message, Long idUsuario, Long idComunidad) {
         try {
-            repositorioComunidad.guardarMensajeDeLaComunidad(message.getContent(), idUsuario,idComunidad);
+            UsuarioComunidad usuarioComunidad = repositorioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
+            repositorioComunidad.guardarMensajeDeLaComunidad(message.getContent(), usuarioComunidad.getComunidad(),usuarioComunidad.getUsuario());
             return message;
         } catch (Exception e) {
             System.out.println("Error al guardar el mensaje: " + e.getMessage());

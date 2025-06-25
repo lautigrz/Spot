@@ -48,6 +48,7 @@ public class ControladorComunidad {
     private ServicioUsuario servicioUsuario;
 
 
+
     public ControladorComunidad(ServicioComunidad servicioComunidad, ServicioSpotify
             servicioSpotify, ServicioPlaylist servicioPlaylist,
                                 ServicioReproduccion servicioReproduccion, ServicioGuardarImagen servicioGuardarImagen
@@ -188,7 +189,7 @@ public class ControladorComunidad {
             model.put("rol", usuarioComunidad.getRol());
             estaEnComunidad = true;
         }
-        model.put("fotoUsuario", servicioUsuario.obtenerUsuarioPorId(idUsuario).getUrlFoto());
+        model.put("fotoUsuario", servicioUsuario.obtenerUsuarioDtoPorId(idUsuario).getUrlFoto());
         model.put("comunidad", comunidad);
         model.put("estaEnComunidad", estaEnComunidad);
         model.put("usuariosActivos", servicioComunidad.obtenerUsuariosDeLaComunidad(id));

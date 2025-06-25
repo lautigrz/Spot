@@ -21,15 +21,14 @@ import java.util.UUID;
 @Controller
 public class ControladorNuevaComunidad {
 
-    @Autowired
+
     private ServicioNuevaComunidad servicioNuevaComunidad;
-    private ServicioUsuarioComunidad servicioUsuarioComunidad;
     private ServicioGuardarImagen servicioGuardarImagen;
     private ServicioUsuario servicioUsuario;
-    public ControladorNuevaComunidad(ServicioNuevaComunidad servicioNuevaComunidad,ServicioGuardarImagen servicioGuardarImagen, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioUsuario servicioUsuario) {
+    public ControladorNuevaComunidad(ServicioNuevaComunidad servicioNuevaComunidad,ServicioGuardarImagen servicioGuardarImagen, ServicioUsuario servicioUsuario) {
         this.servicioNuevaComunidad = servicioNuevaComunidad;
         this.servicioGuardarImagen = servicioGuardarImagen;
-        this.servicioUsuarioComunidad = servicioUsuarioComunidad;
+
         this.servicioUsuario = servicioUsuario;
     }
 
@@ -54,7 +53,7 @@ public class ControladorNuevaComunidad {
         comunidad.setUrlFoto(nombreArchivoPerfil);
         comunidad.setUrlPortada(nombreArchivoPortada);
 
-        Long id = servicioUsuarioComunidad.nuevaComunidad(comunidad, usuario, "Admin");
+        Long id = servicioNuevaComunidad.nuevaComunidad(comunidad, usuario, "Admin");
         return "redirect:/comunidad/" + id;
     }
 
