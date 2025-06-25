@@ -26,9 +26,14 @@ public class ServicioEstadoDeAnimoImpl implements ServicioEstadoDeAnimo {
 
     @Override
     public EstadoDeAnimo obtenerEstadoDeAnimoPorId(Long id) {
+        if (id == null) {
+            return null;
+        }
+        System.out.println("Buscando estado de animo ID: " + id);
         EstadoDeAnimo estadoDeAnimo = repositorioEstadoDeAnimo.obtenerEstadoDeAnimoPorId(id);
+        System.out.println("Estado de animo encontrado: " + estadoDeAnimo);
         if (estadoDeAnimo == null) {
-            return new EstadoDeAnimo();
+            return null;
         }
         return estadoDeAnimo;
     }

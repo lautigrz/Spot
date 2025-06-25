@@ -21,6 +21,7 @@ import java.util.List;
 
 
 @Service
+@Transactional
 public class ServicioPerfilImpl implements ServicioPerfil {
 
     private ServicioInstancia spotify;
@@ -123,19 +124,31 @@ public class ServicioPerfilImpl implements ServicioPerfil {
     }
 
     @Override
-    public EstadoDeAnimo obtenerEstadoDeAnimoDelUsuario(String token) throws Exception{
+    public EstadoDeAnimo obtenerEstadoDeAnimoDelUsuario(String token) throws Exception {
     SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
     User user = spotifyApi.getCurrentUsersProfile().build().execute();
     Usuario usuario = repositorioUsuarioImpl.buscarUsuarioPorSpotifyID(user.getId());
-    return usuario.getEstadoDeAnimo();
+
+    EstadoDeAnimo estado = usuario.getEstadoDeAnimo();
+    System.out.println("Estado de ánimo actual del usuario: " + (estado != null ? estado.getNombre() : "null"));
+
+    if(estado == null || estado.getId() == null) {
+        return null;
+    }
+        return estado;
     }
 
     @Override
     public void actualizarEstadoDeAnimoUsuario(String token, EstadoDeAnimo estadoDeAnimo) throws Exception{
         SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
         User user = spotifyApi.getCurrentUsersProfile().build().execute();
+        System.out.println("ID del usuario Spotify: " + user.getId());
         Usuario usuario = repositorioUsuarioImpl.buscarUsuarioPorSpotifyID(user.getId());
+        System.out.println("Usuario encontrado en base: " + (usuario != null ? usuario.getId() : "null"));
         usuario.setEstadoDeAnimo(estadoDeAnimo);
+        System.out.println("Estado de ánimo seteado a: " + estadoDeAnimo.getNombre());
+        repositorioUsuarioImpl.actualizarUsuario(usuario);
+        System.out.println("Usuario actualizado");
     }
 
     @Override

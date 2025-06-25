@@ -99,12 +99,13 @@ public class ControladorPerfil {
     }
 
     @PostMapping("/actualizar-estado")
-    public String actualizarEstadoDeAnimo(@RequestParam("estadoDeAnimoID") Long estadoDeAnimoID, HttpSession session, RedirectAttributes redirectAttributes) throws Exception{
+    public String actualizarEstadoDeAnimo(@RequestParam("estadoDeAnimoId") Long estadoDeAnimoID, HttpSession session, RedirectAttributes redirectAttributes) throws Exception{
         String token = (String) session.getAttribute("token");
         String refreshToken = (String) session.getAttribute("refreshToken");
 
         try{
             EstadoDeAnimo estado = servicioEstadoDeAnimo.obtenerEstadoDeAnimoPorId(estadoDeAnimoID);
+            System.out.println("Id del estado de ánimo recibido: " + estadoDeAnimoID);
             servicioPerfil.actualizarEstadoDeAnimoUsuario(token, estado);
 
 
@@ -117,16 +118,15 @@ public class ControladorPerfil {
     @PostMapping("/generar-recomendaciones")
     public String generarRecomendaciones(HttpSession session, RedirectAttributes redirectAttributes) throws Exception{
         String token = (String) session.getAttribute("token");
-        String refreshToken = (String) session.getAttribute("refreshToken");
+        EstadoDeAnimo estadoDeAnimo = servicioPerfil.obtenerEstadoDeAnimoDelUsuario(token);
         System.out.println("CHECK CONTROLLER");
         try{
-            List<Track> recomendaciones = servicioRecomendaciones.generarRecomendaciones(token);
+            List<Track> recomendaciones = servicioRecomendaciones.generarRecomendaciones(token, estadoDeAnimo);
+            System.out.println("Cantidad de recomendaciones filtradas: " + recomendaciones.size());
             redirectAttributes.addFlashAttribute("recomendaciones", recomendaciones);
-
         } catch (Exception e){
             e.printStackTrace();
         }
-
         return "redirect:/perfil";
     }
 

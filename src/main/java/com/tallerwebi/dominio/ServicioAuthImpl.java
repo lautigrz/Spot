@@ -34,7 +34,8 @@ public class ServicioAuthImpl implements ServicioAuth {
                 .scope(AuthorizationScope.USER_READ_PRIVATE,AuthorizationScope.USER_READ_EMAIL, AuthorizationScope.USER_READ_PLAYBACK_STATE,
                         AuthorizationScope.PLAYLIST_MODIFY_PUBLIC,
                         AuthorizationScope.STREAMING, AuthorizationScope.USER_FOLLOW_READ,
-                        AuthorizationScope.USER_TOP_READ, AuthorizationScope.USER_READ_RECENTLY_PLAYED)
+                        AuthorizationScope.USER_TOP_READ, AuthorizationScope.USER_READ_RECENTLY_PLAYED,
+                        AuthorizationScope.USER_LIBRARY_READ)
                 .show_dialog(true)
                 .build();
 

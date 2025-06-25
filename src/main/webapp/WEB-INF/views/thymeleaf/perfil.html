@@ -210,21 +210,27 @@
 </div>
 
 <div th:if="${estadoDeAnimoActual != null}">
-    <h3>Tu estado de ánimo actual: <span th:text="${estadoDeAnimoActual.getNombre()}"></span></h3>
+    <h3>Tu estado de ánimo actual:
+        <span th:text="${estadoDeAnimoActual.nombre}"></span>
+    </h3>
+</div>
+<div th:if="${estadoDeAnimoActual == null}">
+    <h3>No tenés un estado de ánimo asignado aún.</h3>
 </div>
 
 <form th:action="@{/actualizar-estado}" method="POST">
-    <label for="estadoDeAnimoID">Cambiar estado de ánimo</label>
-    <select name="estadoDeAnimoID" id="estadoDeAnimoID">
+    <label for="estadoDeAnimoId">Cambiar estado de ánimo</label>
+    <select name="estadoDeAnimoId" id="estadoDeAnimoId">
         <option value="" disabled selected>Seleccionar estado</option>
-        <th:block th:each="estado : ${listaDeEstadosDeAnimo}">
-            <option th:value="${estado.id}"
-                    th:text="${estado.nombre}">
-            </option>
-        </th:block>
+        <option th:each="estado : ${listaDeEstadosDeAnimo}"
+                th:value="${estado.id}"
+                th:text="${estado.nombre}"
+                th:selected="${estadoDeAnimoActual != null} ? ${estado.id == estadoDeAnimoActual.id} : false">
+        </option>
     </select>
     <button type="submit">Actualizar</button>
 </form>
+
 
 <form th:action="@{/generar-recomendaciones}" method="POST">
     <button>Generar recomendaciones</button>
@@ -234,11 +240,11 @@
     <h3>Recomendaciones</h3>
     <ul>
         <li th:each="track : ${recomendaciones}">
-            <span th:text="${track.name}">Nombre de la cancion</span>
+            <span th:text="${track.name}">Nombre</span> -
+            <span th:text="${track.artists[0].name}">Artista</span>
         </li>
     </ul>
 </div>
-
 
 </body>
 </html>
