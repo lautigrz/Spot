@@ -4,7 +4,7 @@ import com.tallerwebi.dominio.*;
 import com.tallerwebi.integracion.config.SpringWebTestConfig;
 import com.tallerwebi.presentacion.ControladorHome;
 import com.tallerwebi.presentacion.dto.UsuarioDto;
-import javafx.scene.effect.Light;
+
 import org.apache.maven.model.Model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
