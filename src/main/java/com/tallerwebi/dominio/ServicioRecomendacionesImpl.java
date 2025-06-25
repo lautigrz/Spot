@@ -41,60 +41,6 @@ public class ServicioRecomendacionesImpl implements ServicioRecomendaciones {
         this.servicioInstanciaImpl = servicioInstanciaImpl;
     }
 
-    /*
-    @Override
-    public List<Track> generarRecomendaciones(String token, EstadoDeAnimo estadoDeAnimo) throws Exception {
-        SpotifyApi spotifyApi = servicioInstanciaImpl.obtenerInstanciaDeSpotifyConToken(token);
-
-        List<Track> saved = obtenerSavedTracks(spotifyApi);
-        List<Track> recent = obtenerRecentlyPlayed(spotifyApi);
-        List<Track> top = obtenerTopTracks(spotifyApi);
-
-        List<Track> todasLasCanciones = Stream.of(saved, recent, top)
-                        .flatMap(List::stream)
-                                .distinct()
-                                .collect(Collectors.toList());
-
-        System.out.println("Total de canciones combinadas: " + todasLasCanciones.size());
-
-        String[] trackIds = todasLasCanciones.stream()
-                        .map(Track::getId)
-                        .toArray(String[]::new);
-
-        System.out.println("Cantidad de track IDs válidos: " + trackIds.length);
-
-        AudioFeatures[] features = spotifyApi.getAudioFeaturesForSeveralTracks(trackIds)
-                        .build()
-                        .execute();
-
-        if (features == null) {
-            System.out.println("AudioFeatures es null");
-        } else {
-            System.out.println("AudioFeatures length: " + features.length);
-        }
-
-        List<Track> coincidencias = new ArrayList<>();
-        for (int i = 0; i < features.length; i++) {
-            AudioFeatures f = features[i];
-            if (f != null) {
-                boolean coincide = coincideConEstadoDeAnimo(f, estadoDeAnimo);
-                System.out.println("Track " + todasLasCanciones.get(i).getName() + " coincide? " + coincide);
-                if (coincide) {
-                    coincidencias.add(todasLasCanciones.get(i));
-                }
-            } else {
-                System.out.println("AudioFeatures null para track " + todasLasCanciones.get(i).getName());
-            }
-        }
-
-        Collections.shuffle(coincidencias);
-
-        return coincidencias.stream()
-                .limit(10)
-                .collect(Collectors.toList());
-    }
-     */
-
     @Override
     public List<Track> generarRecomendaciones(String token, EstadoDeAnimo estadoDeAnimo) throws Exception {
         SpotifyApi spotifyApi = servicioInstanciaImpl.obtenerInstanciaDeSpotifyConToken(token);
@@ -108,36 +54,14 @@ public class ServicioRecomendacionesImpl implements ServicioRecomendaciones {
                 .distinct()
                 .collect(Collectors.toList());
 
-        // Para probar, limitamos a 5 tracks para no saturar la API ni tardar mucho
-        if (todasLasCanciones.size() > 5) {
-            todasLasCanciones = todasLasCanciones.subList(0, 5);
-        }
+        System.out.println("Total de canciones combinadas: " + todasLasCanciones.size());
 
-        List<Track> coincidencias = new ArrayList<>();
+        Collections.shuffle(todasLasCanciones);
 
-        // Pedimos AudioFeatures track por track
-        for (Track track : todasLasCanciones) {
-            try {
-
-                AudioFeatures features = spotifyApi.getAudioFeaturesForTrack(track.getId())
-                        .build()
-                        .execute();
-
-                if (features != null && coincideConEstadoDeAnimo(features, estadoDeAnimo)) {
-                    coincidencias.add(track);
-                }
-            } catch (Exception e) {
-                System.out.println("Error obteniendo AudioFeatures para track " + track.getName() + ": " + e.getMessage());
-            }
-        }
-
-        Collections.shuffle(coincidencias);
-
-        return coincidencias.stream()
+        return todasLasCanciones.stream()
                 .limit(10)
                 .collect(Collectors.toList());
     }
-
 
     private List<Track> obtenerSavedTracks(SpotifyApi spotifyApi) throws Exception {
         Paging<SavedTrack> savedTracks = spotifyApi.getUsersSavedTracks()

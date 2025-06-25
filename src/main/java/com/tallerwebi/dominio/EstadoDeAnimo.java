@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "estado_de_animo")
@@ -62,4 +63,5 @@ public class EstadoDeAnimo {
     public void setTempo(Float tempo) {
         this.tempo = tempo;
     }
+
 }
