@@ -125,6 +125,31 @@
         </div>
     </div>
 
+    <div class="row text-center mb-4">
+        <div class="col">
+            <div class="top-item">
+                <h6>Seguidores</h6>
+                <p th:text="${misSeguidores.size()}">0</p>
+            </div>
+        </div>
+        <div class="col">
+            <div class="top-item">
+                <h6>Siguiendo</h6>
+                <p th:text="${misSeguidos.size()}">0</p>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${usuarioIdPerfil != usuarioIdLogueado}">
+        <form th:if="${yaLoSigo}" th:action="@{/dejar-de-seguir/{id}(id=${usuarioIdPerfil})}" method="post">
+            <button type="submit" class="btn btn-primary">Dejar de seguir</button>
+        </form>
+        <form th:if="${!yaLoSigo}" th:action="@{/seguir/{id}(id=${usuarioIdPerfil})}" method="post">
+            <button type="submit" class="btn btn-primary">Seguir</button>
+        </form>
+    </div>
+
+
     <!-- Qué está escuchando -->
     <!-- Si está escuchando algo -->
     <div class="current-track mb-4 text-center" th:if="${escuchando != null}">

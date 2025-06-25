@@ -1,4 +1,7 @@
 INSERT INTO Usuario(id, user, activo,token,refreshToken, urlFoto) VALUES(null,"d",true,"12","12","das");
+INSERT INTO Usuario(id, user, activo, token, refreshToken, urlFoto) VALUES (null, "usuario1", true, "token1", "refresh1", "urlFoto1");
+INSERT INTO Usuario(id, user, activo, token, refreshToken, urlFoto) VALUES (null, "usuario2", true, "token2", "refresh2", "urlFoto2");
+INSERT INTO Usuario(id, user, activo, token, refreshToken, urlFoto) VALUES (null, "usuario3", true, "token3", "refresh3", "urlFoto3");
 INSERT INTO Comunidad(nombre, descripcion, urlFoto)
 VALUES
     ('Rock', 'Género musical con guitarras eléctricas y batería', 'https://www.verneripohjola.com/wp-content/uploads/2023/03/1_rock.jpg'),

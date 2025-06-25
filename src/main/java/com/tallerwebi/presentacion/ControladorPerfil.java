@@ -8,19 +8,18 @@ import com.tallerwebi.infraestructura.RepositorioUsuarioImpl;
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.infraestructura.RepositorioUsuarioImpl;
+import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 public class ControladorPerfil {
@@ -29,16 +28,18 @@ public class ControladorPerfil {
     private ServicioPerfil servicioPerfil;
     private ServicioEstadoDeAnimo servicioEstadoDeAnimo;
     private ServicioRecomendaciones servicioRecomendaciones;
+    private ServicioUsuario servicioUsuario;
 
     private ServicioFavorito servicioFavorito;
     private ServicioPreescucha servicioPreescucha;
     private RepositorioUsuario repositorioUsuario;
 
     @Autowired
-    public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioEstadoDeAnimo servicioEstadoDeAnimo, ServicioRecomendaciones servicioRecomendaciones) {
+    public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioEstadoDeAnimo servicioEstadoDeAnimo, ServicioRecomendaciones servicioRecomendaciones, ServicioUsuario servicioUsuario) {
         this.servicioPerfil = servicioPerfil;
         this.servicioEstadoDeAnimo = servicioEstadoDeAnimo;
         this.servicioRecomendaciones = servicioRecomendaciones;
+        this.servicioUsuario = servicioUsuario;
     }
 
     @Autowired
@@ -90,6 +91,11 @@ public class ControladorPerfil {
             List<Album> albumesComprados = servicioPerfil.obtenerAlbumesDePreescuchaCompradosPorElUsuario(albumsId, token);
             model.addAttribute("albumesCompradosDetalle", albumesComprados);
 
+            Set<UsuarioDto> seguidos = servicioUsuario.obtenerSeguidos(usuarioId);
+            Set<UsuarioDto> seguidores = servicioUsuario.obtenerSeguidores(usuarioId);
+            model.addAttribute("misSeguidos", seguidos);
+            model.addAttribute("misSeguidores", seguidores);
+
         }catch (Exception e) {
             e.printStackTrace();
 
@@ -135,4 +141,46 @@ public class ControladorPerfil {
     public void setRepositorioUsuario(RepositorioUsuario repositorioUsuario) {
         this.repositorioUsuario = repositorioUsuario;
     }
+
+    @GetMapping("/perfil/{id}")
+    public String perfilUsuario(@PathVariable Long id, HttpSession session, Model model) throws Exception {
+        String token = (String) session.getAttribute("token");
+        Long usuarioLogueadoId = (Long) session.getAttribute("user");
+        Usuario usuario = repositorioUsuario.buscarUsuarioPorId(id);
+        try {
+            User user = servicioPerfil.obtenerPerfilUsuario(token);
+
+            model.addAttribute("nombre", usuario.getUser());
+            model.addAttribute("foto", usuario.getUrlFoto());
+            model.addAttribute("seguidos", servicioUsuario.obtenerSeguidos(id).size());
+            model.addAttribute("seguidores", servicioUsuario.obtenerSeguidores(id).size());
+            model.addAttribute("misSeguidos", servicioUsuario.obtenerSeguidos(id));
+            model.addAttribute("misSeguidores", servicioUsuario.obtenerSeguidores(id));
+
+            model.addAttribute("usuarioIdPerfil", id);
+            model.addAttribute("usuarioLogueadoId", usuarioLogueadoId);
+            boolean yaLoSigo = servicioUsuario.yaSigo(usuarioLogueadoId, id);
+            model.addAttribute("yaLoSigo", yaLoSigo);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "perfil";
+    }
+
+    @PostMapping("/seguir/{id}")
+    public String seguirUsuario(@PathVariable Long id, HttpSession session) throws Exception {
+        Long idLogueado = (Long) session.getAttribute("user");
+        servicioUsuario.seguirUsuario(idLogueado, id);
+        return "redirect:/perfil/" + id;
+    }
+
+    @PostMapping("/dejar-de-seguir/{id}")
+    public String dejarDeSeguirUsuario(@PathVariable Long id, HttpSession session) throws Exception {
+        Long idLogueado = (Long) session.getAttribute("user");
+        servicioUsuario.dejarDeSeguirUsuario(idLogueado, id);
+        return "redirect:/perfil/" + id;
+    }
+
 }
