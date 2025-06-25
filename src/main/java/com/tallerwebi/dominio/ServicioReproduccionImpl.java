@@ -113,11 +113,13 @@ public class ServicioReproduccionImpl implements ServicioReproduccion {
         return usuario == null || usuario.trim().isEmpty();
     }
 
-    private boolean estaEscuchandoMusica(String usuario) {
+    @Override
+    public Boolean estaEscuchandoMusica(String usuario) {
         return reproduccionDelUsuario.get(usuario) != null;
     }
 
-    private CancionDto obtenerCancionActualDeUsuario(String usuario, Long idComunidad)
+    @Override
+    public CancionDto obtenerCancionActualDeUsuario(String usuario, Long idComunidad)
             throws IOException, ParseException, SpotifyWebApiException {
 
         String token = repositorioComunidad.obtenerTokenDelUsuarioQuePerteneceAUnaComunidad(usuario, idComunidad);
@@ -136,6 +138,8 @@ public class ServicioReproduccionImpl implements ServicioReproduccion {
 
         return null;
     }
+
+
 
     private CancionDto mapearTrackACancionDto(Track track, int progreso) {
         CancionDto cancionDto = new CancionDto();

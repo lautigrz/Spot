@@ -114,8 +114,9 @@ public class ControladorComunidadTest {
         when(servicioComunidadMock.hayAlguienEnLaComunidad(String.valueOf(idComunidad), usuarioDtoMock.getUser())).thenReturn(true);
         when(servicioPlaylistMock.obtenerPlaylistsRelacionadasAUnaComunidad(idComunidad)).thenReturn(playlistsMock);
         when(servicioComunidadMock.obtenerMensajes(idComunidad)).thenReturn(mensajesMock);
-         when(servicioUsuarioMock.obtenerUsuarioDtoPorId(idUsuario)).thenReturn(usuarioDtoMock);
+        when(servicioUsuarioMock.obtenerUsuarioDtoPorId(idUsuario)).thenReturn(usuarioDtoMock);
         when(servicioComunidadMock.obtenerUsuariosDeLaComunidad(idComunidad)).thenReturn(usuariosActivosMock);
+        when(servicioReproduccion.estaEscuchandoMusica(anyString())).thenReturn(true);
 
         ModelMap model = new ModelMap();
         ModelAndView mav = controladorComunidad.comunidad(sessionMock, idComunidad, model);
@@ -128,7 +129,7 @@ public class ControladorComunidadTest {
         assertThat(mav.getModel(), hasEntry("urlFoto", usuarioDtoMock.getUrlFoto()));
         assertThat(mav.getModel(), hasEntry("id", usuarioDtoMock.getId()));
         assertThat(mav.getModel(), hasEntry("token", usuarioDtoMock.getToken()));
-        assertThat(mav.getModel(), hasEntry("hayUsuarios", true));
+        assertThat(mav.getModel(), hasEntry("hayUsuarios", false));
         assertThat(mav.getModel(), hasEntry("playlistsDeLaComunidad", playlistsMock));
         assertThat(mav.getModel(), hasEntry("mensajes", mensajesMock));
         assertThat(mav.getModel(), hasEntry("fotoUsuario", usuarioDtoMock.getUrlFoto()));

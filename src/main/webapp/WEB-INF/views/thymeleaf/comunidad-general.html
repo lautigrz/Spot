@@ -22,7 +22,8 @@
             <h5>Comunidad</h5>
             <nav class="nav flex-column mt-3">
 
-                <a class="nav-link" href="#" id="playlist" data-bs-toggle="modal" data-bs-target="#modalPlaylist"><i class="bi bi-plus-circle"></i> Crear nueva playlist</a>
+
+                <a th:if="${rol == 'Admin'}" class="nav-link" href="#" id="playlist" data-bs-toggle="modal" data-bs-target="#modalPlaylist"><i class="bi bi-plus-circle"></i> Crear nueva playlist</a>
                 <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#modalPlaylists">
                     <i class="fas fa-users me-2"></i>Ver Playlists de la comunidad
                 </a>
@@ -165,6 +166,16 @@
                         <div>
                             <strong th:text="${usuarios.getUser()}"></strong><br>
                             <small>🎧 Listening to Latest Hits</small>
+                        </div>
+                        <div th:if="${rol == 'Admin'}" class="dropdown">
+                            <button class="btn btn-link text-dark p-0" type="button" id="dropdownMenuButton"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="#" th:href="@{/comunidad/hacer-admin/{id}(id=${usuarios.getId()})}">Hacer Admin</a></li>
+                                <li><a class="dropdown-item text-danger" href="#" th:href="@{/comunidad/eliminar-usuario/{id}(id=${usuarios.getId()})}">Eliminar de la comunidad</a></li>
+                            </ul>
                         </div>
                     </li>
 

@@ -183,18 +183,34 @@ public class ControladorComunidad {
             model.put("urlFoto",  usuarioComunidad.getUsuario().getUrlFoto());
             model.put("id",  usuarioComunidad.getUsuario().getId());
             model.put("token",  usuarioComunidad.getUsuario().getToken());
-            model.put("hayUsuarios", servicioComunidad.hayAlguienEnLaComunidad(idComunidad,  usuarioComunidad.getUsuario().getUser()));
+            model.put("hayUsuarios", hayAlguienEscuchandoMusica(idComunidad));
             model.put("playlistsDeLaComunidad", servicioPlaylist.obtenerPlaylistsRelacionadasAUnaComunidad(id));
             model.put("mensajes", servicioComunidad.obtenerMensajes(id));
             model.put("rol", usuarioComunidad.getRol());
+
             estaEnComunidad = true;
         }
+
+
         model.put("fotoUsuario", servicioUsuario.obtenerUsuarioDtoPorId(idUsuario).getUrlFoto());
         model.put("comunidad", comunidad);
         model.put("estaEnComunidad", estaEnComunidad);
         model.put("usuariosActivos", servicioComunidad.obtenerUsuariosDeLaComunidad(id));
 
         return new ModelAndView("comunidad-general", model);
+    }
+
+    public Boolean hayAlguienEscuchandoMusica(String id) {
+        List<String> usuariosActivos = servicioComunidad.obtenerTodosLosUsuariosActivosDeUnaComunidad(Long.parseLong(id));
+
+        for(String us : usuariosActivos){
+          boolean estaEscuchando = servicioReproduccion.estaEscuchandoMusica(us);
+           if (estaEscuchando) {
+               return true;
+           }
+
+        }
+        return false;
     }
 
 
