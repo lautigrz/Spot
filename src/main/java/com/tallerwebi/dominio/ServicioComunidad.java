@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.util.List;
 
 public interface ServicioComunidad {
-    Boolean guardarUsuarioEnComunidad(Long idUsuario, Long idComunidad);
-    UsuarioDto obtenerUsuarioDeLaComunidad(Long idUsuario, Long idComunidad);
+
+
     List<Mensaje> obtenerMensajes(Long id);
     ChatMessage registrarUsuarioEnCanalDeComunidad(ChatMessage message, SimpMessageHeaderAccessor simpMessageHeaderAccessor,String idComunidad);
     ChatMessage guardarMensaje(ChatMessage message, Long idUsuario, Long idComunidad);
@@ -24,7 +24,6 @@ public interface ServicioComunidad {
     Comunidad obtenerComunidad(Long id);
     Boolean hayAlguienEnLaComunidad (String nombreComunidad, String user);
     List<Comunidad> obtenerTodasLasComunidades();
-    Playlist obtenerLasPlaylistDeUnaComunidad(Long idComunidad);
     void eliminarUsuarioDelCanal(String user);
     void agregarUserAlCanal(String idComunidad, String username);
     void crearCanalSiNoExiste(String idComunidad);

@@ -44,18 +44,22 @@ public class ControladorComunidad {
     private ServicioPlaylist servicioPlaylist;
     private ServicioReproduccion servicioReproduccion;
     private ServicioGuardarImagen servicioGuardarImagen;
-
+    private ServicioUsuarioComunidad servicioUsuarioComunidad;
     private ServicioUsuario servicioUsuario;
+
+
 
     public ControladorComunidad(ServicioComunidad servicioComunidad, ServicioSpotify
             servicioSpotify, ServicioPlaylist servicioPlaylist,
-                                ServicioReproduccion servicioReproduccion, ServicioGuardarImagen servicioGuardarImagen,ServicioUsuario servicioUsuario) {
+                                ServicioReproduccion servicioReproduccion, ServicioGuardarImagen servicioGuardarImagen
+            ,ServicioUsuario servicioUsuario, ServicioUsuarioComunidad servicioUsuarioComunidad) {
         this.servicioPlaylist = servicioPlaylist;
         this.servicioGuardarImagen = servicioGuardarImagen;
         this.servicioReproduccion = servicioReproduccion;
         this.servicioComunidad = servicioComunidad;
         this.servicioSpotify = servicioSpotify;
         this.servicioUsuario = servicioUsuario;
+        this.servicioUsuarioComunidad = servicioUsuarioComunidad;
     }
 
 
@@ -170,30 +174,43 @@ public class ControladorComunidad {
 
         Long idUsuario = (Long) session.getAttribute("user");
         String idComunidad = String.valueOf(id);
-        UsuarioDto usuarioDto = servicioComunidad.obtenerUsuarioDeLaComunidad(idUsuario, id);
+        UsuarioComunidad usuarioComunidad = servicioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario, id);
         Comunidad comunidad = servicioComunidad.obtenerComunidad(id);
         boolean estaEnComunidad = false;
 
-        if (usuarioDto != null) {
-            model.put("usuario", usuarioDto.getUser());
-            model.put("urlFoto", usuarioDto.getUrlFoto());
-            model.put("id", usuarioDto.getId());
-            model.put("token", usuarioDto.getToken());
-            model.put("hayUsuarios", servicioComunidad.hayAlguienEnLaComunidad(idComunidad, usuarioDto.getUser()));
+        if (usuarioComunidad != null) {
+            model.put("usuario", usuarioComunidad.getUsuario().getUser());
+            model.put("urlFoto",  usuarioComunidad.getUsuario().getUrlFoto());
+            model.put("id",  usuarioComunidad.getUsuario().getId());
+            model.put("token",  usuarioComunidad.getUsuario().getToken());
+            model.put("hayUsuarios", hayAlguienEscuchandoMusica(idComunidad));
             model.put("playlistsDeLaComunidad", servicioPlaylist.obtenerPlaylistsRelacionadasAUnaComunidad(id));
             model.put("mensajes", servicioComunidad.obtenerMensajes(id));
+            model.put("rol", usuarioComunidad.getRol());
 
-            System.out.println("usuario:" + servicioComunidad.hayAlguienEnLaComunidad(idComunidad, usuarioDto.getUser()));
-            System.out.println("ususadario:" + servicioComunidad.obtenerUsuariosDeLaComunidad(id).toString());
             estaEnComunidad = true;
         }
 
-        model.put("fotoUsuario", servicioUsuario.obtenerUsuarioPorId(idUsuario).getUrlFoto());
+
+        model.put("fotoUsuario", servicioUsuario.obtenerUsuarioDtoPorId(idUsuario).getUrlFoto());
         model.put("comunidad", comunidad);
         model.put("estaEnComunidad", estaEnComunidad);
         model.put("usuariosActivos", servicioComunidad.obtenerUsuariosDeLaComunidad(id));
 
         return new ModelAndView("comunidad-general", model);
+    }
+
+    public Boolean hayAlguienEscuchandoMusica(String id) {
+        List<String> usuariosActivos = servicioComunidad.obtenerTodosLosUsuariosActivosDeUnaComunidad(Long.parseLong(id));
+
+        for(String us : usuariosActivos){
+          boolean estaEscuchando = servicioReproduccion.estaEscuchandoMusica(us);
+           if (estaEscuchando) {
+               return true;
+           }
+
+        }
+        return false;
     }
 
 
@@ -202,7 +219,9 @@ public class ControladorComunidad {
     @GetMapping("/unirme/{idComunidad}")
     public String unirme(HttpSession session, @PathVariable Long idComunidad) {
         Long idUsuario = (Long) session.getAttribute("user");
-        Boolean seGuardo = servicioComunidad.guardarUsuarioEnComunidad(idUsuario,idComunidad);
+        Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
+        Comunidad comunidad = servicioComunidad.obtenerComunidad(idComunidad);
+        Boolean seGuardo = servicioUsuarioComunidad.agregarUsuarioAComunidad(usuario, comunidad, "Miembro");
 
         if(!seGuardo){
 
@@ -217,9 +236,9 @@ public class ControladorComunidad {
     @ResponseBody
     public ResponseEntity<?> usuarioEnComunidad(@PathVariable Long idUsuario, @PathVariable Long idComunidad) {
 
-        UsuarioDto usuarioDto = servicioComunidad.obtenerUsuarioDeLaComunidad(idUsuario, idComunidad);
+        UsuarioComunidad usuarioComunidad = servicioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
 
-        if(usuarioDto == null){
+        if(usuarioComunidad == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -257,6 +276,5 @@ public class ControladorComunidad {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // 500
         }
     }
-
 
 }
