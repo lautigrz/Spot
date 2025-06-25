@@ -11,4 +11,5 @@ public interface RepositorioUsuarioComunidad {
     UsuarioComunidad obtenerUsuarioEnComunidad(Long idUsuario, Long idComunidad);
     List<UsuarioDto> obtenerUsuariosDeLaComunidad(Long idComunidad);
 
+    void actualizar(UsuarioComunidad usuarioComunidad);
 }

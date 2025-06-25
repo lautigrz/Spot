@@ -81,4 +81,9 @@ public class RepositorioUsuarioComunidadImpl implements RepositorioUsuarioComuni
 
         return usuariosDto;
     }
+
+    @Override
+    public void actualizar(UsuarioComunidad usuarioComunidad) {
+        sessionFactory.getCurrentSession().update(usuarioComunidad);
+    }
 }

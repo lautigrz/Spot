@@ -29,7 +29,7 @@
                 </a>
 
                 <a class="nav-link active" href="#"><i class="fas fa-music me-2"></i>Recomendar Canción</a>
-
+                <a class="nav-link active" th:if="${rol == 'Admin'}" ><i class="fas fa-music me-2"></i>Recomendaciones</a>
                 <a class="nav-link" href="#"><i class="fas fa-star me-2"></i>Top Tracks de la Comunidad</a>
                 <a class="nav-link" href="#"><i class="fas fa-calendar-alt me-2"></i>Eventos proximos</a>
 
@@ -167,14 +167,24 @@
                             <strong th:text="${usuarios.getUser()}"></strong><br>
                             <small>🎧 Listening to Latest Hits</small>
                         </div>
-                        <div th:if="${rol == 'Admin'}" class="dropdown">
+                        <div th:if="${rol == 'Admin' && usuarios.getId() != id }" class="dropdown">
                             <button class="btn btn-link text-dark p-0" type="button" id="dropdownMenuButton"
                                     data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-three-dots-vertical"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                                <li><a class="dropdown-item" href="#" th:href="@{/comunidad/hacer-admin/{id}(id=${usuarios.getId()})}">Hacer Admin</a></li>
-                                <li><a class="dropdown-item text-danger" href="#" th:href="@{/comunidad/eliminar-usuario/{id}(id=${usuarios.getId()})}">Eliminar de la comunidad</a></li>
+                                <li>
+                                    <form th:action="@{/hacerAdmin/{idComunidad}/{idMiembro}(idComunidad=${comunidad.getId()}, idMiembro=${usuarios.getId()})}" method="post" style="display: inline;">
+                                        <button type="submit" class="dropdown-item btn btn-link p-2">Hacer Admin</button>
+                                    </form>
+                                </li>
+
+                                <li>
+                                    <form th:action="@{/eliminarMiembro/{idComunidad}/{idMiembro}(idComunidad=${comunidad.getId()}, idMiembro=${usuarios.getId()})}" method="post" style="display: inline;">
+                                        <button type="submit" class="dropdown-item btn btn-link p-2 text-danger">Eliminar de la comunidad</button>
+                                    </form>
+                                </li>
+
                             </ul>
                         </div>
                     </li>
