@@ -37,7 +37,7 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
     public Usuario obtenerUsuarioPorId(Long idUsuario) {
     Usuario usuario = repositorioUsuario.buscarUsuarioPorId(idUsuario);
         if (usuario == null) {
-            return null; // O lanzar una excepción si el usuario no se encuentra
+            return null;
         }
 
         return usuario;

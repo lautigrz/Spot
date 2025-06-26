@@ -56,7 +56,7 @@ public class ControladorHomeTest {
         List<Comunidad> comunidadesMock = List.of(new Comunidad(), new Comunidad());
 
 
-        when(servicioUsuarioMock.obtenerUsuarioPorId(idUsuario)).thenReturn(usuarioMock);
+        when(servicioUsuarioMock.obtenerUsuarioDtoPorId(idUsuario)).thenReturn(usuarioMock);
         when(servicioComunidadMock.obtenerTodasLasComunidades()).thenReturn(comunidadesMock);
 
 

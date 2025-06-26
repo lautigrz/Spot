@@ -5,7 +5,7 @@ import com.tallerwebi.presentacion.dto.UsuarioDto;
 import java.util.Set;
 
 public interface ServicioUsuario {
-    UsuarioDto obtenerUsuarioPorId(Long idUsuario);
+    Usuario obtenerUsuarioPorId(Long idUsuario);
     void seguirUsuario(Long seguidorId, Long aSeguirId) throws Exception;
     void dejarDeSeguirUsuario(Long seguidorId, Long aDejarId) throws Exception;
     Set<UsuarioDto> obtenerSeguidores(Long usuarioId);

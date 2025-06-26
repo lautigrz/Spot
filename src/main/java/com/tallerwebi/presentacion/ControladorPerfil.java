@@ -18,6 +18,7 @@ import se.michaelthelin.spotify.model_objects.specification.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -93,6 +94,10 @@ public class ControladorPerfil {
 
             Set<UsuarioDto> seguidos = servicioUsuario.obtenerSeguidos(usuarioId);
             Set<UsuarioDto> seguidores = servicioUsuario.obtenerSeguidores(usuarioId);
+
+            if (seguidos == null) seguidos = Collections.emptySet();
+            if (seguidores == null) seguidores = Collections.emptySet();
+
             model.addAttribute("misSeguidos", seguidos);
             model.addAttribute("misSeguidores", seguidores);
 

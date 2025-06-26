@@ -129,13 +129,13 @@
         <div class="col">
             <div class="top-item">
                 <h6>Seguidores</h6>
-                <p th:text="${misSeguidores.size()}">0</p>
+                <p th:text="${misSeguidores != null} ? ${#lists.size(misSeguidores)} : 0">0</p>
             </div>
         </div>
         <div class="col">
             <div class="top-item">
                 <h6>Siguiendo</h6>
-                <p th:text="${misSeguidos.size()}">0</p>
+                <p th:text="${misSeguidos != null} ? ${#lists.size(misSeguidos)} : 0">0</p>
             </div>
         </div>
     </div>
