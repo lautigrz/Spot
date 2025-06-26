@@ -19,10 +19,9 @@ public class ControladorAdmin {
     private ServicioAdmin servicioAdmin;
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     private ServicioPlaylist servicioPlaylist;
-    private ServicioComunidad servicioComunidad;
-    public ControladorAdmin(ServicioAdmin servicioAdmin, ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioPlaylist servicioPlaylist, ServicioComunidad servicioComunidad) {
+
+    public ControladorAdmin(ServicioAdmin servicioAdmin, ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioPlaylist servicioPlaylist) {
         this.servicioAdmin = servicioAdmin;
-        this.servicioComunidad = servicioComunidad;
         this.servicioPlaylist = servicioPlaylist;
         this.servicioRecomedacionComunidad = servicioRecomedacionComunidad;
     }

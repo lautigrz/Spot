@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -29,4 +30,16 @@ public class Recomendacion {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comunidad_id", nullable = false)
     private Comunidad comunidad;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Recomendacion that = (Recomendacion) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

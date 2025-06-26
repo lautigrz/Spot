@@ -3,6 +3,7 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.Comunidad;
 import com.tallerwebi.dominio.RepositorioUsuarioComunidad;
 import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.UsuarioComunidad;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -90,6 +91,33 @@ public class RepositorioUsuarioComunidadTest {
         assertThat(usuarioComunidad.getRol(), equalTo("ADMIN"));
         assertThat(usuarioComunidad.getUsuario().getUser(), equalTo(usuario.getUser()));
         assertThat(usuarioComunidad.getUsuario().getId(), equalTo(usuario.getId()));
+    }
+
+    @Test
+    @Rollback
+    public void seDebeActualizarUsuarioEnComunidad() {
+        Usuario usuario = new Usuario();
+        usuario.setUser("testUser");
+        usuario.setUrlFoto("http://example.com/test.jpg");
+
+        sessionFactory.getCurrentSession().save(usuario);
+
+        Comunidad comunidad = new Comunidad();
+        comunidad.setNombre("Test Comunidad");
+        comunidad.setUrlFoto("http://example.com/comunidad.jpg");
+        sessionFactory.getCurrentSession().save(comunidad);
+
+
+        repositorioUsuarioComunidad.agregarUsuarioAComunidad(usuario, comunidad, "Admin");
+
+        UsuarioComunidad usuarioComunidadOb = repositorioUsuarioComunidad.obtenerUsuarioEnComunidad(usuario.getId(), comunidad.getId());
+        usuarioComunidadOb.setRol("Miembro");
+
+        repositorioUsuarioComunidad.actualizar(usuarioComunidadOb);
+
+        UsuarioComunidad usuarioActualizado = repositorioUsuarioComunidad.obtenerUsuarioEnComunidad(usuario.getId(), comunidad.getId());
+
+        assertThat(usuarioActualizado.getRol(), equalTo("Miembro"));
     }
 
 
