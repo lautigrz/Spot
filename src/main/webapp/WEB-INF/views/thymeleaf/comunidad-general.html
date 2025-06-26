@@ -28,8 +28,11 @@
                     <i class="fas fa-users me-2"></i>Ver Playlists de la comunidad
                 </a>
 
-                <a class="nav-link active" href="#"><i class="fas fa-music me-2"></i>Recomendar Canción</a>
-                <a class="nav-link active" th:if="${rol == 'Admin'}" ><i class="fas fa-music me-2"></i>Recomendaciones</a>
+                <a class="nav-link active" href="#" id="recomendar" th:if="${rol != 'Admin'}" data-bs-toggle="modal" data-bs-target="#modalRecomendar"><i class="fas fa-music me-2"></i>Recomendar Canción</a>
+                <a class="nav-link active position-relative" th:if="${rol == 'Admin'}" data-bs-toggle="modal" data-bs-target="#modalRecomendaciones" style="cursor: pointer">
+                    <i class="fas fa-music me-2"></i>Canciones recomendadas
+                    <span id="contadorRecomendaciones" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${recomendaciones.size()}"></span>
+                </a>
                 <a class="nav-link" href="#"><i class="fas fa-star me-2"></i>Top Tracks de la Comunidad</a>
                 <a class="nav-link" href="#"><i class="fas fa-calendar-alt me-2"></i>Eventos proximos</a>
 
@@ -347,6 +350,42 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalRecomendar" tabindex="-1" aria-labelledby="modalRecomendarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-dark text-white rounded-4 shadow-lg border-0">
+
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold" id="modalRecomendarLabel">
+                    <i class="fas fa-music me-2"></i>Recomendar canción
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body px-4 py-3">
+
+
+                <div class="modal-body">
+                    <!-- Input de búsqueda -->
+                    <input type="text" id="inputBusquedaRecomendar" class="form-control mb-3" placeholder="Buscar canción...">
+
+                    <!-- Lista de canciones -->
+                    <div id="contenedorCancionesRecomendar" class="list-group">
+
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 justify-content-between">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancelar</button>
+                    <div class="ms-auto">
+                        <button id="btnRecomendar" type="button" class="btn btn-success">Enviar recomendacion</button>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -371,6 +410,69 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalRecomendaciones" tabindex="-1" aria-labelledby="modalRecomendacionesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-dark text-white border-0 rounded-4 shadow">
+
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="modalRecomendacionesLabel">
+                    <i class="fas fa-music me-2"></i>Recomendaciones
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <div id="listaRecomendaciones" class="list-group" th:if="${recomendaciones != null and !recomendaciones.isEmpty()}">
+                    <div class="list-group-item bg-dark text-white mb-2 p-3 rounded d-flex align-items-center shadow-sm"
+                         th:each="recomendacion : ${recomendaciones}"
+                         th:id="'recomendacion-' + ${recomendacion.getId()}">
+
+
+                    <!-- Imagen de la canción -->
+                        <img th:src="${recomendacion.getCancion().getUrlImagen() != null ? recomendacion.getCancion().getUrlImagen() : '/images/blanco.jpg'}"
+                             alt="Portada"
+                             class="me-3 rounded"
+                             style="width: 60px; height: 60px; object-fit: cover;">
+
+                        <!-- Información de la canción -->
+                        <div class="flex-grow-1">
+                            <div class="fw-bold" th:text="${recomendacion.getCancion().getTitulo()}"></div>
+                            <small class="text-white-50" th:text="${recomendacion.getCancion().getArtista()}"></small><br>
+                            <small class="text-white-50" th:text="'Recomendada por: ' + ${recomendacion.getUsuario().getUser()}"></small>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="ms-3 d-flex flex-column">
+                            <button
+                                    type="button"
+                                    class="btn btn-success btn-sm px-3 mb-1 btn-aceptar-reco"
+                                    th:attr="data-id-recomendacion=${recomendacion.id}, data-id-comunidad=${comunidad.id}">
+                                <i class="bi bi-check-circle"></i>
+                            </button>
+
+                            <button
+                                    type="button"
+                                    class="btn btn-danger btn-sm px-3 btn-eliminar-reco"
+                                    th:attr="data-id-recomendacion=${recomendacion.id}, data-id-comunidad=${comunidad.id}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Mensaje si no hay recomendaciones -->
+                <p class="text-white text-center mt-3" th:if="${recomendaciones == null or recomendaciones.isEmpty()}">
+                    No hay recomendaciones nuevas por ahora 🎵
+                </p>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
@@ -380,6 +482,7 @@
 <script th:src="@{/js/comunidad.js}"></script>
 <script th:src="@{/js/barra-escuchando.js}"></script>
 <script th:src="@{/js/playlist.js}"></script>
+<script th:src="@{/js/recomendacion.js}"></script>
 <script th:if="${error != null}">
     const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
     errorModal.show();
