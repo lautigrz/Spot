@@ -45,10 +45,9 @@ public class ControladorHomeTest {
     public void debeRetornarVistaHome() {
 
         Long idUsuario = 1L;
-        UsuarioDto usuarioMock = new UsuarioDto();
-        usuarioMock.setId(idUsuario);
-        usuarioMock.setUser("Ejemplo");
-
+        Usuario usuario = new Usuario();
+        usuario.setId(idUsuario);
+        usuario.setUser("Ejemplo");
 
         HttpSession sessionMock = mock(HttpSession.class);
         when(sessionMock.getAttribute("user")).thenReturn(idUsuario);
@@ -56,7 +55,7 @@ public class ControladorHomeTest {
         List<Comunidad> comunidadesMock = List.of(new Comunidad(), new Comunidad());
 
 
-        when(servicioUsuarioMock.obtenerUsuarioDtoPorId(idUsuario)).thenReturn(usuarioMock);
+        when(servicioUsuarioMock.obtenerUsuarioPorId(idUsuario)).thenReturn(usuario);
         when(servicioComunidadMock.obtenerTodasLasComunidades()).thenReturn(comunidadesMock);
 
 
@@ -64,7 +63,7 @@ public class ControladorHomeTest {
 
 
         assertThat(modelAndView.getViewName(), equalTo("home"));
-        assertThat(modelAndView.getModel().get("usuario"), equalTo(usuarioMock));
+        assertThat(modelAndView.getModel().get("usuario"), equalTo(usuario));
         assertThat(((List<?>) modelAndView.getModel().get("comunidades")).size(), equalTo(2));
     }
 

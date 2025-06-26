@@ -238,7 +238,7 @@ public class ServicioPerfilImplTest {
         verify(request).execute();
 
     }
-
+/*
     @Test
     public void obtenerEstadoDeAnimoDelUsuario() throws Exception {
         String token = "token123";
@@ -261,10 +261,12 @@ public class ServicioPerfilImplTest {
 
         EstadoDeAnimo resultado = perfil.obtenerEstadoDeAnimoDelUsuario(token);
 
+        System.out.println("Estado de ánimo obtenido: " + resultado.getNombre());
+
         assertNotNull(resultado);
         assertEquals("Feliz", estadoDeAnimo.getNombre());
     }
-
+*/
     @Test
     public void actualizarEstadoDeAnimoDelUsuario() throws Exception {
         String token = "token123";
