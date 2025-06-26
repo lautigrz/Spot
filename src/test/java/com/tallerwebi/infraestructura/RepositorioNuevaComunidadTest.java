@@ -2,6 +2,8 @@ package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.Comunidad;
 import com.tallerwebi.dominio.RepositorioNuevaComunidad;
+import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.UsuarioComunidad;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {HibernateInfraestructuraTestConfig.class})
@@ -29,17 +34,28 @@ public class RepositorioNuevaComunidadTest {
     }
 
     @Test
-    public void seDebeGuardarUnaNuevaComunidadYRetornarla() {
+    public void seDebeGuardarUnaNuevaComunidadYRetornarSuId() {
         Comunidad comunidad = new Comunidad();
+
         comunidad.setNombre("Comunidad de prueba");
         comunidad.setDescripcion("Descripción de prueba");
-        comunidad.setUrlFoto("imagen_de_prueba.jpg");
-        comunidad.setUrlPortada("https://www.ejemplo.com/comunidad-de-prueba");
+        comunidad.setUrlPortada("http://comunidad-de-prueba.com");
+        comunidad.setUrlFoto("http://comunidad-de-prueba.com/imagen.jpg");
 
-        Comunidad comunidadGuardada = repositorioNuevaComunidad.nuevaComunidad(comunidad);
 
-        assertThat(comunidadGuardada.getNombre(), equalTo("Comunidad de prueba"));
-        assertThat(comunidadGuardada, equalTo(comunidad));
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setUser("Usuario de prueba");
+
+        sessionFactory.getCurrentSession().save(usuario);
+
+        UsuarioComunidad usuarioComunidad = new UsuarioComunidad();
+        usuarioComunidad.setUsuario(usuario);
+        usuarioComunidad.setComunidad(comunidad);
+
+        Long idComunidad = repositorioNuevaComunidad.nuevaComunidad(comunidad, usuario, "ADMIN");
+
+        assertThat(idComunidad, equalTo(comunidad.getId()));
     }
 
 }

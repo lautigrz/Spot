@@ -32,13 +32,9 @@ public class Usuario {
     @OneToOne
     private EstadoDeAnimo estadoDeAnimo;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "comunidad_usuario", // tabla intermedia
-            joinColumns = @JoinColumn(name = "usuario_id"),
-            inverseJoinColumns = @JoinColumn(name = "comunidad_id")
-    )
-    private Set<Comunidad> comunidades = new HashSet<>();
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UsuarioComunidad> comunidades = new HashSet<>();
+
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

@@ -11,4 +11,5 @@ public interface ServicioUsuario {
     Set<UsuarioDto> obtenerSeguidores(Long usuarioId);
     Set<UsuarioDto> obtenerSeguidos(Long usuarioId);
     boolean yaSigo(Long seguidorId, Long seguidoId) throws Exception;
+    UsuarioDto obtenerUsuarioDtoPorId(Long idUsuario);
 }

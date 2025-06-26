@@ -1,9 +1,6 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Comunidad;
-import com.tallerwebi.dominio.ServicioGuardarImagen;
-import com.tallerwebi.dominio.ServicioGuardarImagenImpl;
-import com.tallerwebi.dominio.ServicioNuevaComunidad;
+import com.tallerwebi.dominio.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.Column;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,14 +21,17 @@ import java.util.UUID;
 @Controller
 public class ControladorNuevaComunidad {
 
-    @Autowired
+
     private ServicioNuevaComunidad servicioNuevaComunidad;
     private ServicioGuardarImagen servicioGuardarImagen;
-
-    public ControladorNuevaComunidad(ServicioNuevaComunidad servicioNuevaComunidad,ServicioGuardarImagen servicioGuardarImagen) {
+    private ServicioUsuario servicioUsuario;
+    public ControladorNuevaComunidad(ServicioNuevaComunidad servicioNuevaComunidad,ServicioGuardarImagen servicioGuardarImagen, ServicioUsuario servicioUsuario) {
         this.servicioNuevaComunidad = servicioNuevaComunidad;
         this.servicioGuardarImagen = servicioGuardarImagen;
+
+        this.servicioUsuario = servicioUsuario;
     }
+
 
     @GetMapping("/nueva-comunidad")
     public String mostrarFormularioNuevaComunidad(Model model) {
@@ -41,17 +42,18 @@ public class ControladorNuevaComunidad {
     @PostMapping("/crear")
     public String crearComunidad(@ModelAttribute Comunidad comunidad,
                                  @RequestParam("fotoPerfil") MultipartFile fotoPerfil,
-                                 @RequestParam("fotoPortada") MultipartFile fotoPortada) throws IOException {
+                                 @RequestParam("fotoPortada") MultipartFile fotoPortada, HttpSession session) throws IOException {
 
 
         String nombreArchivoPerfil = servicioGuardarImagen.guardarImagenPerfilDeComunidad(fotoPerfil);
         String nombreArchivoPortada = servicioGuardarImagen.guardarImagenPortadaDeComunidad(fotoPortada);
+        Long idUsuario = (Long) session.getAttribute("user");
+        Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
 
         comunidad.setUrlFoto(nombreArchivoPerfil);
         comunidad.setUrlPortada(nombreArchivoPortada);
 
-        Long id = servicioNuevaComunidad.nuevaComunidad(comunidad);
-
+        Long id = servicioNuevaComunidad.nuevaComunidad(comunidad, usuario, "Admin");
         return "redirect:/comunidad/" + id;
     }
 

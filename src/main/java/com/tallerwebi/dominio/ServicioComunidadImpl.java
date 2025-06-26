@@ -27,40 +27,12 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
     private RepositorioComunidad repositorioComunidad;
     private RepositorioUsuario repositorioUsuario;
-
+    private RepositorioUsuarioComunidad repositorioUsuarioComunidad;
     @Autowired
-    public ServicioComunidadImpl(RepositorioUsuario repositorioUsuario ,RepositorioComunidad repositorioComunidad) {
-
+    public ServicioComunidadImpl(RepositorioUsuario repositorioUsuario ,RepositorioComunidad repositorioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad) {
+        this.repositorioUsuarioComunidad = repositorioUsuarioComunidad;
         this.repositorioUsuario = repositorioUsuario;
         this.repositorioComunidad = repositorioComunidad;
-    }
-
-    @Override
-    public Boolean guardarUsuarioEnComunidad(Long idUsuario, Long idComunidad) {
-
-        Usuario usuarioEncontrado = repositorioUsuario.buscarUsuarioPorId(idUsuario);
-        Usuario usuarioExisteEnComunidad = repositorioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
-        if(usuarioEncontrado == null || usuarioExisteEnComunidad != null) {
-            return false;
-        }
-
-        return repositorioComunidad.guardarUsuarioEnComunidad(usuarioEncontrado, idComunidad);
-    }
-
-    @Override
-    public UsuarioDto obtenerUsuarioDeLaComunidad(Long idUsuario, Long idComunidad) {
-        Usuario usuario = repositorioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
-
-        if(usuario == null){
-            return null;
-        }
-        UsuarioDto usuarioDto = new UsuarioDto();
-        usuarioDto.setId(usuario.getId());
-        usuarioDto.setUser(usuario.getUser());
-        usuarioDto.setToken(usuario.getToken());
-        usuarioDto.setUrlFoto(usuario.getUrlFoto());
-
-        return usuarioDto;
     }
 
     @Override
@@ -93,7 +65,8 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     @Override
     public ChatMessage guardarMensaje(ChatMessage message, Long idUsuario, Long idComunidad) {
         try {
-            repositorioComunidad.guardarMensajeDeLaComunidad(message.getContent(), idUsuario,idComunidad);
+            UsuarioComunidad usuarioComunidad = repositorioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
+            repositorioComunidad.guardarMensajeDeLaComunidad(message.getContent(), usuarioComunidad.getComunidad(),usuarioComunidad.getUsuario());
             return message;
         } catch (Exception e) {
             System.out.println("Error al guardar el mensaje: " + e.getMessage());
@@ -146,12 +119,6 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     public List<Comunidad> obtenerTodasLasComunidades() {
 
         return repositorioComunidad.obtenerComunidades();
-    }
-
-    @Override
-    public Playlist obtenerLasPlaylistDeUnaComunidad(Long idComunidad) {
-
-        return null;
     }
 
 

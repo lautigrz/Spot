@@ -25,8 +25,9 @@ public class Comunidad {
     @OneToMany(mappedBy = "comunidad", fetch = FetchType.LAZY)
     private List<Mensaje> mensajes = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "comunidades", fetch = FetchType.LAZY)
-    private Set<Usuario> usuarios = new HashSet<>();
+    @OneToMany(mappedBy = "comunidad", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<UsuarioComunidad> usuarios = new HashSet<>();
+
 
     @OneToMany(mappedBy = "comunidad", fetch = FetchType.LAZY)
     private List<Playlist> playlists = new ArrayList<>();
@@ -35,6 +36,7 @@ public class Comunidad {
         mensajes.add(mensaje);
         mensaje.setComunidad(this); // ← este es el punto clave
     }
+
 
     public void agregarPlaylist(Playlist playlist) {
         playlists.add(playlist);

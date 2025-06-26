@@ -26,15 +26,16 @@ public class ServicioComunidadImplTest {
 
     private RepositorioComunidad repositorioComunidadMock;
 
+    private RepositorioUsuarioComunidad repositorioUsuarioComunidadMock;
     private ServicioComunidad servicioComunidad;
 
-    private SpotifyApi spotifyApiMock;
+
     @BeforeEach
     public void setUp() {
         repositorioUsuarioMock = mock(RepositorioUsuario.class);
         repositorioComunidadMock = mock(RepositorioComunidad.class);
-        spotifyApiMock = mock(SpotifyApi.class);
-        servicioComunidad = new ServicioComunidadImpl(repositorioUsuarioMock,repositorioComunidadMock);
+        repositorioUsuarioComunidadMock = mock(RepositorioUsuarioComunidad.class);
+        servicioComunidad = new ServicioComunidadImpl(repositorioUsuarioMock,repositorioComunidadMock, repositorioUsuarioComunidadMock);
     }
     @AfterEach
     public void limpiarEstadoGlobal() {
@@ -53,39 +54,26 @@ public class ServicioComunidadImplTest {
         comunidad.setNombre("Rock");
         comunidad.setDescripcion("descripcion");
 
+        UsuarioComunidad usuarioComunidad = new UsuarioComunidad();
+        usuarioComunidad.setId(3L);
+        usuarioComunidad.setUsuario(usuario);
+        usuarioComunidad.setComunidad(comunidad);
+
+
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setSender(usuario.getUser());
         chatMessage.setContent("Buenas");
 
-        when(repositorioComunidadMock.obtenerUsuarioEnComunidad(anyLong(), anyLong())).thenReturn(usuario);
+
+        when(repositorioUsuarioComunidadMock.obtenerUsuarioEnComunidad(anyLong(),anyLong())).thenReturn(usuarioComunidad);
         when(repositorioComunidadMock.obtenerComunidad(anyLong())).thenReturn(comunidad);
 
        ChatMessage mensaje = servicioComunidad.guardarMensaje(chatMessage,usuario.getId(),comunidad.getId());
 
-        verify(repositorioComunidadMock).guardarMensajeDeLaComunidad(anyString(), anyLong(), anyLong());
+        verify(repositorioComunidadMock).guardarMensajeDeLaComunidad(anyString(), any(Comunidad.class), any(Usuario.class));
         assertThat(mensaje.getSender(), equalTo(usuario.getUser()));
     }
 
-    @Test
-    public void debeObtenerUsuarioDeLaComunidad(){
-        Usuario usuario = new Usuario();
-        usuario.setId(1L);
-        usuario.setUser("lauti");
-        usuario.setUrlFoto("htt://fds");
-
-        Comunidad comunidad = new Comunidad();
-        comunidad.setId(2L);
-        comunidad.setNombre("Rock");
-        comunidad.setDescripcion("descripcion");
-
-        when(repositorioComunidadMock.obtenerUsuarioEnComunidad(anyLong(), anyLong())).thenReturn(usuario);
-
-        UsuarioDto usuarioDto = servicioComunidad.obtenerUsuarioDeLaComunidad(usuario.getId(),comunidad.getId());
-        assertThat(usuarioDto.getId(), equalTo(usuario.getId()));
-        assertThat(usuarioDto.getUser(), equalTo(usuario.getUser()));
-        assertThat(usuarioDto.getUrlFoto(), equalTo(usuario.getUrlFoto()));
-
-    }
 
     @Test
     public void seDebeObtenerUnaListaDeMensajeDeUnaComundad(){
@@ -152,50 +140,6 @@ public class ServicioComunidadImplTest {
 
         assertThat(listaDeComunidades,containsInAnyOrder(comunidades.toArray()));
 
-    }
-
-    @Test
-    public void seDebeguardarUsuarioEnComunidad(){
-        Comunidad comunidad = new Comunidad();
-        comunidad.setId(2L);
-        comunidad.setNombre("Rock");
-        comunidad.setDescripcion("descripcion");
-
-        when(repositorioComunidadMock.obtenerComunidad(anyLong())).thenReturn(comunidad);
-
-        Usuario usuario = new Usuario();
-        usuario.setId(1L);
-        usuario.setUser("lauti");
-        usuario.setUrlFoto("htt://fds");
-
-        when(repositorioUsuarioMock.buscarUsuarioPorId(anyLong())).thenReturn(usuario);
-        when(repositorioComunidadMock.obtenerUsuarioEnComunidad(anyLong(), anyLong())).thenReturn(null); // No existe aún
-        when(repositorioComunidadMock.guardarUsuarioEnComunidad(any(Usuario.class), anyLong())).thenReturn(true);
-
-        Boolean seAgrego = servicioComunidad.guardarUsuarioEnComunidad(usuario.getId(), comunidad.getId());
-
-        assertThat(seAgrego, equalTo(true)); // Se agrega correctamente
-
-    }
-    @Test
-    public void debeRetornarFalseSiElUsuarioExisteEnComunidadAlAgregarlo(){
-        Comunidad comunidad = new Comunidad();
-        comunidad.setId(2L);
-        comunidad.setNombre("Rock");
-        comunidad.setDescripcion("descripcion");
-
-        when(repositorioComunidadMock.obtenerComunidad(anyLong())).thenReturn(comunidad);
-
-        Usuario usuario = new Usuario();
-        usuario.setId(1L);
-        usuario.setUser("lauti");
-        usuario.setUrlFoto("htt://fds");
-
-        when(repositorioUsuarioMock.buscarUsuarioPorId(anyLong())).thenReturn(usuario);
-        when(repositorioComunidadMock.obtenerUsuarioEnComunidad(anyLong(), anyLong())).thenReturn(usuario);
-
-        Boolean seAgrego = servicioComunidad.guardarUsuarioEnComunidad(usuario.getId(),comunidad.getId());
-        assertThat(seAgrego,equalTo(false));
     }
 
     @Test

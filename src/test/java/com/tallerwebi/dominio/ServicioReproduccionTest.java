@@ -36,6 +36,7 @@ public class ServicioReproduccionTest {
     private ServicioComunidad servicioComunidad;
     private ServicioReproduccion servicioReproduccion;
     private RepositorioComunidad repositorioComunidad;
+    private RepositorioUsuarioComunidad repositorioUsuarioComunidad;
 
     @BeforeEach
     public void setUp() {
@@ -43,8 +44,8 @@ public class ServicioReproduccionTest {
         servicioSpotify = mock(ServicioSpotify.class);
         servicioComunidad = mock(ServicioComunidad.class);
         repositorioComunidad = mock(RepositorioComunidad.class);
-
-        servicioReproduccion = new ServicioReproduccionImpl(servicioInstancia, servicioSpotify, repositorioComunidad, servicioComunidad);
+        repositorioUsuarioComunidad = mock(RepositorioUsuarioComunidad.class);
+        servicioReproduccion = new ServicioReproduccionImpl(servicioInstancia, servicioSpotify, repositorioComunidad, servicioComunidad, repositorioUsuarioComunidad);
     }
 
     @Test
@@ -54,16 +55,35 @@ public class ServicioReproduccionTest {
         StartResumeUsersPlaybackRequest requestMock = mock(StartResumeUsersPlaybackRequest.class);
         StartResumeUsersPlaybackRequest.Builder builderMock = mock(StartResumeUsersPlaybackRequest.Builder.class);
 
-        when(servicioInstancia.obtenerInstanciaDeSpotifyConToken(anyString())).thenReturn(spotifyApiMock);
 
-        Usuario usuarioMock = mock(Usuario.class);
-        when(usuarioMock.getUser()).thenReturn("usuarioTest");
-        when(repositorioComunidad.obtenerUsuarioEnComunidad(anyLong(), anyLong())).thenReturn(usuarioMock);
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setUser("lauti");
+        usuario.setUrlFoto("http://fds");
+
+        Comunidad comunidad = new Comunidad();
+        comunidad.setId(2L);
+        comunidad.setNombre("Rock");
+        comunidad.setDescripcion("descripcion");
+
+        UsuarioComunidad usuarioComunidad = new UsuarioComunidad();
+        usuarioComunidad.setId(3L);
+        usuarioComunidad.setUsuario(usuario);
+        usuarioComunidad.setComunidad(comunidad);
+
+
+        when(servicioInstancia.obtenerInstanciaDeSpotifyConToken("fake-token")).thenReturn(spotifyApiMock);
+
+
+        when(repositorioUsuarioComunidad.obtenerUsuarioEnComunidad(1L, 1L)).thenReturn(usuarioComunidad);
+
 
         Cancion cancionMock = mock(Cancion.class);
         when(cancionMock.getUri()).thenReturn("spotify:track:123");
+
         Set<Cancion> canciones = new HashSet<>();
         canciones.add(cancionMock);
+
 
         Playlist playlistMock = mock(Playlist.class);
         when(playlistMock.getCanciones()).thenReturn(canciones);
@@ -71,18 +91,19 @@ public class ServicioReproduccionTest {
 
         List<Playlist> playlists = new ArrayList<>();
         playlists.add(playlistMock);
-        when(repositorioComunidad.obtenerPlaylistsPorComunidadId(anyLong())).thenReturn(playlists);
+        when(repositorioComunidad.obtenerPlaylistsPorComunidadId(1L)).thenReturn(playlists);
 
-        // Builder mocks encadenados
+
         when(spotifyApiMock.startResumeUsersPlayback()).thenReturn(builderMock);
         when(builderMock.uris(any(JsonArray.class))).thenReturn(builderMock);
         when(builderMock.position_ms(0)).thenReturn(builderMock);
         when(builderMock.build()).thenReturn(requestMock);
+        when(requestMock.execute()).thenReturn(null); // ejecuta sin error
 
 
         Boolean resultado = servicioReproduccion.reproducirCancion("fake-token", 1L, 1L);
 
-        // Verificaciones
+
         assertThat(resultado, equalTo(true));
         verify(servicioInstancia).obtenerInstanciaDeSpotifyConToken("fake-token");
         verify(spotifyApiMock).startResumeUsersPlayback();
@@ -90,9 +111,16 @@ public class ServicioReproduccionTest {
     }
 
 
+
     @Test
     public void debeTirarUnaExcepcionAlConsultarPorUnaPlaylistDeLaComunidad(){
+        Usuario usuario = new Usuario();
+        usuario.setUser("lauti");
 
+        UsuarioComunidad uc = new UsuarioComunidad();
+        uc.setUsuario(usuario);
+
+        when(repositorioUsuarioComunidad.obtenerUsuarioEnComunidad(anyLong(), anyLong())).thenReturn(uc);
         when(repositorioComunidad.obtenerPlaylistsPorComunidadId(anyLong())).thenReturn(null); // <--- playlists = null
 
         IllegalStateException ex = assertThrows(

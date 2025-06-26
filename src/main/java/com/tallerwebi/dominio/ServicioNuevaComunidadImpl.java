@@ -14,7 +14,7 @@ public class ServicioNuevaComunidadImpl implements ServicioNuevaComunidad {
     }
 
     @Override
-    public Long nuevaComunidad(Comunidad comunidad) {
-        return this.repositorioNuevaComunidad.nuevaComunidad(comunidad).getId();
+    public Long nuevaComunidad(Comunidad comunidad, Usuario usuario, String rol) {
+        return repositorioNuevaComunidad.nuevaComunidad(comunidad, usuario, rol);
     }
 }
