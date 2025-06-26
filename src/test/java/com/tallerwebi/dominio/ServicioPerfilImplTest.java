@@ -45,19 +45,19 @@ public class ServicioPerfilImplTest {
         // Es decir, estamos "inyectando" spotifyApi para que se use en el metodo probado.
         when(servicioSpotify.obtenerInstanciaDeSpotifyConToken(token)).thenReturn(spotifyApi);
 
-// Simulamos que al llamar al metodo getCurrentUsersProfile() del spotifyApi,
-// devuelve un mock del builder de la solicitud (request builder).
-// Esto permite controlar el siguiente paso en la cadena de llamadas.
+        // Simulamos que al llamar al metodo getCurrentUsersProfile() del spotifyApi,
+        // devuelve un mock del builder de la solicitud (request builder).
+        // Esto permite controlar el siguiente paso en la cadena de llamadas.
         when(spotifyApi.getCurrentUsersProfile()).thenReturn(profileRequestBuilder);
 
-// Simulamos que cuando el builder (profileRequestBuilder) ejecuta build(),
-// devuelve un mock del request real (profileRequest) que obtiene información un usuario de Spotify.
-// Esto permite encadenar la llamada para luego ejecutar el request mockeado.
+        // Simulamos que cuando el builder (profileRequestBuilder) ejecuta build(),
+        // devuelve un mock del request real (profileRequest) que obtiene información un usuario de Spotify.
+        // Esto permite encadenar la llamada para luego ejecutar el request mockeado.
         when(profileRequestBuilder.build()).thenReturn(profileRequest);
 
-// Simulamos que cuando se ejecuta el metodo execute() del request (profileRequest),
-// devuelve el usuario mockeado (mockUser).
-// la respuesta final esperada del API Spotify en este flujo.
+        // Simulamos que cuando se ejecuta el metodo execute() del request (profileRequest),
+        // devuelve el usuario mockeado (mockUser).
+        // la respuesta final esperada del API Spotify en este flujo.
         when(profileRequest.execute()).thenReturn(mockUser);
 
 
@@ -153,7 +153,7 @@ public class ServicioPerfilImplTest {
         when(request.execute()).thenReturn(paging);
         when(paging.getItems()).thenReturn(playlistsArray);
 
-        // Ejecutamos el método real
+        // Ejecutamos el metodo real
         List<PlaylistSimplified> resultado = perfil.obtenerNombreDePlaylistDelUsuario(token);
 
         // Verificaciones
