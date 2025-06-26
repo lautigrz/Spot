@@ -74,8 +74,11 @@ public class ControladorPerfil {
             model.addAttribute("playlist", servicioPerfil.obtenerNombreDePlaylistDelUsuario(token));
             model.addAttribute("totalPlaylist", servicioPerfil.obtenerCantidadDePlaylistDelUsuario(token));
             model.addAttribute("escuchando", servicioPerfil.obtenerReproduccionActualDelUsuario(token));
-            // DEVUELVE UN NULO NOSE QUE ONDA model.addAttribute("artista", servicioPerfil.obtenerReproduccionActualDelUsuario(token, refreshToken).getArtists()[0].getName());
             model.addAttribute("listaDeEstadosDeAnimo", servicioEstadoDeAnimo.obtenerTodosLosEstadosDeAnimo());
+
+            EstadoDeAnimo estado = servicioPerfil.obtenerEstadoDeAnimoDelUsuario(token);
+            System.out.println("Estado desde servicioPerfil: " + (estado != null ? estado.getNombre() : "null"));
+
             if (servicioPerfil.obtenerEstadoDeAnimoDelUsuario(token) != null){
                 model.addAttribute("estadoDeAnimoActual", servicioPerfil.obtenerEstadoDeAnimoDelUsuario(token));
             }
