@@ -27,13 +27,6 @@ public class ServicioPlaylistImpl implements ServicioPlaylist {
     public void agregarCancionALaPlaylist(Long idPlaylist,String idSpotify, String uri) {
         Cancion cancion = repositorioCancion.buscarCancionPorElIdDeSpotify(idSpotify);
 
-        if(cancion == null) {
-            cancion = new Cancion();
-            cancion.setSpotifyId(idSpotify);
-            cancion.setUri(uri);
-            repositorioCancion.guardarCancion(cancion);
-        }
-
         repositorioPlaylist.agregarCancionALaPlaylist(idPlaylist, cancion);
     }
 

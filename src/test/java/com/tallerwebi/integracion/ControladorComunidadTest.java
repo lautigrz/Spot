@@ -62,12 +62,15 @@ public class ControladorComunidadTest {
     private ServicioReproduccion servicioReproduccion;
     private ServicioGuardarImagen servicioGuardarImagen;
     private ServicioUsuarioComunidad servicioUsuarioComunidadMock;
+    private ServicioRecomedacionComunidad servicioRecomedacionComunidadMock;
     private HttpSession sessionMock;
+
 
 
     @BeforeEach
     public void setUp() {
         servicioComunidadMock = mock(ServicioComunidad.class);
+        servicioRecomedacionComunidadMock = mock(ServicioRecomedacionComunidad.class);
         servicioSpotify = mock(ServicioSpotify.class);
         servicioPlaylistMock = mock(ServicioPlaylist.class);
         servicioReproduccion = mock(ServicioReproduccion.class);
@@ -75,7 +78,7 @@ public class ControladorComunidadTest {
         servicioUsuarioMock = mock(ServicioUsuario.class);
         servicioUsuarioComunidadMock = mock(ServicioUsuarioComunidad.class);
         controladorComunidad = new ControladorComunidad(servicioComunidadMock, servicioSpotify, servicioPlaylistMock, servicioReproduccion, servicioGuardarImagen,
-                servicioUsuarioMock, servicioUsuarioComunidadMock);
+                servicioUsuarioMock, servicioUsuarioComunidadMock, servicioRecomedacionComunidadMock);
 
         mockMvc = MockMvcBuilders.standaloneSetup(controladorComunidad).build();
 
@@ -117,7 +120,7 @@ public class ControladorComunidadTest {
         when(servicioUsuarioMock.obtenerUsuarioDtoPorId(idUsuario)).thenReturn(usuarioDtoMock);
         when(servicioComunidadMock.obtenerUsuariosDeLaComunidad(idComunidad)).thenReturn(usuariosActivosMock);
         when(servicioReproduccion.estaEscuchandoMusica(anyString())).thenReturn(true);
-
+        when(servicioRecomedacionComunidadMock.obtenerRecomendacionesPorComunidad(anyLong())).thenReturn(List.of(new Recomendacion()));
         ModelMap model = new ModelMap();
         ModelAndView mav = controladorComunidad.comunidad(sessionMock, idComunidad, model);
 
@@ -133,6 +136,7 @@ public class ControladorComunidadTest {
         assertThat(mav.getModel(), hasEntry("playlistsDeLaComunidad", playlistsMock));
         assertThat(mav.getModel(), hasEntry("mensajes", mensajesMock));
         assertThat(mav.getModel(), hasEntry("fotoUsuario", usuarioDtoMock.getUrlFoto()));
+        assertThat(mav.getModel(), hasEntry("recomendaciones", servicioRecomedacionComunidadMock.obtenerRecomendacionesPorComunidad(anyLong())));
         assertThat(mav.getModel(), hasEntry("comunidad", comunidadMock));
         assertThat(mav.getModel(), hasEntry("estaEnComunidad", true));
         assertThat(mav.getModel(), hasEntry("usuariosActivos", usuariosActivosMock));

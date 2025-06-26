@@ -46,13 +46,13 @@ public class ControladorComunidad {
     private ServicioGuardarImagen servicioGuardarImagen;
     private ServicioUsuarioComunidad servicioUsuarioComunidad;
     private ServicioUsuario servicioUsuario;
-
+    private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
 
 
     public ControladorComunidad(ServicioComunidad servicioComunidad, ServicioSpotify
             servicioSpotify, ServicioPlaylist servicioPlaylist,
                                 ServicioReproduccion servicioReproduccion, ServicioGuardarImagen servicioGuardarImagen
-            ,ServicioUsuario servicioUsuario, ServicioUsuarioComunidad servicioUsuarioComunidad) {
+            ,ServicioUsuario servicioUsuario, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioRecomedacionComunidad servicioRecomedacionComunidad) {
         this.servicioPlaylist = servicioPlaylist;
         this.servicioGuardarImagen = servicioGuardarImagen;
         this.servicioReproduccion = servicioReproduccion;
@@ -60,6 +60,7 @@ public class ControladorComunidad {
         this.servicioSpotify = servicioSpotify;
         this.servicioUsuario = servicioUsuario;
         this.servicioUsuarioComunidad = servicioUsuarioComunidad;
+        this.servicioRecomedacionComunidad = servicioRecomedacionComunidad;
     }
 
 
@@ -187,6 +188,7 @@ public class ControladorComunidad {
             model.put("playlistsDeLaComunidad", servicioPlaylist.obtenerPlaylistsRelacionadasAUnaComunidad(id));
             model.put("mensajes", servicioComunidad.obtenerMensajes(id));
             model.put("rol", usuarioComunidad.getRol());
+            model.put("recomendaciones", servicioRecomedacionComunidad.obtenerRecomendacionesPorComunidad(Long.parseLong(idComunidad)));
 
             estaEnComunidad = true;
         }
