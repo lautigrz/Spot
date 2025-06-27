@@ -5,6 +5,7 @@ import com.tallerwebi.presentacion.ControladorAdmin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.matchers.NotNull;
+import org.springframework.ui.Model;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class ControladorAdminTest {
     private ServicioAdmin servicioAdmin;
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     private ServicioPlaylist servicioPlaylist;
-
+    private ServicioEvento servicioEvento;
     private ControladorAdmin controladorAdmin;
 
     @BeforeEach
@@ -27,8 +28,8 @@ public class ControladorAdminTest {
         servicioAdmin = mock(ServicioAdmin.class);
         servicioRecomedacionComunidad = mock(ServicioRecomedacionComunidad.class);
         servicioPlaylist = mock(ServicioPlaylist.class);
-
-        controladorAdmin = new ControladorAdmin(servicioAdmin, servicioRecomedacionComunidad, servicioPlaylist, null);
+        servicioEvento = mock(ServicioEvento.class);
+        controladorAdmin = new ControladorAdmin(servicioAdmin, servicioRecomedacionComunidad, servicioPlaylist, servicioEvento);
     }
 
     @Test
@@ -105,6 +106,29 @@ public class ControladorAdminTest {
         assertThat(respuesta.get("idRecomendacion"),equalTo(idRecomendacion));
     }
 
+    @Test
+    public void crearEvento_debeAgregarModeloYRetornarVista() {
+        Long idComunidad = 123L;
+        Model modelMock = mock(Model.class);
+
+        String vista = controladorAdmin.crearEvento(idComunidad, modelMock);
+
+        verify(modelMock).addAttribute(eq("evento"), any(Evento.class));
+        verify(modelMock).addAttribute("id", idComunidad);
+
+        assertThat(vista, equalTo("crear-evento"));
+    }
+
+    @Test
+    public void crearEventoComunidad_debeLlamarServicioYRedirigir() {
+        Long idComunidad = 123L;
+        Evento evento = new Evento();
+
+        String vista = controladorAdmin.crearEventoComunidad(idComunidad, evento);
+
+        verify(servicioEvento).publicarEvento(evento, idComunidad);
+        assertThat(vista, equalTo("redirect:/comunidad/" + idComunidad));
+    }
 
 
 }
