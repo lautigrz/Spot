@@ -47,12 +47,13 @@ public class ControladorComunidad {
     private ServicioUsuarioComunidad servicioUsuarioComunidad;
     private ServicioUsuario servicioUsuario;
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
-
+    private ServicioEventoCombinado servicioEventoCombinado;
 
     public ControladorComunidad(ServicioComunidad servicioComunidad, ServicioSpotify
             servicioSpotify, ServicioPlaylist servicioPlaylist,
                                 ServicioReproduccion servicioReproduccion, ServicioGuardarImagen servicioGuardarImagen
-            ,ServicioUsuario servicioUsuario, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioRecomedacionComunidad servicioRecomedacionComunidad) {
+            ,ServicioUsuario servicioUsuario, ServicioUsuarioComunidad servicioUsuarioComunidad,
+                                ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioEventoCombinado servicioEventoCombinado) {
         this.servicioPlaylist = servicioPlaylist;
         this.servicioGuardarImagen = servicioGuardarImagen;
         this.servicioReproduccion = servicioReproduccion;
@@ -61,6 +62,7 @@ public class ControladorComunidad {
         this.servicioUsuario = servicioUsuario;
         this.servicioUsuarioComunidad = servicioUsuarioComunidad;
         this.servicioRecomedacionComunidad = servicioRecomedacionComunidad;
+        this.servicioEventoCombinado = servicioEventoCombinado;
     }
 
 
@@ -189,10 +191,9 @@ public class ControladorComunidad {
             model.put("mensajes", servicioComunidad.obtenerMensajes(id));
             model.put("rol", usuarioComunidad.getRol());
             model.put("recomendaciones", servicioRecomedacionComunidad.obtenerRecomendacionesPorComunidad(Long.parseLong(idComunidad)));
-
+            model.put("eventos", servicioEventoCombinado.obtenerEventos(comunidad.getArtista(), id));
             estaEnComunidad = true;
         }
-
 
         model.put("fotoUsuario", servicioUsuario.obtenerUsuarioDtoPorId(idUsuario).getUrlFoto());
         model.put("comunidad", comunidad);

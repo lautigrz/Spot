@@ -28,7 +28,7 @@ public class ControladorAdminTest {
         servicioRecomedacionComunidad = mock(ServicioRecomedacionComunidad.class);
         servicioPlaylist = mock(ServicioPlaylist.class);
 
-        controladorAdmin = new ControladorAdmin(servicioAdmin, servicioRecomedacionComunidad, servicioPlaylist);
+        controladorAdmin = new ControladorAdmin(servicioAdmin, servicioRecomedacionComunidad, servicioPlaylist, null);
     }
 
     @Test
