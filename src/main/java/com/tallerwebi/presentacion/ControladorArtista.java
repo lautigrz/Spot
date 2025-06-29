@@ -1,17 +1,12 @@
 package com.tallerwebi.presentacion;
 
+import com.mercadopago.resources.preference.Preference;
 import com.neovisionaries.i18n.CountryCode;
-import com.tallerwebi.dominio.RepositorioUsuario;
-import com.tallerwebi.dominio.ServicioFavorito;
-import com.tallerwebi.dominio.ServicioPreescucha;
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
@@ -20,8 +15,10 @@ import se.michaelthelin.spotify.model_objects.specification.Track;
 
 
 import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class ControladorArtista {
@@ -29,6 +26,9 @@ public class ControladorArtista {
     private final SpotifyApi spotifyApi;
     private final RepositorioUsuario repositorioUsuario;
     private final ServicioPreescucha servicioPreescucha;
+
+    @Autowired
+    private ServicioMercadoPago servicioMercadoPago;
 
 
     public ControladorArtista(ServicioFavorito servicioFavorito, SpotifyApi spotifyApi, RepositorioUsuario repositorioUsuario, ServicioPreescucha servicioPreescucha) {
@@ -104,11 +104,44 @@ public class ControladorArtista {
             Usuario usuario = repositorioUsuario.buscarUsuarioPorId(usuarioId);
 
             if(!servicioPreescucha.yaComproPreescucha(albumId, usuario)){
-                servicioPreescucha.comprarPreescucha(albumId, usuario);
+                try{
+                    Preference pref = servicioMercadoPago.crearPreferenciaPago(
+                            "Pre-escucha exclusiva del album " + albumId,
+                            new BigDecimal("100.00"),
+                            "https://ccc4-2802-8010-9542-4c01-746b-fc2-e038-252c.ngrok-free.app/spring/pago-exitoso",
+                            "https://ccc4-2802-8010-9542-4c01-746b-fc2-e038-252c.ngrok-free.app/spring/pago-error",
+                            albumId
+                    );
+                    return "redirect:" + pref.getInitPoint();
+                } catch (Exception e){
+                    e.printStackTrace();
+                    return "redirect:/perfil?errorPago";
+                }
             }
         }
-
         return "redirect:/perfil";
+    }
+
+    @GetMapping("/pago-exitoso")
+    public String pagoExitoso(@RequestParam Map<String, String> params, HttpSession session, Model model){
+        Object usuarioIdObj = session.getAttribute("user");
+        if (usuarioIdObj != null) {
+            Long usuarioId = Long.valueOf(usuarioIdObj.toString());
+            Usuario usuario = repositorioUsuario.buscarUsuarioPorId(usuarioId);
+
+            String albumId = params.get("external_reference");
+
+            if(albumId != null && !servicioPreescucha.yaComproPreescucha(albumId, usuario)){
+                servicioPreescucha.comprarPreescucha(albumId, usuario);
+            }
+            model.addAttribute("albumId", albumId);
+        }
+        return "pago-exitoso";
+    }
+
+    @GetMapping("/pago-error")
+    public String pagoError(){
+        return "pago-error";
     }
 
 
