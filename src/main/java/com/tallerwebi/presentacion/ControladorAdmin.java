@@ -7,6 +7,7 @@ import com.tallerwebi.dominio.*;
 import com.tallerwebi.presentacion.dto.CancionDto;
 import com.tallerwebi.presentacion.dto.RecomendacionDto;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -19,9 +20,11 @@ public class ControladorAdmin {
     private ServicioAdmin servicioAdmin;
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     private ServicioPlaylist servicioPlaylist;
-
-    public ControladorAdmin(ServicioAdmin servicioAdmin, ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioPlaylist servicioPlaylist) {
+    private ServicioEvento servicioEvento;
+    public ControladorAdmin(ServicioAdmin servicioAdmin, ServicioRecomedacionComunidad servicioRecomedacionComunidad,
+                            ServicioPlaylist servicioPlaylist, ServicioEvento servicioEvento) {
         this.servicioAdmin = servicioAdmin;
+        this.servicioEvento = servicioEvento;
         this.servicioPlaylist = servicioPlaylist;
         this.servicioRecomedacionComunidad = servicioRecomedacionComunidad;
     }
@@ -70,6 +73,23 @@ public class ControladorAdmin {
         response.put("idRecomendacion", idRecomendacion);
         return response;
     }
+
+    @GetMapping("/crear-evento/{idComunidad}")
+    public String crearEvento(@PathVariable Long idComunidad, Model model) {
+        model.addAttribute("evento", new Evento());
+        model.addAttribute("id", idComunidad);
+        return "crear-evento";
+    }
+
+    @PostMapping("/crear-evento/{idComunidad}")
+    public String crearEventoComunidad(@PathVariable Long idComunidad,@ModelAttribute Evento evento) {
+
+        servicioEvento.publicarEvento(evento, idComunidad);
+
+        return "redirect:/comunidad/" + idComunidad;
+    }
+
+
 
 
 

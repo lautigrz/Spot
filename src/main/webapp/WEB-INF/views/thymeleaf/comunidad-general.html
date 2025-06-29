@@ -33,8 +33,11 @@
                     <i class="fas fa-music me-2"></i>Canciones recomendadas
                     <span id="contadorRecomendaciones" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${recomendaciones.size()}"></span>
                 </a>
-                <a class="nav-link" href="#"><i class="fas fa-star me-2"></i>Top Tracks de la Comunidad</a>
-                <a class="nav-link" href="#"><i class="fas fa-calendar-alt me-2"></i>Eventos proximos</a>
+                <a class="nav-link" href="#"><i class="fas fa-star me-2"></i>Ranking miembros mas activos</a>
+                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#eventosModal">
+                    <i class="fas fa-calendar-alt me-2"></i>Eventos próximos
+                </a>
+
 
             </nav>
 
@@ -472,6 +475,57 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="eventosModal" tabindex="-1" aria-labelledby="eventosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content bg-white border-0 shadow rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-semibold" id="eventosModalLabel">Eventos Próximos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body pt-2">
+                <div id="contenedorEventos" class="row g-3">
+
+                    <div class="col-md-6 col-lg-4" th:if="${rol == 'Admin'}">
+                        <a th:href="@{/crear-evento/{idComunidad}(idComunidad=${comunidad.getId()})}" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm text-center d-flex align-items-center justify-content-center"
+                                 style="background-color: #f8f9fa; border-radius: 0.75rem; height: 260px;">
+                                <div>
+                                    <div class="display-1 text-primary mb-2">+</div>
+                                    <div class="fw-semibold text-dark">Crear nuevo evento</div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+
+                    <div class="col-md-6 col-lg-4" th:each="evento : ${eventos}">
+                        <div class="card border-0 shadow-sm" style="background-color: #ffffff; border-radius: 0.75rem;">
+                            <img th:src="${evento.getImagen()}" class="card-img-top rounded-top"
+                                 alt="Nombre del evento" style="object-fit: cover; height: 160px;" />
+                            <div class="card-body p-3 d-flex flex-column">
+                                <h6 class="card-title fw-semibold mb-2" th:text="${evento.getNombre()}"></h6>
+                                <p class="card-text text-muted small mb-3">
+                                    <strong>Fecha:</strong> <span th:text="${evento.getFecha()}"></span><br />
+                                    <strong>Lugar:</strong>
+                                    <span th:text="${evento.getLugar()}"></span> -
+                                    <span th:text="${evento.getCiudad()}"></span>,
+                                    <span th:text="${evento.getPais()}"></span>
+                                </p>
+                                <a th:href="${evento.getUrl()}" target="_blank" class="btn btn-sm btn-outline-primary w-100 mt-auto">
+                                    Mas info
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 
