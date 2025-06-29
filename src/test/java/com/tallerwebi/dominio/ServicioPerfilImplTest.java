@@ -242,6 +242,7 @@ public class ServicioPerfilImplTest {
     @Test
     public void obtenerEstadoDeAnimoDelUsuario() throws Exception {
         String token = "token123";
+        String refreshToken = "refresh123";
         String spotifyUserID = "1";
         EstadoDeAnimo estadoDeAnimo = new EstadoDeAnimo("Feliz", 0.5f, 0.5f, 0.5f, 0.5f);
         estadoDeAnimo.setId(1L);
