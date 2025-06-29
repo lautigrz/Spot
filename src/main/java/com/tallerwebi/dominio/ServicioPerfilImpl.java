@@ -130,7 +130,6 @@ public class ServicioPerfilImpl implements ServicioPerfil {
     Usuario usuario = repositorioUsuarioImpl.buscarUsuarioPorSpotifyID(user.getId());
 
     EstadoDeAnimo estado = usuario.getEstadoDeAnimo();
-    System.out.println("Estado de ánimo actual del usuario: " + (estado != null ? estado.getNombre() : "null"));
 
     if(estado == null || estado.getId() == null) {
         return null;

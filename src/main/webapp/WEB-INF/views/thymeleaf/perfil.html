@@ -140,15 +140,16 @@
         </div>
     </div>
 
-    <div th:if="${usuarioIdPerfil != usuarioIdLogueado}">
-        <form th:if="${yaLoSigo}" th:action="@{/dejar-de-seguir/{id}(id=${usuarioIdPerfil})}" method="post">
-            <button type="submit" class="btn btn-primary">Dejar de seguir</button>
-        </form>
-        <form th:if="${!yaLoSigo}" th:action="@{/seguir/{id}(id=${usuarioIdPerfil})}" method="post">
-            <button type="submit" class="btn btn-primary">Seguir</button>
-        </form>
+    <div th:if="${usuarioIdPerfil != usuarioIdLogueado}" class="d-flex justify-content-center mt-3">
+        <div class="text-center">
+            <form th:if="${yaLoSigo}" th:action="@{/dejar-de-seguir/{id}(id=${usuarioIdPerfil})}" method="post" class="mb-2">
+                <button type="submit" class="btn btn-outline-danger px-4">Dejar de seguir</button>
+            </form>
+            <form th:if="${!yaLoSigo}" th:action="@{/seguir/{id}(id=${usuarioIdPerfil})}" method="post">
+                <button type="submit" class="btn btn-outline-success px-4">Seguir</button>
+            </form>
+        </div>
     </div>
-
 
     <!-- Qué está escuchando -->
     <!-- Si está escuchando algo -->
@@ -234,42 +235,60 @@
 
 </div>
 
-<div th:if="${estadoDeAnimoActual != null}">
-    <h3>Tu estado de ánimo actual:
-        <span th:text="${estadoDeAnimoActual.nombre}"></span>
-    </h3>
-</div>
-<div th:if="${estadoDeAnimoActual == null}">
-    <h3>No tenés un estado de ánimo asignado aún.</h3>
+<div class="container mt-4">
+
+    <div th:if="${estadoDeAnimoActual != null}" class="alert alert-info text-center">
+        <h5 class="mb-0">
+            Tu estado de ánimo actual:
+            <strong><span th:text="${estadoDeAnimoActual.nombre}"></span></strong>
+        </h5>
+    </div>
+
+    <div th:if="${estadoDeAnimoActual == null}" class="alert alert-warning text-center">
+        <h5 class="mb-0">No tenés un estado de ánimo asignado aún.</h5>
+    </div>
+
+    <form th:action="@{/actualizar-estado}" method="POST" class="mt-4 p-4 border rounded shadow-sm bg-light">
+        <div class="mb-3">
+            <label for="estadoDeAnimoId" class="form-label">Cambiar estado de ánimo</label>
+            <select name="estadoDeAnimoId" id="estadoDeAnimoId" class="form-select">
+                <option value="" disabled selected>Seleccionar estado</option>
+                <option th:each="estado : ${listaDeEstadosDeAnimo}"
+                        th:value="${estado.id}"
+                        th:text="${estado.nombre}"
+                        th:selected="${estadoDeAnimoActual != null} ? ${estado.id == estadoDeAnimoActual.id} : false">
+                </option>
+            </select>
+        </div>
+
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary">Actualizar</button>
+        </div>
+    </form>
 </div>
 
-<form th:action="@{/actualizar-estado}" method="POST">
-    <label for="estadoDeAnimoId">Cambiar estado de ánimo</label>
-    <select name="estadoDeAnimoId" id="estadoDeAnimoId">
-        <option value="" disabled selected>Seleccionar estado</option>
-        <option th:each="estado : ${listaDeEstadosDeAnimo}"
-                th:value="${estado.id}"
-                th:text="${estado.nombre}"
-                th:selected="${estadoDeAnimoActual != null} ? ${estado.id == estadoDeAnimoActual.id} : false">
-        </option>
-    </select>
-    <button type="submit">Actualizar</button>
+
+<form th:action="@{/generar-recomendaciones}" method="POST" class="text-center my-4">
+    <button class="btn btn-primary btn-lg shadow-sm">
+        🎵 Generar recomendaciones
+    </button>
 </form>
 
+<div th:if="${recomendaciones != null}" class="container">
+    <h3 class="text-center mb-4">Tus recomendaciones 🔥</h3>
 
-<form th:action="@{/generar-recomendaciones}" method="POST">
-    <button>Generar recomendaciones</button>
-</form>
-
-<div th:if="${recomendaciones != null}">
-    <h3>Recomendaciones</h3>
-    <ul>
-        <li th:each="track : ${recomendaciones}">
-            <span th:text="${track.name}">Nombre</span> -
-            <span th:text="${track.artists[0].name}">Artista</span>
-        </li>
-    </ul>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div class="col" th:each="track : ${recomendaciones}">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${track.name}">Nombre del track</h5>
+                    <p class="card-text text-muted" th:text="${track.artists[0].name}">Artista</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
 
 </body>
 </html>
