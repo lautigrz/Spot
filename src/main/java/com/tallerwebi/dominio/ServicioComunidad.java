@@ -1,9 +1,6 @@
 package com.tallerwebi.dominio;
 
-import com.tallerwebi.presentacion.dto.CancionDto;
-import com.tallerwebi.presentacion.dto.ChatMessage;
-import com.tallerwebi.presentacion.dto.Sincronizacion;
-import com.tallerwebi.presentacion.dto.UsuarioDto;
+import com.tallerwebi.presentacion.dto.*;
 import org.apache.hc.core5.http.ParseException;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -14,8 +11,6 @@ import java.io.IOException;
 import java.util.List;
 
 public interface ServicioComunidad {
-
-
     List<Mensaje> obtenerMensajes(Long id);
     ChatMessage registrarUsuarioEnCanalDeComunidad(ChatMessage message, SimpMessageHeaderAccessor simpMessageHeaderAccessor,String idComunidad);
     ChatMessage guardarMensaje(ChatMessage message, Long idUsuario, Long idComunidad);
@@ -28,4 +23,5 @@ public interface ServicioComunidad {
     void agregarUserAlCanal(String idComunidad, String username);
     void crearCanalSiNoExiste(String idComunidad);
     List<UsuarioDto> obtenerUsuariosDeLaComunidad(Long idComunidad);
+    List<ComunidadDto> buscarComunidadesPorNombre(String nombreComunidad);
 }

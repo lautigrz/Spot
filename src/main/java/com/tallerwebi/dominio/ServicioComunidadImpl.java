@@ -1,10 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.google.gson.JsonParser;
-import com.tallerwebi.presentacion.dto.CancionDto;
-import com.tallerwebi.presentacion.dto.ChatMessage;
-import com.tallerwebi.presentacion.dto.Sincronizacion;
-import com.tallerwebi.presentacion.dto.UsuarioDto;
+import com.tallerwebi.presentacion.dto.*;
 import org.apache.hc.core5.http.ParseException;
 import org.hibernate.annotations.Synchronize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +23,11 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     private static Map<String, List<String>> canales = new HashMap<>();
 
     private RepositorioComunidad repositorioComunidad;
-    private RepositorioUsuario repositorioUsuario;
+
     private RepositorioUsuarioComunidad repositorioUsuarioComunidad;
     @Autowired
-    public ServicioComunidadImpl(RepositorioUsuario repositorioUsuario ,RepositorioComunidad repositorioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad) {
+    public ServicioComunidadImpl(RepositorioComunidad repositorioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad) {
         this.repositorioUsuarioComunidad = repositorioUsuarioComunidad;
-        this.repositorioUsuario = repositorioUsuario;
         this.repositorioComunidad = repositorioComunidad;
     }
 
@@ -167,6 +163,24 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
         }
         return usuariosDto;
+    }
+
+    @Override
+    public List<ComunidadDto> buscarComunidadesPorNombre(String nombreComunidad) {
+
+        List<Comunidad> comunidades = repositorioComunidad.buscarComunidadesPorNombre(nombreComunidad);
+
+        List<ComunidadDto> comunidadesDto = new ArrayList<>();
+
+        for (Comunidad comunidad : comunidades) {
+            ComunidadDto comunidadDto = new ComunidadDto();
+            comunidadDto.setId(comunidad.getId());
+            comunidadDto.setNombre(comunidad.getNombre());
+            comunidadDto.setUrlFoto(comunidad.getUrlFoto());
+            comunidadesDto.add(comunidadDto);
+        }
+        
+        return comunidadesDto;
     }
 
     public static void limpiarCanales() {

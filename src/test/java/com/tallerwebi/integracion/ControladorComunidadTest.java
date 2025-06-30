@@ -8,14 +8,12 @@ import com.tallerwebi.integracion.config.HibernateTestConfig;
 import com.tallerwebi.integracion.config.SpringWebTestConfig;
 import com.tallerwebi.presentacion.ControladorComunidad;
 import com.tallerwebi.presentacion.ControladorHome;
-import com.tallerwebi.presentacion.dto.CancionDto;
-import com.tallerwebi.presentacion.dto.ChatMessage;
-import com.tallerwebi.presentacion.dto.Sincronizacion;
-import com.tallerwebi.presentacion.dto.UsuarioDto;
+import com.tallerwebi.presentacion.dto.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -67,7 +65,6 @@ public class ControladorComunidadTest {
     private HttpSession sessionMock;
 
 
-
     @BeforeEach
     public void setUp() {
         servicioComunidadMock = mock(ServicioComunidad.class);
@@ -113,8 +110,8 @@ public class ControladorComunidadTest {
         List<UsuarioDto> usuariosActivosMock = List.of(new UsuarioDto());
 
         when(sessionMock.getAttribute("user")).thenReturn(idUsuario);
-        when(servicioUsuarioComunidadMock.obtenerUsuarioEnComunidad(anyLong(),anyLong())).thenReturn(usuarioComunidadMock);
-        when(servicioUsuarioComunidadMock.obtenerUsuarioEnComunidad(anyLong(),anyLong()).getUsuario()).thenReturn(usuario);
+        when(servicioUsuarioComunidadMock.obtenerUsuarioEnComunidad(anyLong(), anyLong())).thenReturn(usuarioComunidadMock);
+        when(servicioUsuarioComunidadMock.obtenerUsuarioEnComunidad(anyLong(), anyLong()).getUsuario()).thenReturn(usuario);
         when(servicioComunidadMock.obtenerComunidad(idComunidad)).thenReturn(comunidadMock);
         when(servicioComunidadMock.hayAlguienEnLaComunidad(String.valueOf(idComunidad), usuarioDtoMock.getUser())).thenReturn(true);
         when(servicioPlaylistMock.obtenerPlaylistsRelacionadasAUnaComunidad(idComunidad)).thenReturn(playlistsMock);
@@ -306,6 +303,7 @@ public class ControladorComunidadTest {
 
 
     }
+
     @Test
     public void debeReproducirMusicaYDarStatusok() throws Exception {
         Long idComunidad = 5L;
@@ -323,7 +321,7 @@ public class ControladorComunidadTest {
     }
 
     @Test
-   public void debeTirarErrorAlReproducir() throws Exception {
+    public void debeTirarErrorAlReproducir() throws Exception {
         Long idComunidad = 5L;
         String token = "token-abc";
         Long idUsuario = 42L;
@@ -341,6 +339,7 @@ public class ControladorComunidadTest {
 
         verify(servicioReproduccion).reproducirCancion(token, idComunidad, idUsuario);
     }
+
     @Test
     public void debePoderUnirseAUnaComunidadYRedireccionarALaComunidad() throws Exception {
         Long idComunidad = 10L;
@@ -384,6 +383,7 @@ public class ControladorComunidadTest {
 
         verify(servicioUsuarioComunidadMock).agregarUsuarioAComunidad(any(Usuario.class), any(Comunidad.class), anyString());
     }
+
     @Test
     public void debeEncontrarUsuarioEnComunidad() throws Exception {
         Long idUsuario = 1L;
@@ -438,8 +438,24 @@ public class ControladorComunidadTest {
         verify(servicioReproduccion).obtenerCancionSonandoEnLaComunidad(idComunidad);
     }
 
+    @Test
+    public void testBuscarComunidadDevuelveListaOk() throws Exception {
 
+        ComunidadDto comunidad = new ComunidadDto();
+        comunidad.setId(1L);
+        comunidad.setNombre("Test Comunidad");
+        comunidad.setUrlFoto("foto.jpg");
 
+        List<ComunidadDto> lista = List.of(comunidad);
+
+        Mockito.when(servicioComunidadMock.buscarComunidadesPorNombre("test"))
+                .thenReturn(lista);
+
+        mockMvc.perform(get("/buscar-comunidad/test"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+    }
 }
 
 

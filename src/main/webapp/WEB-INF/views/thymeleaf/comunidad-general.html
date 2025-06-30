@@ -48,14 +48,14 @@
         <main class="col-md-7 p-4" id="main">
             <!-- Search bar + top nav -->
             <div class="d-flex justify-content-between align-items-center mb-4 barra">
-                <input type="text" class="form-control w-70 rounded-pill" placeholder="Buscar comunidad" />
+                <input type="text" id="buscador" class="form-control w-70 rounded-pill" placeholder="Buscar comunidad" />
 
                 <div class="d-flex align-items-center notificacion mb-1 ms-auto">
                     <i class="fa-solid fa-bell fa-lg mx-3"></i>
                     <img th:src="${fotoUsuario}" class="rounded-profile" alt="profile" />
                 </div>
             </div>
-
+            <div id="resultados" class="resultados-container"></div>
             <!-- Track Content -->
             <article class="billie-community text-white p-4 rounded"
                      th:style="'background: url(' + ${comunidad.getUrlPortada()} + ') no-repeat center center / cover; position: relative; overflow: hidden;'">
@@ -537,6 +537,7 @@
 <script th:src="@{/js/barra-escuchando.js}"></script>
 <script th:src="@{/js/playlist.js}"></script>
 <script th:src="@{/js/recomendacion.js}"></script>
+<script th:src="@{/js/buscador-comunidad.js}"></script>
 <script th:if="${error != null}">
     const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
     errorModal.show();
@@ -545,13 +546,19 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     const estaEnComunidad = /*[[${estaEnComunidad}]]*/ false;
-
+    const resultados = document.getElementById('resultados');
     if (!estaEnComunidad) {
         const main = document.getElementById('main');
+
         if (main) {
             main.classList.remove('col-md-7', 'p-4');
             main.classList.add('col-md-10', 'p-4', 'mx-auto');
+
         }
+    }
+    else{
+        resultados.classList.remove('resultados-container');
+        resultados.classList.add('resultados-unido');
     }
     /*]]>*/
 </script>

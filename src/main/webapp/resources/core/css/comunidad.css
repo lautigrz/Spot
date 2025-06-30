@@ -187,10 +187,79 @@ nav > a.nav-link {
     font-size: 0.8rem;
 }
 .barra{
-
+    position: relative; /* contenedor del input y resultados */
+    z-index: 10000;
     width: 100% !important;
 
 }
 .badge {
     font-size: 0.75rem;
 }
+#main {
+    position: relative;
+    z-index: 0; /* explícito para controlar stacking */
+}
+
+.resultados-container {
+    position: absolute;
+    top: 11%;
+    left: 3%;
+    width: 84%;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0 0 8px 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 10001; /* más alto que la barra */
+}
+
+.resultados-unido{
+    position: absolute;
+    top: 7%;
+    left: 3%;
+    width: 80%;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0 0 8px 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 10001; /* más alto que la barra */
+}
+
+/* Cada ítem */
+.resultado-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+}
+
+.resultado-item:hover {
+    background: #f0f0f0;
+}
+
+.resultado-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.resultado-texto h6 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.resultado-texto p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+}
+
+

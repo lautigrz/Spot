@@ -1,6 +1,7 @@
 package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.*;
+import com.tallerwebi.presentacion.dto.ComunidadDto;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -116,6 +117,15 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
         return query.getResultList();
     }
 
+    @Override
+    public List<Comunidad> buscarComunidadesPorNombre(String nombreComunidad) {
+        String hql = "FROM Comunidad c WHERE c.nombre LIKE :nombreComunidad OR c.artista LIKE :nombreComunidad";
+        Query<Comunidad> query = sessionFactory.getCurrentSession()
+                .createQuery(hql, Comunidad.class);
+        query.setParameter("nombreComunidad", "%" + nombreComunidad + "%");
+
+        return query.getResultList();
+    }
 
 
 }
