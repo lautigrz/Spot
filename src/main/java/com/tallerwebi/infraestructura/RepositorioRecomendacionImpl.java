@@ -23,20 +23,29 @@ public class RepositorioRecomendacionImpl implements RepositorioRecomendacion {
     }
 
     @Override
-    public void eliminarRecomendacion(Long idRecomendacion) {
+    public Long eliminarRecomendacion(Long idRecomendacion) {
         Recomendacion recomendacion = this.sessionFactory.getCurrentSession().get(Recomendacion.class, idRecomendacion);
+        Long idUsuario = recomendacion.getUsuario().getId();
 
-        this.sessionFactory.getCurrentSession().delete(recomendacion);
+        recomendacion.setEstado(false);
+        sessionFactory.getCurrentSession().update(recomendacion);
+
+        return idUsuario;
     }
 
     @Override
     public List<Recomendacion> obtenerRecomendacionesPorComunidad(Long idComunidad) {
 
-        String hql = "FROM Recomendacion r WHERE r.comunidad.id = :idComunidad AND r.estado = false";
+        String hql = "FROM Recomendacion r WHERE r.comunidad.id = :idComunidad AND r.estado = true";
         return this.sessionFactory.getCurrentSession()
                 .createQuery(hql, Recomendacion.class)
                 .setParameter("idComunidad", idComunidad)
                 .getResultList();
+    }
+
+    @Override
+    public Recomendacion obtenerRecomendacionPorId(Long idRecomendacion) {
+        return sessionFactory.getCurrentSession().get(Recomendacion.class, idRecomendacion);
     }
 
     @Override

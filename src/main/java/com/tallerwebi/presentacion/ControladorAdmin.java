@@ -21,12 +21,14 @@ public class ControladorAdmin {
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     private ServicioPlaylist servicioPlaylist;
     private ServicioEvento servicioEvento;
+    private ServicioNotificacion servicioNotificacion;
     public ControladorAdmin(ServicioAdmin servicioAdmin, ServicioRecomedacionComunidad servicioRecomedacionComunidad,
-                            ServicioPlaylist servicioPlaylist, ServicioEvento servicioEvento) {
+                            ServicioPlaylist servicioPlaylist, ServicioEvento servicioEvento, ServicioNotificacion servicioNotificacion) {
         this.servicioAdmin = servicioAdmin;
         this.servicioEvento = servicioEvento;
         this.servicioPlaylist = servicioPlaylist;
         this.servicioRecomedacionComunidad = servicioRecomedacionComunidad;
+        this.servicioNotificacion = servicioNotificacion;
     }
 
     @PostMapping("/eliminarMiembro/{idComunidad}/{idMiembro}")
@@ -44,8 +46,9 @@ public class ControladorAdmin {
     @PostMapping("/eliminar-reco/{idComunidad}/{idRecomendacion}")
     @ResponseBody
     public Map<String, Object> eliminarRecomendacion(@PathVariable Long idRecomendacion, @PathVariable Long idComunidad) {
-        servicioRecomedacionComunidad.eliminarRecomendacion(idRecomendacion);
+        Long idUsuarioQueRecomendo = servicioRecomedacionComunidad.eliminarRecomendacion(idRecomendacion);
 
+        servicioNotificacion.generarNotificacion(idUsuarioQueRecomendo, idRecomendacion, false);
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("mensaje", "Recomendación eliminada");
@@ -68,6 +71,8 @@ public class ControladorAdmin {
                 recomendacion.getCancion().getUri()
         );
 
+        servicioNotificacion.generarNotificacion(recomendacion.getUsuario().getId(), idRecomendacion, true);
+
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("idRecomendacion", idRecomendacion);
@@ -87,6 +92,15 @@ public class ControladorAdmin {
         servicioEvento.publicarEvento(evento, idComunidad);
 
         return "redirect:/comunidad/" + idComunidad;
+    }
+
+    @PostMapping("/notificacion/{idUsuario}/{idRecomendacion}/{idComunidad}/{estado}")
+    public String notificarRecomendacion(@PathVariable Long idUsuario, @PathVariable Long idRecomendacion, @PathVariable boolean estado, @PathVariable Long idComunidad) {
+
+        servicioNotificacion.generarNotificacion(idUsuario, idRecomendacion,estado);
+
+
+        return "redirect:/comunidad/" + idUsuario;
     }
 
 

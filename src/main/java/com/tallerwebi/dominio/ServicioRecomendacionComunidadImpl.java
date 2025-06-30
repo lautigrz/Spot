@@ -38,8 +38,9 @@ public class ServicioRecomendacionComunidadImpl implements ServicioRecomedacionC
     }
 
     @Override
-    public void eliminarRecomendacion(Long idRecomendacion) {
-        this.repositorioRecomendacion.eliminarRecomendacion(idRecomendacion);
+    public Long eliminarRecomendacion(Long idRecomendacion) {
+
+    return this.repositorioRecomendacion.eliminarRecomendacion(idRecomendacion);
     }
 
     @Override
@@ -51,6 +52,12 @@ public class ServicioRecomendacionComunidadImpl implements ServicioRecomedacionC
     public Recomendacion aceptarRecomendacion(Long idRecomendacion) {
         return this.repositorioRecomendacion.aceptarRecomendacion(idRecomendacion);
     }
+
+    @Override
+    public Recomendacion obtenerRecomendacionPorId(Long idRecomendacion) {
+        return repositorioRecomendacion.obtenerRecomendacionPorId(idRecomendacion);
+    }
+
     private Recomendacion getRecomendacion(CancionDto cancionDto, UsuarioComunidad usuarioComunidad) {
 
         Cancion cancion = this.repositorioCancion.buscarCancionPorElIdDeSpotify(cancionDto.getSpotifyId());
@@ -68,7 +75,7 @@ public class ServicioRecomendacionComunidadImpl implements ServicioRecomedacionC
 
         Recomendacion recomendacion = new Recomendacion();
         recomendacion.setCancion(cancion);
-        recomendacion.setEstado(false);
+        recomendacion.setEstado(true);
         recomendacion.setUsuario(usuarioComunidad.getUsuario());
         recomendacion.setComunidad(usuarioComunidad.getComunidad());
         return recomendacion;

@@ -6,10 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter
@@ -51,6 +48,9 @@ public class Usuario {
             inverseJoinColumns = @JoinColumn(name = "usuario_id")
     )
     private Set<Usuario> seguidos = new HashSet<>();
+
+    @OneToMany(mappedBy = "usuario")
+    private List<Notificacion> notificaciones;
 
     @Override
     public boolean equals(Object o) {

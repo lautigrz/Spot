@@ -6,9 +6,9 @@ public interface RepositorioRecomendacion {
 
     void agregarRecomendacion(Recomendacion recomendacion);
 
-    void eliminarRecomendacion(Long idRecomendacion);
+    Long eliminarRecomendacion(Long idRecomendacion);
 
     List<Recomendacion> obtenerRecomendacionesPorComunidad(Long idComunidad);
-
+    Recomendacion obtenerRecomendacionPorId(Long idRecomendacion);
     Recomendacion aceptarRecomendacion(Long idRecomendacion);
 }
