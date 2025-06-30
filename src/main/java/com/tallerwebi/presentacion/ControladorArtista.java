@@ -108,8 +108,8 @@ public class ControladorArtista {
                     Preference pref = servicioMercadoPago.crearPreferenciaPago(
                             "Pre-escucha exclusiva del album " + albumId,
                             new BigDecimal("100.00"),
-                            "https://ccc4-2802-8010-9542-4c01-746b-fc2-e038-252c.ngrok-free.app/spring/pago-exitoso",
-                            "https://ccc4-2802-8010-9542-4c01-746b-fc2-e038-252c.ngrok-free.app/spring/pago-error",
+                            "https://36d2-2802-8010-9542-4c01-6d56-254b-e7e0-4610.ngrok-free.app/spring/pago-exitoso",
+                            "https://36d2-2802-8010-9542-4c01-6d56-254b-e7e0-4610.ngrok-free.app/spring/pago-error",
                             albumId
                     );
                     return "redirect:" + pref.getInitPoint();
