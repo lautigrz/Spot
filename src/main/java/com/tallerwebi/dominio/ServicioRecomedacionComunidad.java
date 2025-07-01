@@ -1,7 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.presentacion.dto.CancionDto;
-import com.tallerwebi.presentacion.dto.RecomendacionDto;
+
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ public interface ServicioRecomedacionComunidad {
     Long eliminarRecomendacion(Long idRecomendacion);
 
     List<Recomendacion> obtenerRecomendacionesPorComunidad(Long idComunidad);
-
+    List<Recomendacion> obtenerRecomendacionesPorComunidadQueNoFueronLeidas(Long idComunidad);
     Recomendacion aceptarRecomendacion(Long idRecomendacion);
 
     Recomendacion obtenerRecomendacionPorId(Long idRecomendacion);

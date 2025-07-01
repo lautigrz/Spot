@@ -25,8 +25,16 @@
                 </a>
                 <a class="nav-link d-flex align-items-center px-3 py-2 text-start" href="#"
                    data-bs-toggle="offcanvas" data-bs-target="#notificacionesOffcanvas" aria-controls="notificacionesOffcanvas">
-                    <i class="bi bi-bell me-2 fs-5"></i> <span class="link-text">Notificaciones</span>
+                    <div class="position-relative">
+                        <i class="bi bi-bell me-2 fs-5"></i>
+                        <!-- Badge -->
+                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" id="indicador" th:if="${notificacion}">
+      <span class="visually-hidden" ></span>
+    </span>
+                    </div>
+                    <span class="link-text">Notificaciones</span>
                 </a>
+
                 <a class="nav-link d-flex align-items-center px-3 py-2 text-start" href="#">
                     <i class="bi bi-star me-2 fs-5"></i> <span class="link-text">Mis artistas favoritos</span>
                 </a>

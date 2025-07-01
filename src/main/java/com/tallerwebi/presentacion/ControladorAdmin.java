@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.presentacion.dto.CancionDto;
-import com.tallerwebi.presentacion.dto.RecomendacionDto;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -98,8 +98,6 @@ public class ControladorAdmin {
     public String notificarRecomendacion(@PathVariable Long idUsuario, @PathVariable Long idRecomendacion, @PathVariable boolean estado, @PathVariable Long idComunidad) {
 
         servicioNotificacion.generarNotificacion(idUsuario, idRecomendacion,estado);
-
-
         return "redirect:/comunidad/" + idUsuario;
     }
 

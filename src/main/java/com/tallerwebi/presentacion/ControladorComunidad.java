@@ -45,13 +45,15 @@ public class ControladorComunidad {
     private ServicioUsuario servicioUsuario;
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     private ServicioEventoCombinado servicioEventoCombinado;
+    private ServicioNotificacion servicioNotificacion;
 
     public ControladorComunidad(ServicioComunidad servicioComunidad, ServicioSpotify
             servicioSpotify, ServicioPlaylist servicioPlaylist,
                                 ServicioReproduccion servicioReproduccion, ServicioGuardarImagen servicioGuardarImagen
             ,ServicioUsuario servicioUsuario, ServicioUsuarioComunidad servicioUsuarioComunidad,
-                                ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioEventoCombinado servicioEventoCombinado) {
+                                ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioEventoCombinado servicioEventoCombinado, ServicioNotificacion servicioNotificacion) {
         this.servicioPlaylist = servicioPlaylist;
+        this.servicioNotificacion = servicioNotificacion;
         this.servicioGuardarImagen = servicioGuardarImagen;
         this.servicioReproduccion = servicioReproduccion;
         this.servicioComunidad = servicioComunidad;
@@ -188,7 +190,8 @@ public class ControladorComunidad {
             model.put("playlistsDeLaComunidad", servicioPlaylist.obtenerPlaylistsRelacionadasAUnaComunidad(id));
             model.put("mensajes", servicioComunidad.obtenerMensajes(id));
             model.put("rol", usuarioComunidad.getRol());
-            model.put("recomendaciones", servicioRecomedacionComunidad.obtenerRecomendacionesPorComunidad(Long.parseLong(idComunidad)));
+
+            model.put("recomendaciones", servicioRecomedacionComunidad.obtenerRecomendacionesPorComunidadQueNoFueronLeidas(Long.parseLong(idComunidad)));
             model.put("eventos", servicioEventoCombinado.obtenerEventos(comunidad.getArtista(), id));
             estaEnComunidad = true;
         }

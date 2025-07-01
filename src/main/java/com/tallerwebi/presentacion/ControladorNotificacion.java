@@ -3,10 +3,9 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.Notificacion;
 import com.tallerwebi.dominio.ServicioNotificacion;
 import com.tallerwebi.presentacion.dto.NotificacionDto;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,8 +24,11 @@ public class ControladorNotificacion {
     }
 
 
-    @GetMapping("/notificacion/leido/{idNotificacion}")
-    public void cambiarEstadoNotificacion(@PathVariable Long idNotificacion) {
-        servicioNotificacion.cambiarEstadoNotificacion(idNotificacion);
+    @PostMapping("/notificacion/leer")
+    @ResponseBody
+    public ResponseEntity<Void> cambiarEstadoNotificacion(@RequestBody List<Long> idNotificaciones) {
+
+        servicioNotificacion.cambiarEstadoNotificacion(idNotificaciones);
+        return ResponseEntity.ok().build();
     }
 }

@@ -152,10 +152,11 @@ body.sidebar-collapsed .avatar-user {
     gap: 0.3rem;
     padding: 0.6rem 1rem;
     font-size: 0.9rem;
-    max-width: 320px; /* ancho fijo */
+    margin-bottom: 10px;
     word-wrap: break-word;
-    background-color: #f5f5f5;
+    background-color: #d3d1d1;
     border-radius: 8px;
+
 }
 
 .list-group-item .saludo {

@@ -28,6 +28,7 @@ public class RepositorioRecomendacionImpl implements RepositorioRecomendacion {
         Long idUsuario = recomendacion.getUsuario().getId();
 
         recomendacion.setEstado(false);
+        recomendacion.setLeida(true);
         sessionFactory.getCurrentSession().update(recomendacion);
 
         return idUsuario;
@@ -36,7 +37,16 @@ public class RepositorioRecomendacionImpl implements RepositorioRecomendacion {
     @Override
     public List<Recomendacion> obtenerRecomendacionesPorComunidad(Long idComunidad) {
 
-        String hql = "FROM Recomendacion r WHERE r.comunidad.id = :idComunidad AND r.estado = true";
+        String hql = "FROM Recomendacion r WHERE r.comunidad.id = :idComunidad AND r.estado = false";
+        return this.sessionFactory.getCurrentSession()
+                .createQuery(hql, Recomendacion.class)
+                .setParameter("idComunidad", idComunidad)
+                .getResultList();
+    }
+
+    @Override
+    public List<Recomendacion> obtenerRecomendacionesPorComunidadQueNoFueronLeidas(Long idComunidad) {
+        String hql = "FROM Recomendacion r WHERE r.comunidad.id = :idComunidad AND r.leida = false";
         return this.sessionFactory.getCurrentSession()
                 .createQuery(hql, Recomendacion.class)
                 .setParameter("idComunidad", idComunidad)
@@ -55,6 +65,7 @@ public class RepositorioRecomendacionImpl implements RepositorioRecomendacion {
 
         if (recomendacion != null) {
             recomendacion.setEstado(true); // Actualizar estado
+            recomendacion.setLeida(true);
            sessionFactory.getCurrentSession().update(recomendacion); // Guardar el cambio
         }
 

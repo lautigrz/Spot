@@ -22,8 +22,6 @@ public class RepositorioNotificacionImpl implements RepositorioNotificacion {
     public List<Notificacion> obtenerNotificacionesPorUsuario(Long idUsuario) {
 
         String hql = "SELECT n FROM Notificacion n JOIN FETCH n.usuario u WHERE u.id = :idUsuario";
-
-
         Query<Notificacion> query = sessionFactory.getCurrentSession().createQuery(hql, Notificacion.class);
         query.setParameter("idUsuario", idUsuario);
 
@@ -38,7 +36,27 @@ public class RepositorioNotificacionImpl implements RepositorioNotificacion {
     }
 
     @Override
-    public void cambiarEstadoNotificacion(Long idNotificacion) {
+    public void cambiarEstadoNotificacion(List<Long> idsNotificaciones) {
+
+        if (idsNotificaciones != null && !idsNotificaciones.isEmpty()) {
+            String hql = "UPDATE Notificacion n SET n.leido = true WHERE n.id IN (:ids)";
+            sessionFactory.getCurrentSession()
+                    .createQuery(hql)
+                    .setParameterList("ids", idsNotificaciones)
+                    .executeUpdate();
+        }
+    }
+
+    @Override
+    public Boolean elUsuarioTieneNotificaciones(Long idUsuario) {
+        String hql = "SELECT COUNT(n) FROM Notificacion n WHERE n.usuario.id = :idUsuario AND n.leido = false";
+        Query<Long> query = sessionFactory.getCurrentSession().createQuery(hql, Long.class);
+        query.setParameter("idUsuario", idUsuario);
+        Long count = query.uniqueResult();
+
+        System.out.println("el usuario tiene: " + count);
+
+        return count != null && count > 0;
 
     }
 }

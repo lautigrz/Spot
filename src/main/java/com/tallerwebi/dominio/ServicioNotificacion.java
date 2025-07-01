@@ -7,5 +7,6 @@ import java.util.List;
 public interface ServicioNotificacion {
     List<NotificacionDto> obtenerNotificacionesPorUsuario(Long idUsuario);
     void generarNotificacion(Long idUsuario, Long idRecomendacion, Boolean estado);
-    void cambiarEstadoNotificacion(Long idNotificacion);
+    void cambiarEstadoNotificacion(List<Long> idsNotificaciones);
+    Boolean elUsuarioTieneNotificaciones(Long idUsuario);
 }

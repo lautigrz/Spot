@@ -9,6 +9,7 @@ public interface RepositorioRecomendacion {
     Long eliminarRecomendacion(Long idRecomendacion);
 
     List<Recomendacion> obtenerRecomendacionesPorComunidad(Long idComunidad);
+    List<Recomendacion> obtenerRecomendacionesPorComunidadQueNoFueronLeidas(Long idComunidad);
     Recomendacion obtenerRecomendacionPorId(Long idRecomendacion);
     Recomendacion aceptarRecomendacion(Long idRecomendacion);
 }

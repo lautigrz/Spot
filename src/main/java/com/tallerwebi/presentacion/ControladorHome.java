@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.ServicioComunidad;
 import com.tallerwebi.dominio.ServicioInstancia;
+import com.tallerwebi.dominio.ServicioNotificacion;
 import com.tallerwebi.dominio.ServicioUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,12 +23,14 @@ public class ControladorHome {
 
     private ServicioUsuario servicioUsuario;
     private ServicioComunidad servicioComunidad;
+    private ServicioNotificacion servicioNotificacion;
     private ServicioInstancia spotify;
 
 
-    public ControladorHome(ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify) {
+    public ControladorHome(ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion) {
         this.servicioUsuario = servicioUsuario;
         this.servicioComunidad = servicioComunidad;
+        this.servicioNotificacion = servicioNotificacion;
         this.spotify = spotify;
     }
 
@@ -36,7 +39,7 @@ public class ControladorHome {
         ModelMap modelMap = new ModelMap();
 
         Long idUsuario = (Long) session.getAttribute("user");
-
+        modelMap.put("notificacion", servicioNotificacion.elUsuarioTieneNotificaciones(idUsuario));
         modelMap.put("usuario", servicioUsuario.obtenerUsuarioPorId(idUsuario));
         modelMap.put("comunidades", servicioComunidad.obtenerTodasLasComunidades());
         return new ModelAndView("home", modelMap);

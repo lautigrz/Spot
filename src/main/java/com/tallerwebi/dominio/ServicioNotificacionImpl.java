@@ -61,7 +61,13 @@ public class ServicioNotificacionImpl implements ServicioNotificacion {
     }
 
     @Override
-    public void cambiarEstadoNotificacion(Long idNotificacion) {
+    public void cambiarEstadoNotificacion(List<Long> idsNotificacion) {
+        this.repositorioNotificacion.cambiarEstadoNotificacion(idsNotificacion);
+    }
+
+    @Override
+    public Boolean elUsuarioTieneNotificaciones(Long idUsuario) {
+    return this.repositorioNotificacion.elUsuarioTieneNotificaciones(idUsuario);
 
     }
 }

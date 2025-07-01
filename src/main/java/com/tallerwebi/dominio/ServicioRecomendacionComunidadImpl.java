@@ -1,7 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.presentacion.dto.CancionDto;
-import com.tallerwebi.presentacion.dto.RecomendacionDto;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +49,11 @@ public class ServicioRecomendacionComunidadImpl implements ServicioRecomedacionC
     }
 
     @Override
+    public List<Recomendacion> obtenerRecomendacionesPorComunidadQueNoFueronLeidas(Long idComunidad) {
+        return this.repositorioRecomendacion.obtenerRecomendacionesPorComunidadQueNoFueronLeidas(idComunidad);
+    }
+
+    @Override
     public Recomendacion aceptarRecomendacion(Long idRecomendacion) {
         return this.repositorioRecomendacion.aceptarRecomendacion(idRecomendacion);
     }
@@ -70,12 +75,14 @@ public class ServicioRecomendacionComunidadImpl implements ServicioRecomedacionC
             cancion.setArtista(cancionDto.getArtista());
             cancion.setUrlImagen(cancionDto.getUrlImagen());
 
+
             repositorioCancion.guardarCancion(cancion);
         }
 
         Recomendacion recomendacion = new Recomendacion();
         recomendacion.setCancion(cancion);
-        recomendacion.setEstado(true);
+        recomendacion.setEstado(false);
+        recomendacion.setLeida(false);
         recomendacion.setUsuario(usuarioComunidad.getUsuario());
         recomendacion.setComunidad(usuarioComunidad.getComunidad());
         return recomendacion;
