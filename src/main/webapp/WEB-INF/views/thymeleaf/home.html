@@ -15,8 +15,12 @@
 
         <div id="sidebar" class="sidebar d-flex flex-column align-items-center text-center py-4 "
              style="position: fixed; top: 0; left: 0; height: 100vh; width: 220px; background-color: #f8f9fa; transition: width 0.3s;">
-            <img th:src="${usuario.getUrlFoto()}" id="toggleSidebar" alt="Perfil"
-                 class="rounded-circle mb-3 sidebar-avatar" />
+            <img
+                    id="toggleSidebar"
+                    class="rounded-circle mb-3 sidebar-avatar"
+                    alt="Perfil"
+                    th:src="${usuario != null} ? ${usuario.urlFoto} : (${artista != null} ? ${artista.fotoPerfil} : '/images/default-avatar.png')"
+            />
 
 
             <nav class="nav flex-column w-100 px-2" style="padding-left: 0 !important;">

@@ -1,9 +1,6 @@
 package com.tallerwebi.integracion;
 
-import com.tallerwebi.dominio.RepositorioUsuario;
-import com.tallerwebi.dominio.ServicioFavorito;
-import com.tallerwebi.dominio.ServicioPreescucha;
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.*;
 import com.tallerwebi.presentacion.ControladorArtista;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +18,7 @@ public class ControladorArtistaTest {
     private RepositorioUsuario repositorioUsuarioMock;
     private ServicioPreescucha servicioPreescuchaMock;
     private ControladorArtista controladorArtista;
+    private RepositorioArtista repositorioArtistaMock;
 
     @BeforeEach
     public void setUp() {
@@ -28,8 +26,9 @@ public class ControladorArtistaTest {
         spotifyApiMock = mock(SpotifyApi.class);
         repositorioUsuarioMock = mock(RepositorioUsuario.class);
         servicioPreescuchaMock = mock(ServicioPreescucha.class);
+        repositorioArtistaMock = mock(RepositorioArtista.class);
 
-        controladorArtista = new ControladorArtista(servicioFavoritoMock,spotifyApiMock,repositorioUsuarioMock,servicioPreescuchaMock);
+        controladorArtista = new ControladorArtista(servicioFavoritoMock,spotifyApiMock,repositorioUsuarioMock,servicioPreescuchaMock, repositorioArtistaMock);
     }
 
 

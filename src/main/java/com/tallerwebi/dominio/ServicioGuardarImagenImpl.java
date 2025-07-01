@@ -39,4 +39,13 @@ public class ServicioGuardarImagenImpl implements ServicioGuardarImagen {
 
         return urlImagen;
     }
+
+    @Override
+    public String guardarImagenPerfilDeArtista(MultipartFile imagen) throws IOException {
+       String nombreArchivo = UUID.randomUUID() + "-" + imagen.getOriginalFilename();
+       String ruta = "uploads/perfil-artista/" + nombreArchivo;
+       imagen.transferTo(new File(ruta));
+       String urlImagen = "/spring/uploads/perfil-artista/" + nombreArchivo;
+       return urlImagen;
+    }
 }

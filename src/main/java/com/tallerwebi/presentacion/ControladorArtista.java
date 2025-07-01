@@ -1,10 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import com.neovisionaries.i18n.CountryCode;
-import com.tallerwebi.dominio.RepositorioUsuario;
-import com.tallerwebi.dominio.ServicioFavorito;
-import com.tallerwebi.dominio.ServicioPreescucha;
-import com.tallerwebi.dominio.Usuario;
+import com.tallerwebi.dominio.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,13 +26,15 @@ public class ControladorArtista {
     private final SpotifyApi spotifyApi;
     private final RepositorioUsuario repositorioUsuario;
     private final ServicioPreescucha servicioPreescucha;
+    private final RepositorioArtista repositorioArtista;
 
 
-    public ControladorArtista(ServicioFavorito servicioFavorito, SpotifyApi spotifyApi, RepositorioUsuario repositorioUsuario, ServicioPreescucha servicioPreescucha) {
+    public ControladorArtista(ServicioFavorito servicioFavorito, SpotifyApi spotifyApi, RepositorioUsuario repositorioUsuario, ServicioPreescucha servicioPreescucha, RepositorioArtista repositorioArtista) {
         this.servicioFavorito = servicioFavorito;
         this.spotifyApi = spotifyApi;
         this.repositorioUsuario = repositorioUsuario;
         this.servicioPreescucha = servicioPreescucha;
+        this.repositorioArtista = repositorioArtista;
     }
 
     @GetMapping("/artistas/{id}")
@@ -82,6 +81,30 @@ public class ControladorArtista {
         }
     }
 
+
+    @GetMapping("/artistas-local/{id}")
+    public String verArtistaLocal(@PathVariable Long id, Model model, HttpSession session) {
+        try{
+            Artista artista = repositorioArtista.buscarPorId(id);
+            if(artista == null){
+                return "redirect:/home";
+            }
+
+            Usuario usuario = (Usuario) session.getAttribute("usuario");
+            boolean esFavorito = usuario!= null && servicioFavorito.yaEsFavorito(String.valueOf(id),usuario);
+            model.addAttribute("esFavorito", esFavorito);
+            model.addAttribute("artistaLocal", artista);
+
+            return "detalle-artista-local";
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return "error";
+        }
+
+    }
+
+
     @PostMapping("/artistas/{id}/favorito")
     public String agregarAFavoritos(@PathVariable String id, HttpSession session) {
         Object usuarioIdObj = session.getAttribute("user");
@@ -93,6 +116,21 @@ public class ControladorArtista {
         }
         return "redirect:/perfil";
 
+    }
+
+    @PostMapping("/artistas-locales/{id}/favorito")
+    public String agregarFavoritoLocal(@PathVariable Long id, HttpSession session) {
+        Object usuarioIdObj = session.getAttribute("user");
+
+        if (usuarioIdObj != null) {
+            Long usuarioId = Long.valueOf(usuarioIdObj.toString());
+            Usuario usuario = repositorioUsuario.buscarUsuarioPorId(usuarioId);
+
+            String idLocal = "LOCAL_" + id;
+            servicioFavorito.agregarFavorito(idLocal,usuario);
+        }
+
+        return "redirect:/perfil";
     }
 
     @PostMapping("/artistas/{id}/comprar-preescucha")

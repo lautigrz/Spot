@@ -1,8 +1,6 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.ServicioComunidad;
-import com.tallerwebi.dominio.ServicioInstancia;
-import com.tallerwebi.dominio.ServicioUsuario;
+import com.tallerwebi.dominio.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +18,8 @@ import java.util.Optional;
 @Controller
 public class ControladorHome {
 
+    @Autowired
+    private RepositorioArtista repositorioArtista;
     private ServicioUsuario servicioUsuario;
     private ServicioComunidad servicioComunidad;
     private ServicioInstancia spotify;
@@ -36,19 +36,33 @@ public class ControladorHome {
         ModelMap modelMap = new ModelMap();
 
         Long idUsuario = (Long) session.getAttribute("user");
+        Object artistaObj = session.getAttribute("artista");
 
-        modelMap.put("usuario", servicioUsuario.obtenerUsuarioPorId(idUsuario));
+        if (idUsuario != null) {
+            modelMap.put("usuario", servicioUsuario.obtenerUsuarioPorId(idUsuario));
+        } else if (artistaObj != null) {
+            modelMap.put("artista", artistaObj); // ya es el objeto Artista
+        } else {
+            return new ModelAndView("redirect:/login");
+        }
+
         modelMap.put("comunidades", servicioComunidad.obtenerTodasLasComunidades());
         return new ModelAndView("home", modelMap);
     }
 
     @GetMapping("/buscar-artista")
     public String buscarArtistaPorBuscador(String nombre, HttpSession session, Model model) {
+
         try {
-            String token = (String) session.getAttribute("token");
-            if (token == null) {
-                return "redirect:/login";
+            //Primero se busca localmente el artista
+            Artista artistaLocal = repositorioArtista.buscarPorNombre(nombre);
+            if (artistaLocal!=null){
+                return "redirect:/artistas-local/" + artistaLocal.getId();
             }
+
+            String token = (String) session.getAttribute("token");
+            if (token == null) return "redirect:/login";
+
             SpotifyApi spotifyApi = spotify.obtenerInstanciaDeSpotifyConToken(token);
             Paging<Artist> resultado = spotifyApi.searchArtists(nombre).limit(10).build().execute();
             Artist[] artistas = resultado.getItems();
@@ -65,12 +79,11 @@ public class ControladorHome {
                 model.addAttribute("errorBusqueda", "No se encontró ningún artista con ese nombre.");
                 return "home";
             }
-        } catch (Exception e) {
+        }catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("errorBusqueda", "Ocurrió un error al buscar el artista.");
             return "home";
         }
-
     }
 
     @GetMapping("/cerrar")
