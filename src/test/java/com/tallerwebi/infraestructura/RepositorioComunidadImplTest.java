@@ -323,6 +323,25 @@ public class RepositorioComunidadImplTest {
         assertThat(playlistDeLaComunidad, containsInAnyOrder(playlist, playlist2));
     }
 
+    @Test
+    @Rollback
+    public void seDebeObtenerComunidadesBuscadaPorNombre() {
+        Comunidad comunidad = new Comunidad();
+        comunidad.setNombre("Rock");
+        comunidad.setDescripcion("excelente");
+        sessionFactory.getCurrentSession().save(comunidad);
+
+        Comunidad comunidad2 = new Comunidad();
+        comunidad2.setNombre("Cumbia");
+        comunidad2.setDescripcion("excelente");
+
+        sessionFactory.getCurrentSession().save(comunidad2);
+
+        List<Comunidad> comunidades = repositorioComunidad.buscarComunidadesPorNombre("Rock");
+
+        assertThat(comunidades.size(), equalTo(1));
+        assertThat(comunidades.get(0).getId(), equalTo(comunidad.getId()));
+    }
 
 
 }

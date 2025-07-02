@@ -20,12 +20,14 @@ public class ServicioFavoritoImplTest {
     private RepositorioFavorito repositorioFavoritoMock;
     private ServicioFavorito servicioFavorito;
     private SpotifyApi spotifyApiMock;
+    private RepositorioArtista repositorioArtistaMock;
 
     @BeforeEach
     public void setUp(){
         repositorioFavoritoMock = mock(RepositorioFavorito.class);
+        repositorioArtistaMock = mock(RepositorioArtista.class);
         spotifyApiMock = mock(SpotifyApi.class);
-        servicioFavorito = new ServicioFavoritoImpl(repositorioFavoritoMock,spotifyApiMock);
+        servicioFavorito = new ServicioFavoritoImpl(repositorioFavoritoMock,spotifyApiMock, repositorioArtistaMock);
 
     }
 

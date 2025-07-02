@@ -29,18 +29,22 @@
         <div class="form-divider">o</div>
 
         <!-- Formulario clásico -->
-        <form>
+        <form th:action="@{/login}" method="post">
             <div class="mb-3">
-                <input type="email" class="form-control" placeholder="Correo electrónico" required>
+                <input name="email" type="email" class="form-control" placeholder="Correo electrónico" required>
             </div>
             <div class="mb-3">
-                <input type="password" class="form-control" placeholder="Contraseña" required>
+                <input name="password" type="password" class="form-control" placeholder="Contraseña" required>
             </div>
             <button type="submit" class="btn btn-dark w-100">Ingresar</button>
         </form>
 
+        <p class="text-danger mt-2" th:if="${error}">
+            [[${error}]]
+        </p>
+
         <p class="text-center text-muted mt-4">
-            ¿No tenés cuenta? <a href="#" class="text-decoration-none">Registrate</a>
+            ¿No tenés cuenta? <a th:href="@{/registro}" class="text-decoration-none">Registrate</a>
         </p>
     </div>
 </div>

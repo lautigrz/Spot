@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.presentacion.dto.ComunidadDto;
 import com.tallerwebi.presentacion.dto.UsuarioDto;
 
 import java.util.List;
@@ -16,5 +17,5 @@ public interface RepositorioComunidad {
     Set<Cancion> obtenerCancionesDeUnaPlaylistDeUnaComunidad(Long idComunidad);
     Playlist obtenerPlaylistDeUnaComunidad(Long idComunidad);
     List<Usuario> obtenerUsuariosPorComunidad(Long idComunidad);
-
+    List<Comunidad> buscarComunidadesPorNombre(String nombreComunidad);
 }

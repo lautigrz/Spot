@@ -15,10 +15,12 @@ public class ServicioFavoritoImpl implements ServicioFavorito {
 
     private RepositorioFavorito repositorioFavorito;
     private SpotifyApi spotifyApi;
+    private RepositorioArtista repositorioArtista;
 
-    public ServicioFavoritoImpl(RepositorioFavorito repositorioFavorito, SpotifyApi spotifyApi) {
+    public ServicioFavoritoImpl(RepositorioFavorito repositorioFavorito, SpotifyApi spotifyApi, RepositorioArtista repositorioArtista) {
         this.repositorioFavorito = repositorioFavorito;
         this.spotifyApi = spotifyApi;
+        this.repositorioArtista = repositorioArtista;
     }
 
     @Override
@@ -36,18 +38,35 @@ public class ServicioFavoritoImpl implements ServicioFavorito {
         List<Favorito> favoritos = repositorioFavorito.obtenerFavoritosDeUsuario(usuario.getId());
 
         return favoritos.stream().map(fav -> {
-            try {
-                // Consultar Spotify para obtener datos del artista
-                Artist artista = spotifyApi.getArtist(fav.getSpotifyArtistId()).build().execute();
+            String id = fav.getSpotifyArtistId();
 
+            try {
+                // Si el ID empieza con LOCAL_
+                if (id.startsWith("LOCAL_")) {
+                    Long idLocal = Long.parseLong(id.substring(6)); // Quita el prefijo
+                    Artista artistaLocal = repositorioArtista.buscarPorId(idLocal);
+
+                    if (artistaLocal != null) {
+                        return new FavoritoDTO(
+                                id,
+                                artistaLocal.getNombre(),
+                                artistaLocal.getFotoPerfil() != null ? artistaLocal.getFotoPerfil() : ""
+                        );
+                    } else {
+                        return new FavoritoDTO(id, "Artista local no encontrado", "");
+                    }
+                }
+
+                // Caso artista Spotify (id no numérico)
+                Artist artista = spotifyApi.getArtist(id).build().execute();
                 String nombre = artista.getName();
                 String imagenUrl = artista.getImages().length > 0 ? artista.getImages()[0].getUrl() : "";
 
-                return new FavoritoDTO(fav.getSpotifyArtistId(), nombre, imagenUrl);
+                return new FavoritoDTO(id, nombre, imagenUrl);
+
             } catch (Exception e) {
                 e.printStackTrace();
-                // En caso de error, devolver con id y sin datos
-                return new FavoritoDTO(fav.getSpotifyArtistId(), "Nombre no disponible", "");
+                return new FavoritoDTO(id, "Nombre no disponible", "");
             }
         }).collect(Collectors.toList());
     }

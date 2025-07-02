@@ -3,10 +3,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tallerwebi.dominio.*;
 
-import com.tallerwebi.presentacion.dto.CancionDto;
-import com.tallerwebi.presentacion.dto.ChatMessage;
-import com.tallerwebi.presentacion.dto.Sincronizacion;
-import com.tallerwebi.presentacion.dto.UsuarioDto;
+import com.tallerwebi.presentacion.dto.*;
 
 import org.apache.hc.core5.http.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,13 +63,14 @@ public class ControladorComunidad {
     }
 
 
-    @GetMapping("lista")
-    public String listar(Model model) {
-
-        model.addAttribute("comunidades", servicioComunidad.obtenerTodasLasComunidades());
-
-        return "lista-comunidades";
+    @GetMapping("/buscar-comunidad/{nombreComunidad}")
+    @ResponseBody
+    public ResponseEntity<List<ComunidadDto>> buscarComunidad(@PathVariable String nombreComunidad) {
+        List<ComunidadDto> comunidades = servicioComunidad.buscarComunidadesPorNombre(nombreComunidad);
+        return ResponseEntity.ok(comunidades);
     }
+
+
 
     @GetMapping("/busqueda-cancion/{texto}")
     public ResponseEntity<?> buscarCancion(@PathVariable String texto, HttpSession session) throws IOException, ParseException, SpotifyWebApiException {
@@ -190,7 +188,8 @@ public class ControladorComunidad {
             model.put("playlistsDeLaComunidad", servicioPlaylist.obtenerPlaylistsRelacionadasAUnaComunidad(id));
             model.put("mensajes", servicioComunidad.obtenerMensajes(id));
             model.put("rol", usuarioComunidad.getRol());
-            model.put("recomendaciones", servicioRecomedacionComunidad.obtenerRecomendacionesPorComunidad(Long.parseLong(idComunidad)));
+
+            model.put("recomendaciones", servicioRecomedacionComunidad.obtenerRecomendacionesPorComunidadQueNoFueronLeidas(Long.parseLong(idComunidad)));
             model.put("eventos", servicioEventoCombinado.obtenerEventos(comunidad.getArtista(), id));
             estaEnComunidad = true;
         }

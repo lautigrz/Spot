@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.presentacion.dto.ChatMessage;
+import com.tallerwebi.presentacion.dto.ComunidadDto;
 import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +36,7 @@ public class ServicioComunidadImplTest {
         repositorioUsuarioMock = mock(RepositorioUsuario.class);
         repositorioComunidadMock = mock(RepositorioComunidad.class);
         repositorioUsuarioComunidadMock = mock(RepositorioUsuarioComunidad.class);
-        servicioComunidad = new ServicioComunidadImpl(repositorioUsuarioMock,repositorioComunidadMock, repositorioUsuarioComunidadMock);
+        servicioComunidad = new ServicioComunidadImpl(repositorioComunidadMock, repositorioUsuarioComunidadMock);
     }
     @AfterEach
     public void limpiarEstadoGlobal() {
@@ -215,5 +216,28 @@ public class ServicioComunidadImplTest {
         assertThat(usuariosEnCanal, containsInAnyOrder(usuario));
         assertThat(usuario, equalTo(headerAccessor.getSessionAttributes().get("usuario")));
         assertThat(message, equalTo( resultado));
+    }
+    @Test
+    public void seDebeObtenerComunidadesDtoBuscadaPorNombre() {
+        Comunidad comunidad = new Comunidad();
+        comunidad.setNombre("Rock");
+        comunidad.setDescripcion("excelente");
+
+        Comunidad comunidad2 = new Comunidad();
+        comunidad2.setNombre("Cumbia");
+        comunidad2.setDescripcion("excelente");
+
+        List<Comunidad> comunidades = new ArrayList<>();
+        comunidades.add(comunidad);
+        comunidades.add(comunidad2);
+
+        when(repositorioComunidadMock.buscarComunidadesPorNombre(anyString())).thenReturn(comunidades);
+
+        List<ComunidadDto> resultado = servicioComunidad.buscarComunidadesPorNombre("Rock");
+        assertThat(resultado.size(),equalTo(2));
+        assertThat(resultado.get(0).getNombre(),equalTo("Rock"));
+        assertThat(resultado.get(1).getNombre(),equalTo("Cumbia"));
+
+
     }
 }

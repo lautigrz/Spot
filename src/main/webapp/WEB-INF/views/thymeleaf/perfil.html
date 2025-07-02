@@ -202,14 +202,14 @@
 
     </div>
 
-    <!-- Agregar en perfil.html, donde quieras mostrar los favoritos -->
     <div class="mb-5">
         <h4 class="fw-bold mb-3">Mis Favoritos</h4>
         <div th:if="${favoritos != null and #lists.isEmpty(favoritos) == false}">
             <ul>
                 <li th:each="fav : ${favoritos}" class="d-flex align-items-center mb-2">
                     <img th:src="${fav.imagenUrl}" alt="Foto artista" style="width:30px; height:30px; border-radius:50%; margin-right: 10px;">
-                    <span th:text="${fav.nombre}"></span>
+                    <a th:href="${fav.spotifyArtistId.startsWith('LOCAL_') ? '/spring/artistas-local/' + #strings.substring(fav.spotifyArtistId, 6) : '/spring/artistas/' + fav.spotifyArtistId}"
+                       th:text="${fav.nombre}"></a>
                 </li>
             </ul>
         </div>
