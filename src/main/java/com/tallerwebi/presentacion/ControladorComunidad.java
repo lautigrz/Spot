@@ -45,15 +45,13 @@ public class ControladorComunidad {
     private ServicioUsuario servicioUsuario;
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     private ServicioEventoCombinado servicioEventoCombinado;
-    private ServicioNotificacion servicioNotificacion;
 
     public ControladorComunidad(ServicioComunidad servicioComunidad, ServicioSpotify
             servicioSpotify, ServicioPlaylist servicioPlaylist,
                                 ServicioReproduccion servicioReproduccion, ServicioGuardarImagen servicioGuardarImagen
             ,ServicioUsuario servicioUsuario, ServicioUsuarioComunidad servicioUsuarioComunidad,
-                                ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioEventoCombinado servicioEventoCombinado, ServicioNotificacion servicioNotificacion) {
+                                ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioEventoCombinado servicioEventoCombinado) {
         this.servicioPlaylist = servicioPlaylist;
-        this.servicioNotificacion = servicioNotificacion;
         this.servicioGuardarImagen = servicioGuardarImagen;
         this.servicioReproduccion = servicioReproduccion;
         this.servicioComunidad = servicioComunidad;

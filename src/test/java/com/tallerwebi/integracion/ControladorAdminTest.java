@@ -21,15 +21,17 @@ public class ControladorAdminTest {
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     private ServicioPlaylist servicioPlaylist;
     private ServicioEvento servicioEvento;
+    private ServicioNotificacion servicioNotificacion;
     private ControladorAdmin controladorAdmin;
 
     @BeforeEach
     public void setUp() {
         servicioAdmin = mock(ServicioAdmin.class);
         servicioRecomedacionComunidad = mock(ServicioRecomedacionComunidad.class);
+        servicioNotificacion = mock(ServicioNotificacion.class);
         servicioPlaylist = mock(ServicioPlaylist.class);
         servicioEvento = mock(ServicioEvento.class);
-        controladorAdmin = new ControladorAdmin(servicioAdmin, servicioRecomedacionComunidad, servicioPlaylist, servicioEvento, null);
+        controladorAdmin = new ControladorAdmin(servicioAdmin, servicioRecomedacionComunidad, servicioPlaylist, servicioEvento, servicioNotificacion);
     }
 
     @Test
@@ -62,6 +64,7 @@ public class ControladorAdminTest {
         Map<String, Object> respuesta = controladorAdmin.eliminarRecomendacion(idRecomendacion, idComunidad);
 
         verify(servicioRecomedacionComunidad).eliminarRecomendacion(eq(idRecomendacion));
+        verify(servicioNotificacion).generarNotificacion(anyLong(), eq(idRecomendacion), eq(false));
         assertThat(respuesta, notNullValue());
         assertThat(respuesta.get("success"), equalTo(true));
         assertThat(respuesta.get("mensaje"),equalTo("Recomendación eliminada"));
@@ -74,6 +77,10 @@ public class ControladorAdminTest {
         Long idComunidad = 10L;
         Long idRecomendacion = 20L;
 
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setUser("Usuario Test");
+
         Cancion cancion = new Cancion();
         cancion.setSpotifyId("spotify123");
         cancion.setUri("spotify:track:abc123");
@@ -81,12 +88,14 @@ public class ControladorAdminTest {
         Recomendacion recomendacion = new Recomendacion();
         recomendacion.setId(idRecomendacion);
         recomendacion.setCancion(cancion);
+        recomendacion.setUsuario(usuario);
 
         Playlist playlist = new Playlist();
         playlist.setId(99L);
         List<Playlist> playlists = List.of(playlist);
 
         when(servicioRecomedacionComunidad.aceptarRecomendacion(idRecomendacion)).thenReturn(recomendacion);
+
         when(servicioPlaylist.obtenerPlaylistsRelacionadasAUnaComunidad(idComunidad)).thenReturn(playlists);
 
 

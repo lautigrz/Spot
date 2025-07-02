@@ -125,7 +125,7 @@ public class RepositorioRecomendacionTest {
 
         Recomendacion recomendacionEliminada = sessionFactory.getCurrentSession().get(Recomendacion.class, idRecomendacion);
 
-        assertThat(recomendacionEliminada, equalTo(null));
+        assertThat(recomendacionEliminada.getEstado(), equalTo(false));
     }
 
     @Test
@@ -215,6 +215,104 @@ public class RepositorioRecomendacionTest {
         Recomendacion recomendacionAceptada = repositorioRecomendacion.aceptarRecomendacion(idRecomendacion);
 
         assertThat(recomendacionAceptada.getEstado(), equalTo(true));
+    }
+
+    @Test
+    @Rollback
+    public void testObtenerRecomendacionesPorComunidadQueNoFueronLeidas() {
+        Cancion c = new Cancion();
+        c.setSpotifyId("spotify:track:1234567890");
+        c.setTitulo("Test Song");
+        c.setArtista("Test Artist");
+        c.setUrlImagen("http://example.com/image.jpg");
+
+        sessionFactory.getCurrentSession().save(c);
+
+        Usuario u = new Usuario();
+        u.setUser("prueba");
+
+        sessionFactory.getCurrentSession().save(u);
+
+        Comunidad comunidad = new Comunidad();
+        comunidad.setNombre("Comunidad de Prueba");
+        comunidad.setDescripcion("Descripción de la comunidad de prueba");
+
+        sessionFactory.getCurrentSession().save(comunidad);
+
+        UsuarioComunidad usuarioComunidad = new UsuarioComunidad();
+        usuarioComunidad.setUsuario(u);
+        usuarioComunidad.setComunidad(comunidad);
+        usuarioComunidad.setRol("Miembro");
+
+        sessionFactory.getCurrentSession().save(usuarioComunidad);
+
+        Recomendacion recom = new Recomendacion();
+        recom.setUsuario(usuarioComunidad.getUsuario());
+        recom.setComunidad(usuarioComunidad.getComunidad());
+        recom.setCancion(c);
+        recom.setEstado(false);
+        recom.setLeida(false);
+
+        Recomendacion recom1 = new Recomendacion();
+        recom1.setUsuario(usuarioComunidad.getUsuario());
+        recom1.setComunidad(usuarioComunidad.getComunidad());
+        recom1.setCancion(c);
+        recom1.setEstado(false);
+        recom1.setLeida(true);
+
+        repositorioRecomendacion.agregarRecomendacion(recom);
+        repositorioRecomendacion.agregarRecomendacion(recom1);
+
+        Long idComunidad = comunidad.getId();
+
+        List<Recomendacion> recomendacionesNoLeidas = repositorioRecomendacion.obtenerRecomendacionesPorComunidadQueNoFueronLeidas(idComunidad);
+
+        assertThat(recomendacionesNoLeidas.size(), equalTo(1));
+        assertThat(recomendacionesNoLeidas.get(0), equalTo(recom));
+    }
+
+    @Test
+    @Rollback
+    public void testObtenerRecomendacionPorId() {
+        Cancion c = new Cancion();
+        c.setSpotifyId("spotify:track:1234567890");
+        c.setTitulo("Test Song");
+        c.setArtista("Test Artist");
+        c.setUrlImagen("http://example.com/image.jpg");
+
+        sessionFactory.getCurrentSession().save(c);
+
+        Usuario u = new Usuario();
+        u.setUser("prueba");
+
+        sessionFactory.getCurrentSession().save(u);
+
+        Comunidad comunidad = new Comunidad();
+        comunidad.setNombre("Comunidad de Prueba");
+        comunidad.setDescripcion("Descripción de la comunidad de prueba");
+
+        sessionFactory.getCurrentSession().save(comunidad);
+
+        UsuarioComunidad usuarioComunidad = new UsuarioComunidad();
+        usuarioComunidad.setUsuario(u);
+        usuarioComunidad.setComunidad(comunidad);
+        usuarioComunidad.setRol("Miembro");
+
+        sessionFactory.getCurrentSession().save(usuarioComunidad);
+
+        Recomendacion recom = new Recomendacion();
+        recom.setUsuario(usuarioComunidad.getUsuario());
+        recom.setComunidad(usuarioComunidad.getComunidad());
+        recom.setCancion(c);
+        recom.setEstado(false);
+
+        repositorioRecomendacion.agregarRecomendacion(recom);
+
+        Long idRecomendacion = recom.getId();
+
+        Recomendacion recomendacionObtenida = repositorioRecomendacion.obtenerRecomendacionPorId(idRecomendacion);
+
+        assertThat(recomendacionObtenida, equalTo(recom));
     }
 
 }

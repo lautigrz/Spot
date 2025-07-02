@@ -70,4 +70,5 @@ public class ServicioNotificacionImpl implements ServicioNotificacion {
     return this.repositorioNotificacion.elUsuarioTieneNotificaciones(idUsuario);
 
     }
+
 }

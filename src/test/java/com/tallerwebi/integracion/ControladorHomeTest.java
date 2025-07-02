@@ -29,6 +29,7 @@ public class ControladorHomeTest {
     private ServicioUsuario servicioUsuarioMock;
     private ServicioComunidad servicioComunidadMock;
     private ServicioInstancia servicioInstanciaMock;
+    private ServicioNotificacion servicioNotificacionMock;
     private ControladorHome controladorHome;
 
     @BeforeEach
@@ -36,8 +37,9 @@ public class ControladorHomeTest {
         servicioUsuarioMock = mock(ServicioUsuario.class);
         servicioComunidadMock = mock(ServicioComunidad.class);
         servicioInstanciaMock = mock(ServicioInstancia.class);
+        servicioNotificacionMock = mock(ServicioNotificacion.class);
 
-        controladorHome = new ControladorHome(servicioUsuarioMock, servicioComunidadMock, servicioInstanciaMock, null);
+        controladorHome = new ControladorHome(servicioUsuarioMock, servicioComunidadMock, servicioInstanciaMock, servicioNotificacionMock);
 
     }
 
@@ -57,13 +59,14 @@ public class ControladorHomeTest {
 
         when(servicioUsuarioMock.obtenerUsuarioPorId(idUsuario)).thenReturn(usuario);
         when(servicioComunidadMock.obtenerTodasLasComunidades()).thenReturn(comunidadesMock);
-
+        when(servicioNotificacionMock.elUsuarioTieneNotificaciones(idUsuario)).thenReturn(true);
 
         ModelAndView modelAndView = controladorHome.vistaHome(sessionMock);
 
 
         assertThat(modelAndView.getViewName(), equalTo("home"));
         assertThat(modelAndView.getModel().get("usuario"), equalTo(usuario));
+        assertThat(modelAndView.getModel().get("notificacion"), equalTo(true));
         assertThat(((List<?>) modelAndView.getModel().get("comunidades")).size(), equalTo(2));
     }
 
