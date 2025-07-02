@@ -19,6 +19,7 @@ public class Recomendacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Boolean estado;
+    private Boolean leida;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Cancion cancion;
