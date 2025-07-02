@@ -46,11 +46,9 @@ public class ControladorHomeTest {
 
         servicioPosteoMock = mock(ServicioPosteo.class);
 
-        controladorHome = new ControladorHome(repositorioArtistaMock,servicioUsuarioMock,servicioComunidadMock,servicioInstanciaMock,servicioPosteoMock);
-
         servicioNotificacionMock = mock(ServicioNotificacion.class);
 
-        controladorHome = new ControladorHome(servicioUsuarioMock, servicioComunidadMock, servicioInstanciaMock, servicioNotificacionMock, servicioPosteoMock);
+        controladorHome = new ControladorHome(repositorioArtistaMock,servicioUsuarioMock, servicioComunidadMock, servicioInstanciaMock, servicioNotificacionMock, servicioPosteoMock);
 
     }
 
