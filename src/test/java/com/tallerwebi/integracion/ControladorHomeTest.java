@@ -26,18 +26,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ControladorHomeTest {
 
+
+    private RepositorioArtista repositorioArtistaMock;
     private ServicioUsuario servicioUsuarioMock;
     private ServicioComunidad servicioComunidadMock;
     private ServicioInstancia servicioInstanciaMock;
+    private ServicioPosteo servicioPosteoMock;
     private ControladorHome controladorHome;
 
     @BeforeEach
     public void setup() {
+        repositorioArtistaMock = mock(RepositorioArtista.class);
         servicioUsuarioMock = mock(ServicioUsuario.class);
         servicioComunidadMock = mock(ServicioComunidad.class);
         servicioInstanciaMock = mock(ServicioInstancia.class);
+        servicioPosteoMock = mock(ServicioPosteo.class);
 
-        controladorHome = new ControladorHome(servicioUsuarioMock, servicioComunidadMock, servicioInstanciaMock);
+
+        controladorHome = new ControladorHome(repositorioArtistaMock,servicioUsuarioMock,servicioComunidadMock,servicioInstanciaMock,servicioPosteoMock);
 
     }
 

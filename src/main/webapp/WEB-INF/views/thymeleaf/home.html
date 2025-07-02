@@ -52,83 +52,48 @@
                 </form>
             </div>
 
-            <!-- Publicar nuevo post -->
-            <div class="card feed-card p-3 mb-4" style="background-color: #181818;">
-                <div class="d-flex mb-3">
-                    <img src="https://i.pravatar.cc/50" class="rounded-circle me-3 avatar-user" alt="Avatar">
-                    <input
-                            type="text"
-                            class="form-control border-0"
-                            placeholder="Compartí lo que estás escuchando..."
-                            style="border-radius: 20px; padding: 12px 20px; height: 80px; background-color: #fff; color: #000;"
-                    >
+            <!-- Publicar nuevo post solamente si soy artista -->
+           <div th:if="${artista != null}" class="card feed-card p-3 mb-4" style="background-color: #181818;">
+               <div class="d-flex mb-3">
+                   <img th:src="${artista.fotoPerfil != null} ? ${artista.fotoPerfil} : '/images/default-avatar.png'"
+                        class="rounded-circle me-3 avatar-user" alt="Avatar" style="width:50px; height:50px;" />
+                   <form th:action="@{/postear}" method="post" style="width:100%;">
+                       <input
+                               name="texto"
+                               type="text"
+                               class="form-control border-0"
+                               placeholder="Compartile a tus seguidores lo que quieras decir!"
+                               style="border-radius: 20px; padding: 12px 20px; height: 80px; background-color: #fff; color: #000;"
+                               required
+                       />
+                       <div class="d-flex justify-content-end mt-2">
+                           <button type="submit" class="btn btn-success btn-sm px-4">Publicar</button>
+                       </div>
+                   </form>
+               </div>
+           </div>
 
-                </div>
-                <div class="d-flex justify-content-between px-2">
-                    <div class="d-flex gap-4">
-                        <a href="#" class="text-decoration-none text-secondary"><i class="bi bi-image me-1"></i> Foto</a>
-                        <a href="#" class="text-decoration-none text-secondary"><i class="bi bi-mic-fill me-1"></i> Audio</a>
-                        <a href="#" class="text-decoration-none text-secondary"><i class="bi bi-emoji-smile me-1"></i> Emojis</a>
+
+            <!-- Muestro los posteos -->
+            <div th:each="post : ${posteos}">
+                <div class="card feed-card p-3 mb-4" style="background-color: #1e1e1e;">
+                    <div class="d-flex align-items-center mb-3">
+                        <img th:src="${post.artista.fotoPerfil != null} ? ${post.artista.fotoPerfil} : '/images/default-avatar.png'"
+                             class="rounded-circle me-2 avatar-user" alt="Avatar" style="width:40px; height:40px;" />
+                        <div>
+                            <strong th:text="${post.artista.nombre}">Nombre Artista</strong><br />
+                            <small class="text-secondary" th:text="${post.fechaFormateada}">Fecha</small>
+                        </div>
                     </div>
-                    <button class="btn btn-success btn-sm px-4">Publicar</button>
-                </div>
-            </div>
-
-
-            <!-- Card: Post 2 -->
-            <!-- Posteo 1 -->
-            <div class="card feed-card p-3 mb-4" style="background-color: #1e1e1e;">
-                <div class="d-flex align-items-center mb-3">
-                    <img src="https://i.pravatar.cc/40" class="rounded-circle me-2 avatar-user"  alt="Avatar">
-                    <div>
-                        <strong>@neonvibes</strong><br>
-                        <small class="text-secondary">Hace 2 horas</small>
-                    </div>
-                </div>
-                <p class="text-white">🎶 Explorando lo nuevo de Synthwave. Estas dos joyas son arte puro.</p>
-                <div class="row img-post">
-                    <div class="col-md-6 mb-2">
-                        <img src="billie.jpeg" class="img-fluid rounded" alt="Synth 1">
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <img src="billie.jpeg" class="img-fluid rounded" alt="Synth 2">
-                    </div>
-                </div>
-
-                <!-- Footer con botones sin hover -->
-                <div class="d-flex justify-content-start gap-3 mt-3 px-1">
-                    <button class="btn btn-sm d-flex align-items-center rounded-pill px-3"
-                            style="background-color: #f5f5f5; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd;">
-                        <i class="bi bi-hand-thumbs-up me-2"></i> Me gusta
-                    </button>
-                    <button class="btn btn-sm d-flex align-items-center rounded-pill px-3"
-                            style="background-color: #f5f5f5; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd;">
-                        <i class="bi bi-share me-2"></i> Compartir
-                    </button>
-                </div>
-            </div>
-
-
-            <!-- Posteo 2 -->
-            <div class="card feed-card p-3 mb-4" style="background-color: #1e1e1e;">
-                <div class="d-flex align-items-center mb-3">
-                    <img src="https://i.pravatar.cc/41" class="rounded-circle me-2 avatar-user" alt="Avatar">
-                    <div>
-                        <strong>@beatlover</strong><br>
-                        <small class="text-secondary">Ayer</small>
-                    </div>
-                </div>
-                <p>🎧 Este mix está 🔥 para arrancar la semana con toda.</p>
-                <div class="d-flex gap-3">
-                    <img src="https://i.imgur.com/AV3YzLJ.jpeg" class="rounded" width="100" height="100" style="object-fit: cover;" alt="Mix Cover">
-                    <img src="https://i.imgur.com/w1S7L7R.jpeg" class="rounded" width="100" height="100" style="object-fit: cover;" alt="Mix Cover 2">
-                    <img src="https://i.imgur.com/vZl0OAJ.jpeg" class="rounded" width="100" height="100" style="object-fit: cover;" alt="Mix Cover 3">
+                    <p class="text-black" th:text="${post.contenido}">Contenido del post</p>
                 </div>
             </div>
 
         </div>
 
-        <!-- Right column -->
+
+
+                        <!-- Right column -->
         <!-- Explorador de comunidades -->
         <div class="col-md-3 right-col">
             <h6 class="text-uppercase text-secondary mb-3">Explorar comunidades</h6>

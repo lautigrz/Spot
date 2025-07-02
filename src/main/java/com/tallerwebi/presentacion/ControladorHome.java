@@ -1,11 +1,14 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.*;
+import org.dom4j.rule.Mode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
@@ -13,22 +16,26 @@ import se.michaelthelin.spotify.model_objects.specification.Paging;
 
 import javax.servlet.http.HttpSession;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
 public class ControladorHome {
 
-    @Autowired
+
     private RepositorioArtista repositorioArtista;
     private ServicioUsuario servicioUsuario;
     private ServicioComunidad servicioComunidad;
     private ServicioInstancia spotify;
+    private ServicioPosteo servicioPosteo;
 
 
-    public ControladorHome(ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify) {
+    public ControladorHome(RepositorioArtista repositorioArtista, ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioPosteo servicioPosteo) {
+        this.repositorioArtista = repositorioArtista;
         this.servicioUsuario = servicioUsuario;
         this.servicioComunidad = servicioComunidad;
         this.spotify = spotify;
+        this.servicioPosteo = servicioPosteo;
     }
 
     @GetMapping("/home")
@@ -39,9 +46,18 @@ public class ControladorHome {
         Object artistaObj = session.getAttribute("artista");
 
         if (idUsuario != null) {
-            modelMap.put("usuario", servicioUsuario.obtenerUsuarioPorId(idUsuario));
+            Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
+            modelMap.put("usuario", usuario);
+
+            List<Post> posteos = servicioPosteo.obtenerPosteosDeArtistasFavoritos(usuario);
+            modelMap.put("posteos", posteos);
         } else if (artistaObj != null) {
-            modelMap.put("artista", artistaObj); // ya es el objeto Artista
+            Artista artista = (Artista) artistaObj;
+            modelMap.put("artista", artista);
+
+            //Muestra sus propios posteos
+            List<Post> posteos = servicioPosteo.obtenerPosteosDeArtista(artista);
+            modelMap.put("posteos", posteos);
         } else {
             return new ModelAndView("redirect:/login");
         }
@@ -49,6 +65,7 @@ public class ControladorHome {
         modelMap.put("comunidades", servicioComunidad.obtenerTodasLasComunidades());
         return new ModelAndView("home", modelMap);
     }
+
 
     @GetMapping("/buscar-artista")
     public String buscarArtistaPorBuscador(String nombre, HttpSession session, Model model) {
@@ -86,11 +103,28 @@ public class ControladorHome {
         }
     }
 
+
+
     @GetMapping("/cerrar")
     public String cerrarSesion(HttpSession session) {
         session.invalidate();
         return "redirect:/login";
     }
 
+    @PostMapping("/postear")
+    public String postearTexto(@RequestParam("texto") String texto, HttpSession session) {
+        Object artistaObj = session.getAttribute("artista");
+        if (artistaObj == null) {
+            // No es artista, por lo tanto no puede subir un post
+            return "redirect:/home";
+        }
+
+        Artista artista = (Artista) artistaObj;
+        servicioPosteo.publicarPosteo(artista, texto);
+        return "redirect:/home";
+    }
 
 }
+
+
+
