@@ -23,15 +23,17 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
     }
 
     @Override
-    public void guardarMensajeDeLaComunidad(String contenido, Comunidad comunidad,Usuario usuario) {
+    public Long guardarMensajeDeLaComunidad(String contenido, Comunidad comunidad,Usuario usuario) {
 
         Mensaje mensaje = new Mensaje();
         mensaje.setTexto(contenido);
         mensaje.setUsuario(usuario);
-
+        mensaje.setEstadoMensaje(true);
         comunidad.agregarMensaje(mensaje);
 
         sessionFactory.getCurrentSession().save(mensaje);
+
+       return mensaje.getId();
     }
 
     @Override

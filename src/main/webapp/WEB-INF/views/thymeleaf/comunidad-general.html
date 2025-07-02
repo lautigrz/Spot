@@ -13,6 +13,7 @@
 <input type="hidden" id="id" th:value="${id}">
 <input type="hidden" id="urlFoto" th:value="${urlFoto}">
 <input type="hidden" id="token" th:value="${token}">
+<input type="hidden" id="rol" th:value="${rol}">
 <input type="hidden" id="comunidad" th:value="${comunidad.getId()}">
 <div class="container-fluid">
     <div class="row mt-10" >
@@ -109,7 +110,7 @@
 
                 <!-- Contenedor de mensajes -->
                 <div id="mensajeVista" style="flex-grow: 1; overflow-y: auto; padding: 10px;">
-                    <div class="chat-message p-3 d-flex align-items-start my-2 bg-light rounded" th:each="mensaje : ${mensajes}">
+                    <div class="chat-message p-3 d-flex align-items-start my-2 bg-light rounded position-relative" th:each="mensaje : ${mensajes}" th:attr="data-id=${mensaje.getId()}">
                         <img th:src="@{${mensaje.getUsuario().getUrlFoto()}}" class="rounded-circle me-3" alt="User" style="width: 50px; height: 50px; object-fit: cover;">
                         <div class="d-flex align-items-center flex-grow-1">
                             <div class="flex-grow-1">
@@ -118,6 +119,14 @@
                                 <p class="mb-0 d-inline" th:text="${mensaje.getTexto()}"></p>
                             </div>
                             <i class="fas fa-heart ms-3 corazon" style="cursor:pointer;" title="Like"></i>
+                        </div>
+                        <div class="position-absolute top-0 end-0 dropdown" th:if="${rol == 'Admin'}">
+                            <button class="btn btn-sm btn-light dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border: none; box-shadow: none; padding: 0px 5px;">⋮</button>
+                             <ul class="dropdown-menu dropdown-menu-end">
+                                 <li>
+                                <a class="dropdown-item" href="#">Eliminar mensaje</a>
+                            </li>
+                        </ul>
                         </div>
                     </div>
                     <!-- Aquí se agregarán más mensajes -->

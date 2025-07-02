@@ -45,13 +45,15 @@ public class ControladorComunidad {
     private ServicioUsuario servicioUsuario;
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     private ServicioEventoCombinado servicioEventoCombinado;
+    private ServicioMensaje servicioMensaje;
 
     public ControladorComunidad(ServicioComunidad servicioComunidad, ServicioSpotify
             servicioSpotify, ServicioPlaylist servicioPlaylist,
                                 ServicioReproduccion servicioReproduccion, ServicioGuardarImagen servicioGuardarImagen
             ,ServicioUsuario servicioUsuario, ServicioUsuarioComunidad servicioUsuarioComunidad,
-                                ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioEventoCombinado servicioEventoCombinado) {
+                                ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioEventoCombinado servicioEventoCombinado, ServicioMensaje servicioMensaje) {
         this.servicioPlaylist = servicioPlaylist;
+        this.servicioMensaje = servicioMensaje;
         this.servicioGuardarImagen = servicioGuardarImagen;
         this.servicioReproduccion = servicioReproduccion;
         this.servicioComunidad = servicioComunidad;
@@ -152,7 +154,8 @@ public class ControladorComunidad {
 
         servicioComunidad.registrarUsuarioEnCanalDeComunidad(message, headerAccessor, idComunidad);
 
-        // Enviar manualmente el mensaje al canal de esa comunidad
+        System.out.println("Registro en cambio" + message.getSender() + " en el canal: " + idComunidad);
+
         messagingTemplate.convertAndSend("/topic/" + idComunidad, message);
     }
 
@@ -164,11 +167,34 @@ public class ControladorComunidad {
             Long id = Long.parseLong(message.getId());
             Long idComuni = Long.parseLong(idComunidad);
             ChatMessage response = servicioComunidad.guardarMensaje(message, id, idComuni);
+            response.setType(ChatMessage.MessageType.CHAT);
             messagingTemplate.convertAndSend("/topic/" + idComunidad, response);
         } catch (NumberFormatException e) {
             System.err.println("ID de usuario inválido: " + message.getId());
         }
     }
+    @MessageMapping("/chat.delete/{idComunidad}")
+    public void delete(@Payload ChatMessage message,
+                       @DestinationVariable String idComunidad) {
+
+        try {
+            Long idMensaje = Long.parseLong(message.getId());
+            Long idComuni = Long.parseLong(idComunidad);
+
+            servicioMensaje.eliminarMensaje(idMensaje);
+
+            ChatMessage eliminado = new ChatMessage();
+            eliminado.setId(message.getId());
+            eliminado.setType(ChatMessage.MessageType.DELETE);
+
+
+            messagingTemplate.convertAndSend("/topic/" + idComunidad, eliminado);
+
+        } catch (NumberFormatException e) {
+            System.err.println("ID inválido: " + message.getId());
+        }
+    }
+
 
     @GetMapping("/comunidad/{id}")
     public ModelAndView comunidad(HttpSession session, @PathVariable Long id, ModelMap model) throws IOException, ParseException, SpotifyWebApiException {
