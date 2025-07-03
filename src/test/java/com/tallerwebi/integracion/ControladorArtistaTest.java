@@ -15,7 +15,7 @@ public class ControladorArtistaTest {
 
     private ServicioFavorito servicioFavoritoMock;
     private SpotifyApi spotifyApiMock;
-    private RepositorioUsuario repositorioUsuarioMock;
+    private ServicioUsuario servicioUsuarioMock;
     private ServicioPreescucha servicioPreescuchaMock;
     private ControladorArtista controladorArtista;
     private RepositorioArtista repositorioArtistaMock;
@@ -24,11 +24,11 @@ public class ControladorArtistaTest {
     public void setUp() {
         servicioFavoritoMock = mock(ServicioFavorito.class);
         spotifyApiMock = mock(SpotifyApi.class);
-        repositorioUsuarioMock = mock(RepositorioUsuario.class);
+        servicioUsuarioMock = mock(ServicioUsuario.class);
         servicioPreescuchaMock = mock(ServicioPreescucha.class);
         repositorioArtistaMock = mock(RepositorioArtista.class);
 
-        controladorArtista = new ControladorArtista(servicioFavoritoMock,spotifyApiMock,repositorioUsuarioMock,servicioPreescuchaMock, repositorioArtistaMock);
+        controladorArtista = new ControladorArtista(servicioFavoritoMock,spotifyApiMock,servicioUsuarioMock,servicioPreescuchaMock, repositorioArtistaMock);
     }
 
 
@@ -43,13 +43,13 @@ public class ControladorArtistaTest {
         when(sessionMock.getAttribute("user")).thenReturn(usuarioId);
 
         Usuario usuarioMock = mock(Usuario.class);
-        when(repositorioUsuarioMock.buscarUsuarioPorId(usuarioId)).thenReturn(usuarioMock);
+        when(servicioUsuarioMock.obtenerUsuarioPorId(usuarioId)).thenReturn(usuarioMock);
 
         when(servicioPreescuchaMock.yaComproPreescucha(albumId,usuarioMock)).thenReturn(false);
 
         String resultado = controladorArtista.comprarPreescucha(artistaId, sessionMock, albumId);
 
-        verify(repositorioUsuarioMock).buscarUsuarioPorId(usuarioId);
+        verify(servicioUsuarioMock).obtenerUsuarioPorId(usuarioId);
         verify(servicioPreescuchaMock).yaComproPreescucha(albumId,usuarioMock);
         verify(servicioPreescuchaMock).comprarPreescucha(albumId,usuarioMock);
         assertEquals("redirect:/perfil", resultado);
@@ -66,13 +66,13 @@ public class ControladorArtistaTest {
         when(sessionMock.getAttribute("user")).thenReturn(usuarioId);
 
         Usuario usuarioMock = mock(Usuario.class);
-        when(repositorioUsuarioMock.buscarUsuarioPorId(usuarioId)).thenReturn(usuarioMock);
+        when(servicioUsuarioMock.obtenerUsuarioPorId(usuarioId)).thenReturn(usuarioMock);
 
         when(servicioPreescuchaMock.yaComproPreescucha(albumId, usuarioMock)).thenReturn(true);
 
         String resultado = controladorArtista.comprarPreescucha(artistaId, sessionMock, albumId);
 
-        verify(repositorioUsuarioMock).buscarUsuarioPorId(usuarioId);
+        verify(servicioUsuarioMock).obtenerUsuarioPorId(usuarioId);
         verify(servicioPreescuchaMock).yaComproPreescucha(albumId, usuarioMock);
         verify(servicioPreescuchaMock, never()).comprarPreescucha(anyString(), any()); //Nunca se ejecuta el metodo de que compre la preescucha
         assertEquals("redirect:/perfil", resultado);
@@ -87,11 +87,11 @@ public class ControladorArtistaTest {
         when(sessionMock.getAttribute("user")).thenReturn(usuarioId);
 
         Usuario usuarioMock = mock(Usuario.class);
-        when(repositorioUsuarioMock.buscarUsuarioPorId(usuarioId)).thenReturn(usuarioMock);
+        when(servicioUsuarioMock.obtenerUsuarioPorId(usuarioId)).thenReturn(usuarioMock);
 
         String resultado = controladorArtista.agregarAFavoritos(artistaId, sessionMock);
 
-        verify(repositorioUsuarioMock).buscarUsuarioPorId(usuarioId);
+        verify(servicioUsuarioMock).obtenerUsuarioPorId(usuarioId);
         verify(servicioFavoritoMock).agregarFavorito(artistaId, usuarioMock);
         assertEquals("redirect:/perfil", resultado);
     }

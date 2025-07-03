@@ -24,15 +24,15 @@ import java.util.List;
 public class ControladorArtista {
     private final ServicioFavorito servicioFavorito;
     private final SpotifyApi spotifyApi;
-    private final RepositorioUsuario repositorioUsuario;
+    private final ServicioUsuario servicioUsuario;
     private final ServicioPreescucha servicioPreescucha;
     private final RepositorioArtista repositorioArtista;
 
 
-    public ControladorArtista(ServicioFavorito servicioFavorito, SpotifyApi spotifyApi, RepositorioUsuario repositorioUsuario, ServicioPreescucha servicioPreescucha, RepositorioArtista repositorioArtista) {
+    public ControladorArtista(ServicioFavorito servicioFavorito, SpotifyApi spotifyApi, ServicioUsuario servicioUsuario, ServicioPreescucha servicioPreescucha, RepositorioArtista repositorioArtista) {
         this.servicioFavorito = servicioFavorito;
         this.spotifyApi = spotifyApi;
-        this.repositorioUsuario = repositorioUsuario;
+        this.servicioUsuario = servicioUsuario;
         this.servicioPreescucha = servicioPreescucha;
         this.repositorioArtista = repositorioArtista;
     }
@@ -111,7 +111,7 @@ public class ControladorArtista {
 
         if (usuarioIdObj != null) {
             Long usuarioId = Long.valueOf(usuarioIdObj.toString());
-            Usuario usuario = repositorioUsuario.buscarUsuarioPorId(usuarioId);
+            Usuario usuario = servicioUsuario.obtenerUsuarioPorId(usuarioId);
             servicioFavorito.agregarFavorito(id,usuario);
         }
         return "redirect:/perfil";
@@ -124,7 +124,7 @@ public class ControladorArtista {
 
         if (usuarioIdObj != null) {
             Long usuarioId = Long.valueOf(usuarioIdObj.toString());
-            Usuario usuario = repositorioUsuario.buscarUsuarioPorId(usuarioId);
+            Usuario usuario = servicioUsuario.obtenerUsuarioPorId(usuarioId);
 
             String idLocal = "LOCAL_" + id;
             servicioFavorito.agregarFavorito(idLocal,usuario);
@@ -139,7 +139,7 @@ public class ControladorArtista {
 
         if (usuarioIdObj != null) {
             Long usuarioId = Long.valueOf(usuarioIdObj.toString());
-            Usuario usuario = repositorioUsuario.buscarUsuarioPorId(usuarioId);
+            Usuario usuario = servicioUsuario.obtenerUsuarioPorId(usuarioId);
 
             if(!servicioPreescucha.yaComproPreescucha(albumId, usuario)){
                 servicioPreescucha.comprarPreescucha(albumId, usuario);

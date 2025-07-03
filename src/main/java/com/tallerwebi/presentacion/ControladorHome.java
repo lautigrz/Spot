@@ -23,15 +23,15 @@ import java.util.Optional;
 public class ControladorHome {
 
 
-    private RepositorioArtista repositorioArtista;
+    private ServicioArtista servicioArtista;
     private ServicioUsuario servicioUsuario;
     private ServicioComunidad servicioComunidad;
     private ServicioInstancia spotify;
     private ServicioPosteo servicioPosteo;
 
 
-    public ControladorHome(RepositorioArtista repositorioArtista, ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioPosteo servicioPosteo) {
-        this.repositorioArtista = repositorioArtista;
+    public ControladorHome(ServicioArtista servicioArtista, ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioPosteo servicioPosteo) {
+        this.servicioArtista = servicioArtista;
         this.servicioUsuario = servicioUsuario;
         this.servicioComunidad = servicioComunidad;
         this.spotify = spotify;
@@ -72,7 +72,7 @@ public class ControladorHome {
 
         try {
             //Primero se busca localmente el artista
-            Artista artistaLocal = repositorioArtista.buscarPorNombre(nombre);
+            Artista artistaLocal = servicioArtista.buscarPorNombre(nombre);
             if (artistaLocal!=null){
                 return "redirect:/artistas-local/" + artistaLocal.getId();
             }
