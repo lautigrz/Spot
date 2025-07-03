@@ -40,7 +40,6 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     @Override
     public ChatMessage registrarUsuarioEnCanalDeComunidad(ChatMessage message, SimpMessageHeaderAccessor simpMessageHeaderAccessor, String idComunidad) {
 
-        System.out.println("registrando usuario en canal de comunidad: " + idComunidad);
 
         try {
 
@@ -55,7 +54,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
             }
 
         } catch (Exception e) {
-            System.out.println("entro al catch" + e);
+
             e.printStackTrace();
         }
 

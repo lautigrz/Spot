@@ -40,7 +40,7 @@ function onConnected(datos) {
     stompClient.send(
         `/app/chat.register/${datos.idComunidad}`,
         {},
-        JSON.stringify({sender: datos.username, type: "JOIN"}),
+        JSON.stringify({sender: datos.username, type: "CHAT"}),
     );
 
 

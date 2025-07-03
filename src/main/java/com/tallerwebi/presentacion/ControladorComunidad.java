@@ -154,8 +154,6 @@ public class ControladorComunidad {
 
         servicioComunidad.registrarUsuarioEnCanalDeComunidad(message, headerAccessor, idComunidad);
 
-        System.out.println("Registro en cambio" + message.getSender() + " en el canal: " + idComunidad);
-
         messagingTemplate.convertAndSend("/topic/" + idComunidad, message);
     }
 
