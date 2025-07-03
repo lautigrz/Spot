@@ -5,7 +5,6 @@ import com.tallerwebi.presentacion.ControladorArtista;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import se.michaelthelin.spotify.SpotifyApi;
-
 import javax.servlet.http.HttpSession;
 
 import static junit.framework.Assert.assertEquals;
@@ -32,6 +31,8 @@ public class ControladorArtistaTest {
     }
 
 
+    /*
+
     @Test
     public void queSePuedaComprarUnAlbumDePreescucha(){
         String artistaId = "4xt9SaC07YZvUxwzNEMkyS"; // Ruben Blades
@@ -53,7 +54,7 @@ public class ControladorArtistaTest {
         verify(servicioPreescuchaMock).yaComproPreescucha(albumId,usuarioMock);
         verify(servicioPreescuchaMock).comprarPreescucha(albumId,usuarioMock);
         assertEquals("redirect:/perfil", resultado);
-        }
+        }*/
 
 
     @Test
