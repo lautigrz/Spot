@@ -14,12 +14,7 @@ public class ServicioMensajeImpl implements ServicioMensaje {
     }
 
     @Override
-    public Mensaje obtenerMensaje(Long id) {
-        return this.repositorioMensaje.obtenerMensaje(id);
-    }
-
-    @Override
-    public void eliminarMensaje(Long idMensaje) {
-        this.repositorioMensaje.eliminarMensaje(idMensaje);
+    public String eliminarMensaje(Long idMensaje) {
+        return this.repositorioMensaje.eliminarMensaje(idMensaje);
     }
 }

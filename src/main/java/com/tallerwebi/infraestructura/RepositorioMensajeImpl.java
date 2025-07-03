@@ -16,15 +16,19 @@ public class RepositorioMensajeImpl implements RepositorioMensaje {
         this.sessionFactory = sessionFactory;
     }
 
-    @Override
-    public Mensaje obtenerMensaje(Long id) {
-        return sessionFactory.getCurrentSession().get(Mensaje.class, id);
+    private Mensaje obtenerMensaje(Long id) {
+        String hql = "FROM Mensaje m JOIN FETCH m.usuario WHERE m.id = :id";
+        return sessionFactory.getCurrentSession()
+                .createQuery(hql, Mensaje.class)
+                .setParameter("id", id)
+                .uniqueResult();
     }
 
     @Override
-    public void eliminarMensaje(Long idMensaje) {
+    public String eliminarMensaje(Long idMensaje) {
         Mensaje mensaje = obtenerMensaje(idMensaje);
         mensaje.setEstadoMensaje(false);
         sessionFactory.getCurrentSession().update(mensaje);
+        return mensaje.getUsuario().getUrlFoto();
     }
 }

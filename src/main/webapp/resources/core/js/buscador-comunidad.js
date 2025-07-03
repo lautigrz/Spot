@@ -5,6 +5,7 @@ document.getElementById("buscador").addEventListener("keyup", function (e) {
 
 
     if (buscar.length === 0) {
+        resultados.style.display = "none";
         resultados.innerHTML = "";
         return;
     }
@@ -13,27 +14,27 @@ document.getElementById("buscador").addEventListener("keyup", function (e) {
         .then(response => response.json())
         .then(data => {
             console.log(data);
-            // Limpia resultados anteriores
+
             resultados.innerHTML = "";
 
             if (data.length === 0) {
-                resultados.innerHTML = "<p>No se encontraron comunidades.</p>";
                 return;
             }
 
 
             data.forEach(comunidad => {
+                resultados.style.display = "block";
                 const link = document.createElement("a");
-                link.href = `/spring/comunidad/${comunidad.id}`; // ajusta URL a tu ruta
+                link.href = `/spring/comunidad/${comunidad.id}`;
                 link.classList.add("resultado-item");
 
-                // Crea la imagen
+
                 const img = document.createElement("img");
-                img.src = comunidad.urlFoto; // URL de la foto
+                img.src = comunidad.urlFoto;
                 img.alt = comunidad.nombre;
                 img.classList.add("resultado-img");
 
-                // Contenedor de texto
+
                 const texto = document.createElement("div");
                 texto.classList.add("resultado-texto");
 
@@ -46,7 +47,7 @@ document.getElementById("buscador").addEventListener("keyup", function (e) {
                 texto.appendChild(nombre);
                 texto.appendChild(descripcion);
 
-                // Agrega imagen y texto al enlace
+
                 link.appendChild(img);
                 link.appendChild(texto);
 

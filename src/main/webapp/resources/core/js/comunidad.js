@@ -96,9 +96,20 @@ function onMessageReceived(payload) {
         if (mensajeDiv) {
             console.log("mensaje eliminado:", message.id);
 
-            mensajeDiv.innerHTML = "<em>Este mensaje fue eliminado</em>";
+            mensajeDiv.innerHTML = `
+  <div class="d-flex align-items-start text-muted fst-italic border-bottom">
+    <img src="${message.image}" alt="Usuario" 
+         class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+    <div class="d-flex align-items-center">
+      <i class="bi bi-info-circle me-2"></i>
+      <em>Este mensaje fue eliminado por el administrador porque no cumple las normas de la comunidad.</em>
+    </div>
+  </div>
+`;
 
-            mensajeDiv.classList.add("text-muted", "fst-italic");
+
+
+            mensajeDiv.classList.add("text-muted");
         }
     }
 
@@ -163,6 +174,7 @@ function crearMensajeHTML(message) {
     console.log("Rol:" + rol)
     if (rol === 'Admin') {
         var idComunidad = document.getElementById("comunidad").value;
+        var urlImage = document.getElementById("urlFoto").value
         const menuContainer = document.createElement("div");
         menuContainer.className = "position-absolute top-0 end-0 dropdown";
 
@@ -188,7 +200,7 @@ function crearMensajeHTML(message) {
         eliminarLink.textContent = "Eliminar mensaje";
         eliminarLink.onclick = function(e) {
             e.preventDefault();
-            eliminarMensaje(message.id, idComunidad);
+            eliminarMensaje(message.id, idComunidad, urlImage);
         };
 
         eliminarItem.appendChild(eliminarLink);

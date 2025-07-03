@@ -22,6 +22,7 @@ public class ControladorAdminTest {
     private ServicioPlaylist servicioPlaylist;
     private ServicioEvento servicioEvento;
     private ServicioNotificacion servicioNotificacion;
+    private ServicioMensaje servicioMensaje;
     private ControladorAdmin controladorAdmin;
 
     @BeforeEach
@@ -31,7 +32,8 @@ public class ControladorAdminTest {
         servicioNotificacion = mock(ServicioNotificacion.class);
         servicioPlaylist = mock(ServicioPlaylist.class);
         servicioEvento = mock(ServicioEvento.class);
-        controladorAdmin = new ControladorAdmin(servicioAdmin, servicioRecomedacionComunidad, servicioPlaylist, servicioEvento, servicioNotificacion);
+        servicioMensaje = mock(ServicioMensaje.class);
+        controladorAdmin = new ControladorAdmin(servicioAdmin, servicioRecomedacionComunidad, servicioPlaylist, servicioEvento, servicioNotificacion, servicioMensaje);
     }
 
     @Test

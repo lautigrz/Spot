@@ -28,6 +28,9 @@ public class ServicioEventoResponseImpl implements ServicioEventoResponse {
 
     @Override
     public List<EventoResponse.Evento> eventosobtenerEventosDeLaApi(String artista) {
+        if (artista == null) {
+            return Collections.emptyList();
+        }
         try {
             String apikey = "aiBgBScq3Ao1yYqDOQJ6rGx0iKUJzmBL";
             String artistaCodificado = URLEncoder.encode(artista, StandardCharsets.UTF_8);
