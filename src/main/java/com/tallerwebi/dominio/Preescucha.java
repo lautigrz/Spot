@@ -21,6 +21,10 @@ public class Preescucha {
     private int id;
     private String spotifyAlbumId;
     private LocalDateTime fechaCompra;
+    private Double precio;
+    private String titulo;
+    private String preescuchaFotoUrl;
+
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")

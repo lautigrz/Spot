@@ -45,4 +45,26 @@ public class ServicioPreescuchaImpl implements ServicioPreescucha {
                 .map(Preescucha::getSpotifyAlbumId)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void guardarPreescuchaLocal(Preescucha preescucha){
+        repositorioPreescucha.guardar(preescucha);
+    }
+
+    @Override
+    public boolean yaComproPreescuchaLocal(int preescuchaId, Usuario usuario){
+        return repositorioPreescucha.existeCompraLocal(preescuchaId, usuario.getId());
+    }
+
+    @Override
+    public void comprarPreescuchaLocal(int preescuchaId, Usuario usuario) {
+        if(!repositorioPreescucha.existeCompraLocal(preescuchaId, usuario.getId())){
+            Preescucha preescucha = new Preescucha();
+            preescucha.setId(preescuchaId);
+            preescucha.setUsuario(usuario);
+            preescucha.setFechaCompra(LocalDateTime.now());
+            repositorioPreescucha.guardar(preescucha);
+        }
+    }
+
 }
