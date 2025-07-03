@@ -180,7 +180,8 @@
                         </div>
                         <div>
                             <strong th:text="${usuarios.getUser()}"></strong><br>
-                            <small>🎧 Listening to Latest Hits</small>
+                            <small th:text="'🎧 ' + ${usuarios.getEscuchando()}"></small>
+
                         </div>
                         <div th:if="${rol == 'Admin' && usuarios.getId() != id }" class="dropdown">
                             <button class="btn btn-link text-dark p-0" type="button" id="dropdownMenuButton"

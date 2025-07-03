@@ -5,6 +5,7 @@ import com.tallerwebi.presentacion.dto.*;
 import org.apache.hc.core5.http.ParseException;
 import org.hibernate.annotations.Synchronize;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,10 +26,13 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     private RepositorioComunidad repositorioComunidad;
 
     private RepositorioUsuarioComunidad repositorioUsuarioComunidad;
-    @Autowired
-    public ServicioComunidadImpl(RepositorioComunidad repositorioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad) {
+
+    private ServicioReproduccion servicioReproduccion;
+
+    public ServicioComunidadImpl(RepositorioComunidad repositorioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad, @Lazy ServicioReproduccion servicioReproduccion) {
         this.repositorioUsuarioComunidad = repositorioUsuarioComunidad;
         this.repositorioComunidad = repositorioComunidad;
+        this.servicioReproduccion = servicioReproduccion;
     }
 
     @Override
@@ -141,7 +145,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     }
 
     @Override
-    public List<UsuarioDto> obtenerUsuariosDeLaComunidad(Long idComunidad) {
+    public List<UsuarioDto> obtenerUsuariosDeLaComunidad(Long idComunidad) throws IOException, ParseException, SpotifyWebApiException {
 
         List<UsuarioDto> usuariosDto = new ArrayList<>();
 
@@ -157,9 +161,17 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
             }
 
+            CancionDto cancionDto = servicioReproduccion.obtenerCancionActualDeUsuario(usuario.getUser(), idComunidad);
+            String escuchando = "No escuchando musica en este momento";
+            if(cancionDto != null) {
+                escuchando = cancionDto.getArtista() + " - " + cancionDto.getTitulo();
+
+            }
+
             usuarioDto.setUser(usuario.getUser());
             usuarioDto.setId(usuario.getId());
             usuarioDto.setUrlFoto(usuario.getUrlFoto());
+            usuarioDto.setEscuchando(escuchando);
             usuariosDto.add(usuarioDto);
 
         }
