@@ -55,21 +55,36 @@ public class ServicioAuthImpl implements ServicioAuth {
     @Override
     public UsuarioDto guardarUsuario(String token, String refreshToken) throws Exception {
 
-            User user = obtenerPerfilUsuario(token, refreshToken);
+        User user = obtenerPerfilUsuario(token, refreshToken);
 
-            if(user == null) {
-                throw new Exception("Error al obtener el usuario");
-            }
-            Usuario usuario = new Usuario();
-            usuario.setUser(user.getDisplayName());
-            usuario.setToken(token);
-            usuario.setRefreshToken(refreshToken);
+        if (user == null) {
+            throw new Exception("Error al obtener el usuario");
+        }
+
+        // 1️⃣ Buscar usuario existente
+        Usuario usuario = repositorioAuth.buscarPorSpotifyID(user.getId());
+
+        // 2️⃣ Si no existe, lo creo
+        if (usuario == null) {
+            usuario = new Usuario();
             usuario.setSpotifyID(user.getId());
+        }
+
+        // 3️⃣ Actualizo o seteo todos los datos relevantes
+        usuario.setUser(user.getDisplayName());
+        usuario.setToken(token);
+        usuario.setRefreshToken(refreshToken);
+
+        if (user.getImages() != null && user.getImages().length > 0) {
             usuario.setUrlFoto(user.getImages()[0].getUrl());
+        }
 
+        // 4️⃣ Guardar (insert o update)
+        UsuarioDto  usuarioGuardado = repositorioAuth.guardar(usuario);
 
-        return this.repositorioAuth.guardar(usuario);
+        return usuarioGuardado;
     }
+
 
     @Override
     public User obtenerPerfilUsuario(String token, String refreshToken) throws Exception {
@@ -77,6 +92,8 @@ public class ServicioAuthImpl implements ServicioAuth {
         spotifyApi.setRefreshToken(refreshToken);
         return spotifyApi.getCurrentUsersProfile().build().execute();
     }
+
+
 
 
 }

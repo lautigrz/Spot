@@ -4,5 +4,5 @@ import com.tallerwebi.presentacion.dto.UsuarioDto;
 
 public interface RepositorioAuth {
     UsuarioDto guardar(Usuario usuario);
-
+    Usuario buscarPorSpotifyID(String idSpotify);
 }

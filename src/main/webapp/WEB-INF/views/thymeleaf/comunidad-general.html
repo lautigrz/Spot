@@ -504,6 +504,7 @@
             <div class="modal-body pt-2">
                 <div id="contenedorEventos" class="row g-3">
 
+                    <!-- Crear Evento -->
                     <div class="col-md-6 col-lg-4" th:if="${rol == 'Admin'}">
                         <a th:href="@{/crear-evento/{idComunidad}(idComunidad=${comunidad.getId()})}" class="text-decoration-none">
                             <div class="card border-0 shadow-sm text-center d-flex align-items-center justify-content-center"
@@ -516,11 +517,12 @@
                         </a>
                     </div>
 
-                    <div th:if="${eventos == null or #lists.isEmpty(eventos)}">
+                    <!-- Mensaje si no hay eventos -->
+                    <div class="col-12" th:if="${eventos == null or #lists.isEmpty(eventos)}">
                         <p class="text-dark">No hay eventos disponibles.</p>
                     </div>
 
-                    <div th:if="${eventos != null and !#lists.isEmpty(eventos)}">
+                    <!-- Tarjetas de eventos -->
                     <div class="col-md-6 col-lg-4" th:each="evento : ${eventos}">
                         <div class="card border-0 shadow-sm" style="background-color: #ffffff; border-radius: 0.75rem;">
                             <img th:src="${evento.getImagen()}" class="card-img-top rounded-top"
@@ -540,9 +542,10 @@
                             </div>
                         </div>
                     </div>
-                    </div>
+
                 </div>
             </div>
+
         </div>
     </div>
 </div>

@@ -12,4 +12,5 @@ public interface ServicioAuth {
     AuthorizationCodeCredentials credentials(String code) throws Exception;
     UsuarioDto guardarUsuario(String token, String refreshToken) throws Exception ;
     User obtenerPerfilUsuario(String token, String refreshToken) throws Exception;
+
 }

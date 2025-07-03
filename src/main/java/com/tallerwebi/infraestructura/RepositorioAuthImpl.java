@@ -19,11 +19,23 @@ public class RepositorioAuthImpl implements RepositorioAuth {
     @Override
     public UsuarioDto guardar(Usuario usuario) {
 
-        this.sessionFactory.getCurrentSession().save(usuario);
+        this.sessionFactory.getCurrentSession().saveOrUpdate(usuario);
         UsuarioDto usuarioDto = new UsuarioDto();
         usuarioDto.setId(usuario.getId());
         return usuarioDto;
 
+    }
+
+    @Override
+    public Usuario buscarPorSpotifyID(String idSpotify) {
+        String hql =" from Usuario u where u.spotifyID = :idSpotify";
+        Usuario usuario = (Usuario) this.sessionFactory.getCurrentSession()
+                .createQuery(hql)
+                .setParameter("idSpotify", idSpotify)
+                .uniqueResult();
+
+
+        return usuario;
     }
 
 }
