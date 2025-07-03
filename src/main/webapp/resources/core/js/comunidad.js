@@ -142,11 +142,19 @@ function crearMensajeHTML(message) {
     const fecha = new Date();
     const small = document.createElement("small");
     small.className = "text-muted";
-    small.innerText = fecha.toLocaleDateString("en-GB", {
-        day: "2-digit", month: "short", year: "numeric",
-    }) + " · " + fecha.toLocaleTimeString("en-US", {
-        hour: "2-digit", minute: "2-digit"
-    });
+    small.innerText =
+        fecha.toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "numeric",
+            year: "2-digit"
+        })
+        + " · " +
+        fecha.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        });
+
 
 
     const p = document.createElement("p");

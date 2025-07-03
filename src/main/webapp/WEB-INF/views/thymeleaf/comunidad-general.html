@@ -111,7 +111,14 @@
                         <div class="d-flex align-items-center flex-grow-1">
                             <div class="flex-grow-1">
                                 <strong th:text="${mensaje.getUsuario().getUser()}"></strong><br>
-                                <small class="text-muted">20 Aug 2023 · 10:20 AM</small>
+
+                                <small class="text-muted"
+                                       th:with="formatter=${T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yy · HH:mm')}"
+                                       th:text="${mensaje.fechaCreacion.format(formatter)}">
+                                </small>
+
+
+
                                 <p class="mb-0 d-inline" th:text="${mensaje.getTexto()}"></p>
                             </div>
                             <i class="fas fa-heart ms-3 corazon" style="cursor:pointer;" title="Like"></i>
