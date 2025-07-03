@@ -74,4 +74,9 @@ public class ServicioPreescuchaImpl implements ServicioPreescucha {
         }
     }
 
+    @Override
+    public boolean yaComproPreescuchaLocal(int preescuchaId, Usuario usuario) {
+        return repositorioPreescucha.existeCompraLocal(preescuchaId, usuario.getId());
+    }
+
 }

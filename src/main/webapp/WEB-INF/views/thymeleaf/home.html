@@ -27,6 +27,11 @@
                 <a class="nav-link active d-flex align-items-center px-3 py-2 text-start" th:href="@{/perfil}">
                     <i class="bi bi-person me-2 fs-5"></i> <span class="link-text">Perfil</span>
                 </a>
+
+                <a th:if="${artista != null}" class="nav-link d-flex align-items-center px-3 py-2 text-start" th:href="@{/crear-preescucha}">
+                    <i class="bi bi-music-note me-2 fs-5"></i> <span class="link-text">Crear Preescucha</span>
+                </a>
+
                 <a class="nav-link d-flex align-items-center px-3 py-2 text-start" href="#"
                    data-bs-toggle="offcanvas" data-bs-target="#notificacionesOffcanvas" aria-controls="notificacionesOffcanvas">
                     <div class="position-relative">

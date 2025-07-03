@@ -80,5 +80,17 @@
   <p class="info" th:if="${esFavorito}">Ya es tu favorito.</p>
 </div>
 
+<div class="preescucha-list" th:if="${preescuchas != null and !preescuchas.isEmpty()}">
+  <h2>Pre-escuchas disponibles</h2>
+
+  <div th:each="pre : ${preescuchas}" class="preescucha-item">
+    <img th:src="${pre.preescuchaFotoUrl}" alt="Portada preescucha" />
+    <div class="preescucha-detalles">
+      <p class="preescucha-titulo" th:text="${pre.titulo}">Título preescucha</p>
+      <p>Precio: $<span th:text="${pre.precio}">0.00</span></p>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

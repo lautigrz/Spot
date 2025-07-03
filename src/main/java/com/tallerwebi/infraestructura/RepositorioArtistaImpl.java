@@ -3,6 +3,7 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.Artista;
 import com.tallerwebi.dominio.Preescucha;
 import com.tallerwebi.dominio.RepositorioArtista;
+import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,9 @@ public class RepositorioArtistaImpl implements RepositorioArtista {
 
     @Override
     public Artista buscarPorId(Long id) {
-        return sessionFactory.getCurrentSession().get(Artista.class, id);
+        Artista artista = sessionFactory.getCurrentSession().get(Artista.class, id);
+        Hibernate.initialize(artista.getPreescuchas());
+        return artista;
     }
 
     @Override

@@ -9,4 +9,5 @@ public interface ServicioGuardarImagen {
     String guardarImagenPerfilDeComunidad(MultipartFile imagen) throws IOException;
     String guardarImagenPortadaDeComunidad(MultipartFile imagen) throws IOException;
     String guardarImagenPerfilDeArtista(MultipartFile fotoPerfil) throws IOException;
+    String guardarImagenPreescucha(MultipartFile imagen) throws IOException;
 }

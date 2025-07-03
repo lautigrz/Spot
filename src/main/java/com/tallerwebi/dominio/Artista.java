@@ -26,7 +26,6 @@ public class Artista {
     private String password;
     private String fotoPerfil;
 
-    @OneToMany
-    @JoinColumn(name = "preescucha_id")
+    @OneToMany(mappedBy = "artista", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Preescucha> preescuchas = new ArrayList<>();
 }

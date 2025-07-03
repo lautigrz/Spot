@@ -16,9 +16,7 @@ import se.michaelthelin.spotify.model_objects.specification.Track;
 
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class ControladorArtista {
@@ -98,13 +96,23 @@ public class ControladorArtista {
             model.addAttribute("esFavorito", esFavorito);
             model.addAttribute("artistaLocal", artista);
 
+            List<Preescucha> preescuchas = artista.getPreescuchas();
+            if (preescuchas == null){
+                preescuchas = new ArrayList<>();
+            }
+            model.addAttribute("preescuchas", preescuchas);
+
+            System.out.println("Preescuchas del artista: " + artista.getPreescuchas().size());
+            for (Preescucha p : artista.getPreescuchas()) {
+                System.out.println("Titulo: " + p.getTitulo() + ", URL: " + p.getPreescuchaFotoUrl());
+            }
+
             return "detalle-artista-local";
         }
         catch (Exception e) {
             e.printStackTrace();
             return "error";
         }
-
     }
 
 
