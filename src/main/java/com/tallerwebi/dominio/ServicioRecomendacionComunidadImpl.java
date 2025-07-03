@@ -1,7 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.presentacion.dto.CancionDto;
-import com.tallerwebi.presentacion.dto.RecomendacionDto;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,8 +38,9 @@ public class ServicioRecomendacionComunidadImpl implements ServicioRecomedacionC
     }
 
     @Override
-    public void eliminarRecomendacion(Long idRecomendacion) {
-        this.repositorioRecomendacion.eliminarRecomendacion(idRecomendacion);
+    public Long eliminarRecomendacion(Long idRecomendacion) {
+
+    return this.repositorioRecomendacion.eliminarRecomendacion(idRecomendacion);
     }
 
     @Override
@@ -48,9 +49,20 @@ public class ServicioRecomendacionComunidadImpl implements ServicioRecomedacionC
     }
 
     @Override
+    public List<Recomendacion> obtenerRecomendacionesPorComunidadQueNoFueronLeidas(Long idComunidad) {
+        return this.repositorioRecomendacion.obtenerRecomendacionesPorComunidadQueNoFueronLeidas(idComunidad);
+    }
+
+    @Override
     public Recomendacion aceptarRecomendacion(Long idRecomendacion) {
         return this.repositorioRecomendacion.aceptarRecomendacion(idRecomendacion);
     }
+
+    @Override
+    public Recomendacion obtenerRecomendacionPorId(Long idRecomendacion) {
+        return repositorioRecomendacion.obtenerRecomendacionPorId(idRecomendacion);
+    }
+
     private Recomendacion getRecomendacion(CancionDto cancionDto, UsuarioComunidad usuarioComunidad) {
 
         Cancion cancion = this.repositorioCancion.buscarCancionPorElIdDeSpotify(cancionDto.getSpotifyId());
@@ -63,12 +75,14 @@ public class ServicioRecomendacionComunidadImpl implements ServicioRecomedacionC
             cancion.setArtista(cancionDto.getArtista());
             cancion.setUrlImagen(cancionDto.getUrlImagen());
 
+
             repositorioCancion.guardarCancion(cancion);
         }
 
         Recomendacion recomendacion = new Recomendacion();
         recomendacion.setCancion(cancion);
         recomendacion.setEstado(false);
+        recomendacion.setLeida(false);
         recomendacion.setUsuario(usuarioComunidad.getUsuario());
         recomendacion.setComunidad(usuarioComunidad.getComunidad());
         return recomendacion;

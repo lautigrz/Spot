@@ -1,7 +1,14 @@
 package com.tallerwebi.presentacion;
 
+
 import com.tallerwebi.dominio.*;
 import org.dom4j.rule.Mode;
+
+import com.tallerwebi.dominio.ServicioComunidad;
+import com.tallerwebi.dominio.ServicioInstancia;
+import com.tallerwebi.dominio.ServicioNotificacion;
+import com.tallerwebi.dominio.ServicioUsuario;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,17 +30,19 @@ import java.util.Optional;
 public class ControladorHome {
 
 
-    private ServicioArtista servicioArtista;
+    private RepositorioArtista repositorioArtista;
     private ServicioUsuario servicioUsuario;
     private ServicioComunidad servicioComunidad;
+    private ServicioNotificacion servicioNotificacion;
     private ServicioInstancia spotify;
     private ServicioPosteo servicioPosteo;
 
 
-    public ControladorHome(ServicioArtista servicioArtista, ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioPosteo servicioPosteo) {
-        this.servicioArtista = servicioArtista;
+    public ControladorHome(RepositorioArtista repositorioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo) {
+            this.repositorioArtista = repositorioArtista;
         this.servicioUsuario = servicioUsuario;
         this.servicioComunidad = servicioComunidad;
+        this.servicioNotificacion = servicioNotificacion;
         this.spotify = spotify;
         this.servicioPosteo = servicioPosteo;
     }
@@ -62,6 +71,9 @@ public class ControladorHome {
             return new ModelAndView("redirect:/login");
         }
 
+        modelMap.put("notificacion", servicioNotificacion.elUsuarioTieneNotificaciones(idUsuario));
+        modelMap.put("usuario", servicioUsuario.obtenerUsuarioPorId(idUsuario));
+
         modelMap.put("comunidades", servicioComunidad.obtenerTodasLasComunidades());
         return new ModelAndView("home", modelMap);
     }
@@ -72,7 +84,7 @@ public class ControladorHome {
 
         try {
             //Primero se busca localmente el artista
-            Artista artistaLocal = servicioArtista.buscarPorNombre(nombre);
+            Artista artistaLocal = repositorioArtista.buscarPorNombre(nombre);
             if (artistaLocal!=null){
                 return "redirect:/artistas-local/" + artistaLocal.getId();
             }

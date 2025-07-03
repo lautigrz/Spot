@@ -27,23 +27,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ControladorHomeTest {
 
 
-    private ServicioArtista servicioArtistaMock;
+    private RepositorioArtista repositorioArtistaMock;
     private ServicioUsuario servicioUsuarioMock;
     private ServicioComunidad servicioComunidadMock;
     private ServicioInstancia servicioInstanciaMock;
+
     private ServicioPosteo servicioPosteoMock;
+    private ServicioNotificacion servicioNotificacionMock;
+
     private ControladorHome controladorHome;
 
     @BeforeEach
     public void setup() {
-        servicioArtistaMock = mock(ServicioArtista.class);
+        repositorioArtistaMock = mock(RepositorioArtista.class);
         servicioUsuarioMock = mock(ServicioUsuario.class);
         servicioComunidadMock = mock(ServicioComunidad.class);
         servicioInstanciaMock = mock(ServicioInstancia.class);
+
         servicioPosteoMock = mock(ServicioPosteo.class);
 
+        servicioNotificacionMock = mock(ServicioNotificacion.class);
 
-        controladorHome = new ControladorHome(servicioArtistaMock,servicioUsuarioMock,servicioComunidadMock,servicioInstanciaMock,servicioPosteoMock);
+        controladorHome = new ControladorHome(repositorioArtistaMock,servicioUsuarioMock, servicioComunidadMock, servicioInstanciaMock, servicioNotificacionMock, servicioPosteoMock);
 
     }
 
@@ -63,13 +68,14 @@ public class ControladorHomeTest {
 
         when(servicioUsuarioMock.obtenerUsuarioPorId(idUsuario)).thenReturn(usuario);
         when(servicioComunidadMock.obtenerTodasLasComunidades()).thenReturn(comunidadesMock);
-
+        when(servicioNotificacionMock.elUsuarioTieneNotificaciones(idUsuario)).thenReturn(true);
 
         ModelAndView modelAndView = controladorHome.vistaHome(sessionMock);
 
 
         assertThat(modelAndView.getViewName(), equalTo("home"));
         assertThat(modelAndView.getModel().get("usuario"), equalTo(usuario));
+        assertThat(modelAndView.getModel().get("notificacion"), equalTo(true));
         assertThat(((List<?>) modelAndView.getModel().get("comunidades")).size(), equalTo(2));
     }
 
