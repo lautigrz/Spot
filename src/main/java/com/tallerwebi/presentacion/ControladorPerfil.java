@@ -30,10 +30,8 @@ public class ControladorPerfil {
     private ServicioEstadoDeAnimo servicioEstadoDeAnimo;
     private ServicioRecomendaciones servicioRecomendaciones;
     private ServicioUsuario servicioUsuario;
-
     private ServicioFavorito servicioFavorito;
     private ServicioPreescucha servicioPreescucha;
-    private RepositorioUsuario repositorioUsuario;
 
     @Autowired
     public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioEstadoDeAnimo servicioEstadoDeAnimo, ServicioRecomendaciones servicioRecomendaciones, ServicioUsuario servicioUsuario) {
@@ -58,7 +56,7 @@ public class ControladorPerfil {
         String token = (String) session.getAttribute("token");
         String refreshToken = (String) session.getAttribute("refreshToken");
         Long usuarioId = (Long) session.getAttribute("user");
-        Usuario usuario = repositorioUsuario.buscarUsuarioPorId(usuarioId);
+        Usuario usuario = servicioUsuario.obtenerUsuarioPorId(usuarioId);
 
 
 
@@ -145,16 +143,11 @@ public class ControladorPerfil {
     }
 
 
-    @Autowired
-    public void setRepositorioUsuario(RepositorioUsuario repositorioUsuario) {
-        this.repositorioUsuario = repositorioUsuario;
-    }
-
     @GetMapping("/perfil/{id}")
     public String perfilUsuario(@PathVariable Long id, HttpSession session, Model model) throws Exception {
         String token = (String) session.getAttribute("token");
         Long usuarioLogueadoId = (Long) session.getAttribute("user");
-        Usuario usuario = repositorioUsuario.buscarUsuarioPorId(id);
+        Usuario usuario = servicioUsuario.obtenerUsuarioPorId(id);
         try {
             User user = servicioPerfil.obtenerPerfilUsuario(token);
 

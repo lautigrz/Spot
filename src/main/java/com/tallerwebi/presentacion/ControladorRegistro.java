@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.Artista;
 import com.tallerwebi.dominio.RepositorioArtista;
+import com.tallerwebi.dominio.ServicioArtista;
 import com.tallerwebi.dominio.ServicioGuardarImagen;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,12 +17,12 @@ import java.io.IOException;
 @Controller
 public class ControladorRegistro {
 
-    private final RepositorioArtista repositorioArtista;
+    private final ServicioArtista servicioArtista;
     private ServicioGuardarImagen servicioGuardarImagen;
 
 
-    public ControladorRegistro(RepositorioArtista repositorioArtista, ServicioGuardarImagen servicioGuardarImagen) {
-        this.repositorioArtista = repositorioArtista;
+    public ControladorRegistro(ServicioArtista servicioArtista, ServicioGuardarImagen servicioGuardarImagen) {
+        this.servicioArtista = servicioArtista;
         this.servicioGuardarImagen = servicioGuardarImagen;
     }
 
@@ -34,7 +35,7 @@ public class ControladorRegistro {
     public String registrarArtista(@RequestParam String nombre, @RequestParam String email, @RequestParam String password,
                                    @RequestParam("fotoPerfil") MultipartFile fotoPerfil, HttpSession session, Model model)throws IOException {
 
-        if (repositorioArtista.buscarPorEmail(email).isPresent()) {
+        if (servicioArtista.buscarPorEmail(email).isPresent()) {
             model.addAttribute("error", "Ya existe un artista con ese email");
             return "registro";
         }
@@ -48,7 +49,7 @@ public class ControladorRegistro {
         nuevo.setPassword(password);
         nuevo.setFotoPerfil(urlFotoPerfil); // Por ahora nulo
 
-        repositorioArtista.guardar(nuevo);
+        servicioArtista.guardar(nuevo);
         session.setAttribute("artista", nuevo);
         return "redirect:/login";
 
