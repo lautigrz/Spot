@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import se.michaelthelin.spotify.SpotifyApi;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,23 +50,27 @@ public class ServicioPreescuchaImpl implements ServicioPreescucha {
     }
 
     @Override
-    public void guardarPreescuchaLocal(Preescucha preescucha){
-        repositorioPreescucha.guardar(preescucha);
-    }
-
-    @Override
-    public boolean yaComproPreescuchaLocal(int preescuchaId, Usuario usuario){
-        return repositorioPreescucha.existeCompraLocal(preescuchaId, usuario.getId());
+    public void crearPreescuchaLocal(Double precio, String titulo, String preescuchaFotoUrl, Artista artista){
+        Preescucha nuevaPreescucha = new Preescucha();
+        nuevaPreescucha.setPrecio(precio);
+        nuevaPreescucha.setTitulo(titulo);
+        nuevaPreescucha.setPreescuchaFotoUrl(preescuchaFotoUrl);
+        nuevaPreescucha.setArtista(artista);
+        repositorioPreescucha.guardar(nuevaPreescucha);
     }
 
     @Override
     public void comprarPreescuchaLocal(int preescuchaId, Usuario usuario) {
-        if(!repositorioPreescucha.existeCompraLocal(preescuchaId, usuario.getId())){
-            Preescucha preescucha = new Preescucha();
-            preescucha.setId(preescuchaId);
-            preescucha.setUsuario(usuario);
-            preescucha.setFechaCompra(LocalDateTime.now());
-            repositorioPreescucha.guardar(preescucha);
+        if (!repositorioPreescucha.existeCompraLocal(preescuchaId, usuario.getId())) {
+            Preescucha original = repositorioPreescucha.buscarPreescuchaPorId(preescuchaId);
+            Preescucha copia = new Preescucha();
+            copia.setPrecio(original.getPrecio());
+            copia.setTitulo(original.getTitulo());
+            copia.setPreescuchaFotoUrl(original.getPreescuchaFotoUrl());
+            copia.setArtista(original.getArtista());
+            copia.setUsuario(usuario);
+            copia.setFechaCompra(LocalDateTime.now());
+            repositorioPreescucha.guardar(copia);
         }
     }
 

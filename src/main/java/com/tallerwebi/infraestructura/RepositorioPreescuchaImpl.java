@@ -44,13 +44,20 @@ public class RepositorioPreescuchaImpl  implements RepositorioPreescucha {
     }
 
     @Override
-    public boolean existeCompraLocal(int preescuchaId, Long id){
-        String hql = "SELECT COUNT(p) FROM Preescucha p WHERE p.id = :id AND p.usuario.id = :usuarioId";
+    public boolean existeCompraLocal(int preescuchaId, Long usuarioId){
+        String hql = "SELECT COUNT(p) FROM Preescucha p WHERE p.id = :preescuchaId AND p.usuario.id = :usuarioId";
         Query<Long> query = sessionFactory.getCurrentSession().createQuery(hql, Long.class);
-        query.setParameter("id", id);
-        query.setParameter("usuarioId", id);
+        query.setParameter("preescuchaId", preescuchaId);
+        query.setParameter("usuarioId", usuarioId);
         return query.uniqueResult() > 0;
     }
 
+    @Override
+    public Preescucha buscarPreescuchaPorId(int preescuchaId){
+        String hql = "FROM Preescucha p WHERE p.id = :id";
+        Query query = sessionFactory.getCurrentSession().createQuery(hql, Preescucha.class);
+        query.setParameter("id", preescuchaId);
+        return (Preescucha) query.uniqueResult();
+    }
 
 }

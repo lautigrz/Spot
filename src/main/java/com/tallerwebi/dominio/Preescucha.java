@@ -29,4 +29,8 @@ public class Preescucha {
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "artista_id")
+    private Artista artista;
 }
