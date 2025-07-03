@@ -96,6 +96,25 @@ public class ControladorArtistaTest {
         verify(servicioFavoritoMock).agregarFavorito(artistaId, usuarioMock);
         assertEquals("redirect:/perfil", resultado);
     }
+
+    @Test
+    public void queSePuedaAgregarUnArtistaLocalAFavoritos(){
+        Long artistaLocalId = 10L;
+        String idLocalEsperado = "LOCAL_" + artistaLocalId;
+        Long usuarioId = 5L;
+
+        HttpSession sessionMock = mock(HttpSession.class);
+        when(sessionMock.getAttribute("user")).thenReturn(usuarioId);
+
+        Usuario usuarioMock = mock(Usuario.class);
+        when(servicioUsuarioMock.obtenerUsuarioPorId(usuarioId)).thenReturn(usuarioMock);
+
+        String resultado = controladorArtista.agregarFavoritoLocal(artistaLocalId, sessionMock);
+
+        verify(servicioUsuarioMock).obtenerUsuarioPorId(usuarioId);
+        verify(servicioFavoritoMock).agregarFavorito(idLocalEsperado, usuarioMock);
+        assertEquals("redirect:/perfil", resultado);
+    }
     }
 
 
