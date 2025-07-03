@@ -61,11 +61,11 @@
 
         <div class="mb-3">
             <label for="descripcionComunidad" class="form-label fw-semibold">Descripción</label>
-            <textarea class="form-control" id="descripcionComunidad" name="descripcion" placeholder="Escribe una breve descripción de la comunidad..." maxlength="300" rows="3" required></textarea>
+            <textarea class="form-control" id="descripcionComunidad" name="descripcion" placeholder="Escribe una breve descripción de la comunidad..." maxlength="150" rows="3" required></textarea>
         </div>
         <div class="mb-3">
             <label for="artista" class="form-label fw-semibold">Sobre quien es la comunidad?</label>
-            <textarea class="form-control" id="artista" name="artista" placeholder="Escribe el nombre del artista, banda o festival..." maxlength="300" rows="3" required></textarea>
+            <input type="text" class="form-control" id="artista" name="artista" placeholder="Escribe el nombre del artista, banda o festival... (Opcional)" maxlength="25" required/>
         </div>
 
         <button type="submit" class="btn btn-primary px-4">Crear Comunidad</button>

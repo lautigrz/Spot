@@ -23,22 +23,26 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
     }
 
     @Override
-    public void guardarMensajeDeLaComunidad(String contenido, Comunidad comunidad,Usuario usuario) {
+    public Long guardarMensajeDeLaComunidad(String contenido, Comunidad comunidad,Usuario usuario) {
 
         Mensaje mensaje = new Mensaje();
         mensaje.setTexto(contenido);
         mensaje.setUsuario(usuario);
-
+        mensaje.setEstadoMensaje(true);
         comunidad.agregarMensaje(mensaje);
 
         sessionFactory.getCurrentSession().save(mensaje);
+
+       return mensaje.getId();
     }
 
     @Override
     public List<Mensaje> obtenerMensajesDeComunidad(Long id) {
-        Comunidad comunidad = obtenerComunidad(id);
-        comunidad.getMensajes().size();  // forzamos la carga
-        return comunidad.getMensajes();
+        String hql = "FROM Mensaje m WHERE m.comunidad.id = :id AND m.estadoMensaje = true ORDER BY m.id ASC";
+        return sessionFactory.getCurrentSession()
+                .createQuery(hql, Mensaje.class)
+                .setParameter("id", id)
+                .getResultList();
     }
     @Override
     public List<Comunidad> obtenerComunidades() {
@@ -49,6 +53,7 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
 
     @Override
     public Comunidad obtenerComunidad(Long id) {
+
         return sessionFactory.getCurrentSession().get(Comunidad.class, id);
     }
 

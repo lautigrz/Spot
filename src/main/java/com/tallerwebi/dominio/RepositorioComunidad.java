@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface RepositorioComunidad {
-    void guardarMensajeDeLaComunidad(String mensaje, Comunidad comunidad, Usuario usuario);
+    Long guardarMensajeDeLaComunidad(String mensaje, Comunidad comunidad, Usuario usuario);
     List<Mensaje> obtenerMensajesDeComunidad(Long id);
     List<Comunidad> obtenerComunidades();
     Comunidad obtenerComunidad(Long id);

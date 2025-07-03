@@ -13,6 +13,7 @@
 <input type="hidden" id="id" th:value="${id}">
 <input type="hidden" id="urlFoto" th:value="${urlFoto}">
 <input type="hidden" id="token" th:value="${token}">
+<input type="hidden" id="rol" th:value="${rol}">
 <input type="hidden" id="comunidad" th:value="${comunidad.getId()}">
 <div class="container-fluid">
     <div class="row mt-10" >
@@ -33,7 +34,7 @@
                     <i class="fas fa-music me-2"></i>Canciones recomendadas
                     <span id="contadorRecomendaciones" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${recomendaciones.size()}"></span>
                 </a>
-                <a class="nav-link" href="#"><i class="fas fa-star me-2"></i>Ranking miembros mas activos</a>
+
                 <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#eventosModal">
                     <i class="fas fa-calendar-alt me-2"></i>Eventos próximos
                 </a>
@@ -50,12 +51,8 @@
             <div class="d-flex justify-content-between align-items-center mb-4 barra">
                 <input type="text" id="buscador" class="form-control w-70 rounded-pill" placeholder="Buscar comunidad" />
 
-                <div class="d-flex align-items-center notificacion mb-1 ms-auto">
-                    <i class="fa-solid fa-bell fa-lg mx-3"></i>
-                    <img th:src="${fotoUsuario}" class="rounded-profile" alt="profile" />
-                </div>
             </div>
-            <div id="resultados" class="resultados-container"></div>
+            <div id="resultados" class="resultados-container" style="display: none;"></div>
             <!-- Track Content -->
             <article class="billie-community text-white p-4 rounded"
                      th:style="'background: url(' + ${comunidad.getUrlPortada()} + ') no-repeat center center / cover; position: relative; overflow: hidden;'">
@@ -109,7 +106,7 @@
 
                 <!-- Contenedor de mensajes -->
                 <div id="mensajeVista" style="flex-grow: 1; overflow-y: auto; padding: 10px;">
-                    <div class="chat-message p-3 d-flex align-items-start my-2 bg-light rounded" th:each="mensaje : ${mensajes}">
+                    <div class="chat-message p-3 d-flex align-items-start my-2 bg-light rounded position-relative" th:each="mensaje : ${mensajes}" th:attr="data-id=${mensaje.getId()}">
                         <img th:src="@{${mensaje.getUsuario().getUrlFoto()}}" class="rounded-circle me-3" alt="User" style="width: 50px; height: 50px; object-fit: cover;">
                         <div class="d-flex align-items-center flex-grow-1">
                             <div class="flex-grow-1">
@@ -118,6 +115,18 @@
                                 <p class="mb-0 d-inline" th:text="${mensaje.getTexto()}"></p>
                             </div>
                             <i class="fas fa-heart ms-3 corazon" style="cursor:pointer;" title="Like"></i>
+                        </div>
+                        <div class="position-absolute top-0 end-0 dropdown" th:if="${rol == 'Admin'}">
+                            <button class="btn btn-sm btn-light dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border: none; box-shadow: none; padding: 0px 5px;">⋮</button>
+                             <ul class="dropdown-menu dropdown-menu-end">
+                                 <li>
+                                     <button class="dropdown-item"
+                                        th:attr="onclick=|eliminarMensaje(${mensaje.getId()}, ${comunidad.getId()})|">
+                                         Eliminar mensaje
+                                     </button>
+                                 </li>
+
+                             </ul>
                         </div>
                     </div>
                     <!-- Aquí se agregarán más mensajes -->
@@ -480,7 +489,7 @@
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content bg-white border-0 shadow rounded-4">
             <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-semibold" id="eventosModalLabel">Eventos Próximos</h5>
+                <h5 class="modal-title fw-semibold text-dark" id="eventosModalLabel">Eventos Próximos</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
 
@@ -499,7 +508,11 @@
                         </a>
                     </div>
 
+                    <div th:if="${eventos == null or #lists.isEmpty(eventos)}">
+                        <p class="text-dark">No hay eventos disponibles.</p>
+                    </div>
 
+                    <div th:if="${eventos != null and !#lists.isEmpty(eventos)}">
                     <div class="col-md-6 col-lg-4" th:each="evento : ${eventos}">
                         <div class="card border-0 shadow-sm" style="background-color: #ffffff; border-radius: 0.75rem;">
                             <img th:src="${evento.getImagen()}" class="card-img-top rounded-top"
@@ -518,6 +531,7 @@
                                 </a>
                             </div>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>

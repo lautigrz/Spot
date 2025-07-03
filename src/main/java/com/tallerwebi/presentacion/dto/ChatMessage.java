@@ -15,6 +15,6 @@ public class ChatMessage {
  private String id;
 
  public enum MessageType {
-   CHAT, LEAVE, JOIN
+   CHAT, DELETE
  }
 }

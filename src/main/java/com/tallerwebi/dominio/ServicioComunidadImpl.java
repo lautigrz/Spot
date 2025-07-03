@@ -36,9 +36,12 @@ public class ServicioComunidadImpl implements ServicioComunidad {
         return repositorioComunidad.obtenerMensajesDeComunidad(id);
     }
 
-    // falta test
+
     @Override
     public ChatMessage registrarUsuarioEnCanalDeComunidad(ChatMessage message, SimpMessageHeaderAccessor simpMessageHeaderAccessor, String idComunidad) {
+
+        System.out.println("registrando usuario en canal de comunidad: " + idComunidad);
+
         try {
 
             simpMessageHeaderAccessor.getSessionAttributes().put("usuario", message.getSender());
@@ -52,6 +55,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
             }
 
         } catch (Exception e) {
+            System.out.println("entro al catch" + e);
             e.printStackTrace();
         }
 
@@ -62,8 +66,10 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     public ChatMessage guardarMensaje(ChatMessage message, Long idUsuario, Long idComunidad) {
         try {
             UsuarioComunidad usuarioComunidad = repositorioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
-            repositorioComunidad.guardarMensajeDeLaComunidad(message.getContent(), usuarioComunidad.getComunidad(),usuarioComunidad.getUsuario());
-            return message;
+           Long id = repositorioComunidad.guardarMensajeDeLaComunidad(message.getContent(), usuarioComunidad.getComunidad(),usuarioComunidad.getUsuario());
+           message.setId(String.valueOf(id));
+
+           return message;
         } catch (Exception e) {
             System.out.println("Error al guardar el mensaje: " + e.getMessage());
             e.printStackTrace();
@@ -142,11 +148,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
         List<Usuario> usuarios = repositorioComunidad.obtenerUsuariosPorComunidad(idComunidad);
 
-        System.out.println("usuarios del repo" + usuarios.size());
-
         List<String> usuariosEnCanalActivos = obtenerTodosLosUsuariosActivosDeUnaComunidad(idComunidad);
-
-        System.out.println("usuarios del canal" + usuariosEnCanalActivos.size());
 
         for (Usuario usuario : usuarios) {
             UsuarioDto usuarioDto = new UsuarioDto();
