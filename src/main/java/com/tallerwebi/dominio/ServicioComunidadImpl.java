@@ -5,6 +5,7 @@ import com.tallerwebi.presentacion.dto.*;
 import org.apache.hc.core5.http.ParseException;
 import org.hibernate.annotations.Synchronize;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,10 +26,13 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     private RepositorioComunidad repositorioComunidad;
 
     private RepositorioUsuarioComunidad repositorioUsuarioComunidad;
-    @Autowired
-    public ServicioComunidadImpl(RepositorioComunidad repositorioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad) {
+
+    private ServicioReproduccion servicioReproduccion;
+
+    public ServicioComunidadImpl(RepositorioComunidad repositorioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad, @Lazy ServicioReproduccion servicioReproduccion) {
         this.repositorioUsuarioComunidad = repositorioUsuarioComunidad;
         this.repositorioComunidad = repositorioComunidad;
+        this.servicioReproduccion = servicioReproduccion;
     }
 
     @Override
@@ -36,9 +40,11 @@ public class ServicioComunidadImpl implements ServicioComunidad {
         return repositorioComunidad.obtenerMensajesDeComunidad(id);
     }
 
-    // falta test
+
     @Override
     public ChatMessage registrarUsuarioEnCanalDeComunidad(ChatMessage message, SimpMessageHeaderAccessor simpMessageHeaderAccessor, String idComunidad) {
+
+
         try {
 
             simpMessageHeaderAccessor.getSessionAttributes().put("usuario", message.getSender());
@@ -52,6 +58,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
             }
 
         } catch (Exception e) {
+
             e.printStackTrace();
         }
 
@@ -62,8 +69,10 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     public ChatMessage guardarMensaje(ChatMessage message, Long idUsuario, Long idComunidad) {
         try {
             UsuarioComunidad usuarioComunidad = repositorioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
-            repositorioComunidad.guardarMensajeDeLaComunidad(message.getContent(), usuarioComunidad.getComunidad(),usuarioComunidad.getUsuario());
-            return message;
+           Long id = repositorioComunidad.guardarMensajeDeLaComunidad(message.getContent(), usuarioComunidad.getComunidad(),usuarioComunidad.getUsuario());
+           message.setId(String.valueOf(id));
+
+           return message;
         } catch (Exception e) {
             System.out.println("Error al guardar el mensaje: " + e.getMessage());
             e.printStackTrace();
@@ -136,17 +145,13 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     }
 
     @Override
-    public List<UsuarioDto> obtenerUsuariosDeLaComunidad(Long idComunidad) {
+    public List<UsuarioDto> obtenerUsuariosDeLaComunidad(Long idComunidad) throws IOException, ParseException, SpotifyWebApiException {
 
         List<UsuarioDto> usuariosDto = new ArrayList<>();
 
         List<Usuario> usuarios = repositorioComunidad.obtenerUsuariosPorComunidad(idComunidad);
 
-        System.out.println("usuarios del repo" + usuarios.size());
-
         List<String> usuariosEnCanalActivos = obtenerTodosLosUsuariosActivosDeUnaComunidad(idComunidad);
-
-        System.out.println("usuarios del canal" + usuariosEnCanalActivos.size());
 
         for (Usuario usuario : usuarios) {
             UsuarioDto usuarioDto = new UsuarioDto();
@@ -156,9 +161,17 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
             }
 
+            CancionDto cancionDto = servicioReproduccion.obtenerCancionActualDeUsuario(usuario.getUser(), idComunidad);
+            String escuchando = "No escuchando musica en este momento";
+            if(cancionDto != null) {
+                escuchando = cancionDto.getArtista() + " - " + cancionDto.getTitulo();
+
+            }
+
             usuarioDto.setUser(usuario.getUser());
             usuarioDto.setId(usuario.getId());
             usuarioDto.setUrlFoto(usuario.getUrlFoto());
+            usuarioDto.setEscuchando(escuchando);
             usuariosDto.add(usuarioDto);
 
         }

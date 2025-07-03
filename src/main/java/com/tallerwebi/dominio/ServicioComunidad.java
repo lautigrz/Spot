@@ -22,6 +22,6 @@ public interface ServicioComunidad {
     void eliminarUsuarioDelCanal(String user);
     void agregarUserAlCanal(String idComunidad, String username);
     void crearCanalSiNoExiste(String idComunidad);
-    List<UsuarioDto> obtenerUsuariosDeLaComunidad(Long idComunidad);
+    List<UsuarioDto> obtenerUsuariosDeLaComunidad(Long idComunidad) throws IOException, ParseException, SpotifyWebApiException;
     List<ComunidadDto> buscarComunidadesPorNombre(String nombreComunidad);
 }

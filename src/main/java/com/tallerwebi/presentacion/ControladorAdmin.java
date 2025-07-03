@@ -6,6 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.presentacion.dto.CancionDto;
 
+import com.tallerwebi.presentacion.dto.ChatMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,16 +22,20 @@ import java.util.Map;
 
 @Controller
 public class ControladorAdmin {
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     private ServicioAdmin servicioAdmin;
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     private ServicioPlaylist servicioPlaylist;
     private ServicioEvento servicioEvento;
     private ServicioNotificacion servicioNotificacion;
+    private ServicioMensaje servicioMensaje;
     public ControladorAdmin(ServicioAdmin servicioAdmin, ServicioRecomedacionComunidad servicioRecomedacionComunidad,
-                            ServicioPlaylist servicioPlaylist, ServicioEvento servicioEvento, ServicioNotificacion servicioNotificacion) {
+                            ServicioPlaylist servicioPlaylist, ServicioEvento servicioEvento, ServicioNotificacion servicioNotificacion, ServicioMensaje servicioMensaje) {
         this.servicioAdmin = servicioAdmin;
         this.servicioEvento = servicioEvento;
+        this.servicioMensaje = servicioMensaje;
         this.servicioPlaylist = servicioPlaylist;
         this.servicioRecomedacionComunidad = servicioRecomedacionComunidad;
         this.servicioNotificacion = servicioNotificacion;
@@ -99,6 +109,28 @@ public class ControladorAdmin {
 
         servicioNotificacion.generarNotificacion(idUsuario, idRecomendacion,estado);
         return "redirect:/comunidad/" + idUsuario;
+    }
+
+    @MessageMapping("/chat.delete/{idComunidad}")
+    public void delete(@Payload ChatMessage message,
+                       @DestinationVariable String idComunidad) {
+
+        try {
+            Long idMensaje = Long.parseLong(message.getId());
+
+
+            String image = servicioMensaje.eliminarMensaje(idMensaje);
+
+            ChatMessage eliminado = new ChatMessage();
+            eliminado.setId(message.getId());
+            eliminado.setImage(image);
+            eliminado.setType(ChatMessage.MessageType.DELETE);
+
+            messagingTemplate.convertAndSend("/topic/" + idComunidad, eliminado);
+
+        } catch (NumberFormatException e) {
+            System.err.println("ID inválido: " + message.getId());
+        }
     }
 
 

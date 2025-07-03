@@ -29,14 +29,15 @@ public class ServicioComunidadImplTest {
 
     private RepositorioUsuarioComunidad repositorioUsuarioComunidadMock;
     private ServicioComunidad servicioComunidad;
-
+    private ServicioReproduccion servicioReproduccionMock;
 
     @BeforeEach
     public void setUp() {
         repositorioUsuarioMock = mock(RepositorioUsuario.class);
         repositorioComunidadMock = mock(RepositorioComunidad.class);
         repositorioUsuarioComunidadMock = mock(RepositorioUsuarioComunidad.class);
-        servicioComunidad = new ServicioComunidadImpl(repositorioComunidadMock, repositorioUsuarioComunidadMock);
+        servicioReproduccionMock = mock(ServicioReproduccion.class);
+        servicioComunidad = new ServicioComunidadImpl(repositorioComunidadMock, repositorioUsuarioComunidadMock,servicioReproduccionMock);
     }
     @AfterEach
     public void limpiarEstadoGlobal() {

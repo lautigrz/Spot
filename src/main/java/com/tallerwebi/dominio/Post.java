@@ -20,7 +20,7 @@ public class Post {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, columnDefinition = "TEXT") //No puede ser nulo el contenido del posteo
+    @Column(nullable = false) //No puede ser nulo el contenido del posteo
     private String contenido;
     @Column(nullable = false)
     private LocalDateTime fecha;
