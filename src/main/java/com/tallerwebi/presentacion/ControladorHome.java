@@ -30,7 +30,7 @@ import java.util.Optional;
 public class ControladorHome {
 
 
-    private RepositorioArtista repositorioArtista;
+    private ServicioArtista servicioArtista;
     private ServicioUsuario servicioUsuario;
     private ServicioComunidad servicioComunidad;
     private ServicioNotificacion servicioNotificacion;
@@ -38,8 +38,8 @@ public class ControladorHome {
     private ServicioPosteo servicioPosteo;
 
 
-    public ControladorHome(RepositorioArtista repositorioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo) {
-            this.repositorioArtista = repositorioArtista;
+    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo) {
+            this.servicioArtista = servicioArtista;
         this.servicioUsuario = servicioUsuario;
         this.servicioComunidad = servicioComunidad;
         this.servicioNotificacion = servicioNotificacion;
@@ -60,6 +60,9 @@ public class ControladorHome {
 
             List<Post> posteos = servicioPosteo.obtenerPosteosDeArtistasFavoritos(usuario);
             modelMap.put("posteos", posteos);
+
+
+            modelMap.put("notificacion", servicioNotificacion.elUsuarioTieneNotificaciones(idUsuario));
         } else if (artistaObj != null) {
             Artista artista = (Artista) artistaObj;
             modelMap.put("artista", artista);
@@ -71,9 +74,6 @@ public class ControladorHome {
             return new ModelAndView("redirect:/login");
         }
 
-        modelMap.put("notificacion", servicioNotificacion.elUsuarioTieneNotificaciones(idUsuario));
-        modelMap.put("usuario", servicioUsuario.obtenerUsuarioPorId(idUsuario));
-
         modelMap.put("comunidades", servicioComunidad.obtenerTodasLasComunidades());
         return new ModelAndView("home", modelMap);
     }
@@ -84,7 +84,7 @@ public class ControladorHome {
 
         try {
             //Primero se busca localmente el artista
-            Artista artistaLocal = repositorioArtista.buscarPorNombre(nombre);
+            Artista artistaLocal = servicioArtista.buscarPorNombre(nombre);
             if (artistaLocal!=null){
                 return "redirect:/artistas-local/" + artistaLocal.getId();
             }

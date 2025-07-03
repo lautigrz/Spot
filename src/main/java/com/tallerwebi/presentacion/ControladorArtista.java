@@ -26,18 +26,18 @@ public class ControladorArtista {
     private final SpotifyApi spotifyApi;
     private final ServicioUsuario servicioUsuario;
     private final ServicioPreescucha servicioPreescucha;
-    private final RepositorioArtista repositorioArtista;
+    private final ServicioArtista servicioArtista;
 
     @Autowired
     private ServicioMercadoPago servicioMercadoPago;
 
 
-    public ControladorArtista(ServicioFavorito servicioFavorito, SpotifyApi spotifyApi, ServicioUsuario servicioUsuario, ServicioPreescucha servicioPreescucha, RepositorioArtista repositorioArtista) {
+    public ControladorArtista(ServicioFavorito servicioFavorito, SpotifyApi spotifyApi, ServicioUsuario servicioUsuario, ServicioPreescucha servicioPreescucha, ServicioArtista servicioArtista) {
         this.servicioFavorito = servicioFavorito;
         this.spotifyApi = spotifyApi;
         this.servicioUsuario = servicioUsuario;
         this.servicioPreescucha = servicioPreescucha;
-        this.repositorioArtista = repositorioArtista;
+        this.servicioArtista = servicioArtista;
     }
 
     @GetMapping("/artistas/{id}")
@@ -88,7 +88,7 @@ public class ControladorArtista {
     @GetMapping("/artistas-local/{id}")
     public String verArtistaLocal(@PathVariable Long id, Model model, HttpSession session) {
         try{
-            Artista artista = repositorioArtista.buscarPorId(id);
+            Artista artista = servicioArtista.buscarPorId(id);
             if(artista == null){
                 return "redirect:/home";
             }
@@ -168,7 +168,7 @@ public class ControladorArtista {
         Object usuarioIdObj = session.getAttribute("user");
         if (usuarioIdObj != null) {
             Long usuarioId = Long.valueOf(usuarioIdObj.toString());
-            Usuario usuario = repositorioUsuario.buscarUsuarioPorId(usuarioId);
+            Usuario usuario = servicioUsuario.obtenerUsuarioPorId(usuarioId);
 
             String albumId = params.get("external_reference");
 

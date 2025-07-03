@@ -18,7 +18,7 @@ public class ControladorArtistaTest {
     private ServicioUsuario servicioUsuarioMock;
     private ServicioPreescucha servicioPreescuchaMock;
     private ControladorArtista controladorArtista;
-    private RepositorioArtista repositorioArtistaMock;
+    private ServicioArtista servicioArtistaMock;
 
     @BeforeEach
     public void setUp() {
@@ -26,9 +26,9 @@ public class ControladorArtistaTest {
         spotifyApiMock = mock(SpotifyApi.class);
         servicioUsuarioMock = mock(ServicioUsuario.class);
         servicioPreescuchaMock = mock(ServicioPreescucha.class);
-        repositorioArtistaMock = mock(RepositorioArtista.class);
+        servicioArtistaMock = mock(ServicioArtista.class);
 
-        controladorArtista = new ControladorArtista(servicioFavoritoMock,spotifyApiMock,servicioUsuarioMock,servicioPreescuchaMock, repositorioArtistaMock);
+        controladorArtista = new ControladorArtista(servicioFavoritoMock,spotifyApiMock,servicioUsuarioMock,servicioPreescuchaMock, servicioArtistaMock);
     }
 
 
