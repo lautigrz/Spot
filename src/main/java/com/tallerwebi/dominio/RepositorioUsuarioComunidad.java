@@ -10,6 +10,6 @@ public interface RepositorioUsuarioComunidad {
     String obtenerRolDelUsuarioEnComunidad(Long idUsuario, Long idComunidad);
     UsuarioComunidad obtenerUsuarioEnComunidad(Long idUsuario, Long idComunidad);
     List<UsuarioDto> obtenerUsuariosDeLaComunidad(Long idComunidad);
-
     void actualizar(UsuarioComunidad usuarioComunidad);
+    Boolean eliminarUsuarioDeComunidad(Long idUsuario, Long idComunidad);
 }

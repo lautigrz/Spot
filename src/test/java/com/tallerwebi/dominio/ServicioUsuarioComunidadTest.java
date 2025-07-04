@@ -73,4 +73,25 @@ public class ServicioUsuarioComunidadTest {
 
         assertThat(resultado, equalTo(usuarioComunidad));
     }
+
+    @Test
+    public void seDebeEliminarUnUsuarioDeLaComunidadyDevolverTrue() {
+
+        when(repositorioUsuarioComunidadMock.eliminarUsuarioDeComunidad(anyLong(), anyLong()))
+            .thenReturn(true);
+
+        Boolean resultado = servicioUsuarioComunidad.eliminarUsuarioDeComunidad(1L, 2L);
+
+        assertThat(resultado, equalTo(true));
+    }
+    @Test
+    public void seDebeEliminarUnUsuarioDeLaComunidadyDevolverFalse() {
+
+        when(repositorioUsuarioComunidadMock.eliminarUsuarioDeComunidad(anyLong(), anyLong()))
+                .thenReturn(false);
+
+        Boolean resultado = servicioUsuarioComunidad.eliminarUsuarioDeComunidad(1L, 2L);
+
+        assertThat(resultado, equalTo(false));
+    }
 }

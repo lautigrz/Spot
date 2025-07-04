@@ -86,4 +86,15 @@ public class RepositorioUsuarioComunidadImpl implements RepositorioUsuarioComuni
     public void actualizar(UsuarioComunidad usuarioComunidad) {
         sessionFactory.getCurrentSession().update(usuarioComunidad);
     }
+
+    @Override
+    public Boolean eliminarUsuarioDeComunidad(Long idUsuario, Long idComunidad) {
+        String hql = "DELETE FROM UsuarioComunidad uc WHERE uc.usuario.id = :idUsuario AND uc.comunidad.id = :idComunidad";
+        Query query = sessionFactory.getCurrentSession().createQuery(hql);
+        query.setParameter("idUsuario", idUsuario);
+        query.setParameter("idComunidad", idComunidad);
+        int result = query.executeUpdate();
+
+        return result > 0;
+    }
 }

@@ -172,6 +172,21 @@ public class ControladorComunidad {
         }
     }
 
+    @PostMapping("/abandonar-comunidad/{idComunidad}/{idUsuario}")
+    public String abandonarComunidad(@PathVariable Long idComunidad, @PathVariable Long idUsuario) {
+        if (idComunidad == null || idUsuario == null) {
+            return "redirect:/error";
+        }
+        try {
+              Boolean seELimino =  servicioUsuarioComunidad.eliminarUsuarioDeComunidad(idUsuario, idComunidad);
+                return seELimino ? "redirect:/home" : "redirect:/error";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/comunidad/" + idComunidad;
+        }
+    }
+
 
 
     @GetMapping("/comunidad/{id}")

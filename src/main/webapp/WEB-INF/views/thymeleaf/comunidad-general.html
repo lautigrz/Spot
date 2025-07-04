@@ -64,6 +64,29 @@
                 <div style="position: relative; z-index: 2;">
                     <a th:href="@{/home}" class="text-decoration-none text-light mb-3 d-inline-block">&larr; Salir</a>
 
+
+                    <div class="dropdown position-absolute top-0 end-0 me-2" th:if="${estaEnComunidad}">
+                        <button class="btn text-light btn-sm dropdown" type="button" id="dropdownMenuButtonAbandonar" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButtonAbandonar">
+                            <li>
+                                <form th:action="@{/abandonar-comunidad/{idComunidad}/{idUsuario}(
+                       idComunidad=${comunidad.getId()},
+                       idUsuario=${id})}"
+                                      method="post"
+                                      style="margin: 0;">
+
+                                    <!-- Botón que se ve como un item del menú -->
+                                    <button type="submit" class="dropdown-item text-danger" style="border: none; background: none;">
+                                        Abandonar comunidad
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+
+
                     <div class="d-flex align-items-center mb-3">
                         <img th:src="${comunidad.getUrlFoto()}" alt="Billie Eilish" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover; border: 2px solid white;">
                         <div>

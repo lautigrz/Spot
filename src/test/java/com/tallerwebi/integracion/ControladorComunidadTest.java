@@ -456,6 +456,24 @@ public class ControladorComunidadTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
     }
+
+    @Test
+    public void debeAbandonarUnaComunidadYRedireccionaAHome() throws Exception {
+
+        Long idComunidad = 1L;
+        Long idUsuario = 2L;
+
+        when(servicioUsuarioComunidadMock.eliminarUsuarioDeComunidad(idUsuario, idComunidad))
+                .thenReturn(true);
+
+
+        mockMvc.perform(post("/abandonar-comunidad/{idComunidad}/{idUsuario}", idComunidad, idUsuario))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/home"));
+
+        verify(servicioUsuarioComunidadMock).eliminarUsuarioDeComunidad(idUsuario, idComunidad);
+    }
+
 }
 
 

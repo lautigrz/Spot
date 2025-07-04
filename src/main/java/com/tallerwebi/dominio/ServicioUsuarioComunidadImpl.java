@@ -30,4 +30,9 @@ public class ServicioUsuarioComunidadImpl implements ServicioUsuarioComunidad {
     public UsuarioComunidad obtenerUsuarioEnComunidad(Long idUsuario, Long id) {
         return repositorioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario, id);
     }
+
+    @Override
+    public Boolean eliminarUsuarioDeComunidad(Long idUsuario, Long idComunidad) {
+        return repositorioUsuarioComunidad.eliminarUsuarioDeComunidad(idUsuario, idComunidad);
+    }
 }

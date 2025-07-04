@@ -120,6 +120,28 @@ public class RepositorioUsuarioComunidadTest {
         assertThat(usuarioActualizado.getRol(), equalTo("Miembro"));
     }
 
+    @Test
+    @Rollback
+    public void seDebeEliminarUsuarioDeComunidad() {
+        Usuario usuario = new Usuario();
+        usuario.setUser("testUser");
+        usuario.setUrlFoto("http://example.com/test.jpg");
+
+        sessionFactory.getCurrentSession().save(usuario);
+
+        Comunidad comunidad = new Comunidad();
+        comunidad.setNombre("Test Comunidad");
+        comunidad.setUrlFoto("http://example.com/comunidad.jpg");
+        sessionFactory.getCurrentSession().save(comunidad);
+
+        repositorioUsuarioComunidad.agregarUsuarioAComunidad(usuario, comunidad, "Admin");
+
+        repositorioUsuarioComunidad.eliminarUsuarioDeComunidad(usuario.getId(), comunidad.getId());
+
+        UsuarioComunidad usuarioComunidad = repositorioUsuarioComunidad.obtenerUsuarioEnComunidad(usuario.getId(), comunidad.getId());
+
+        assertThat(usuarioComunidad, equalTo(null));
+    }
 
 
 }
