@@ -44,6 +44,7 @@ public class ControladorAdmin {
     @PostMapping("/eliminarMiembro/{idComunidad}/{idMiembro}")
     public String eliminarMiembroDeComunidad(@PathVariable Long idComunidad,@PathVariable Long idMiembro) {
         servicioAdmin.eliminarMiembroDeComunidad(idComunidad, idMiembro);
+        servicioNotificacion.generarNotificacionDeEliminacionDeUsuarioDeLaComunidad(idMiembro,idComunidad);
         return "redirect:/comunidad/" + idComunidad;
     }
 
@@ -58,7 +59,7 @@ public class ControladorAdmin {
     public Map<String, Object> eliminarRecomendacion(@PathVariable Long idRecomendacion, @PathVariable Long idComunidad) {
         Long idUsuarioQueRecomendo = servicioRecomedacionComunidad.eliminarRecomendacion(idRecomendacion);
 
-        servicioNotificacion.generarNotificacion(idUsuarioQueRecomendo, idRecomendacion, false);
+        servicioNotificacion.generarNotificacionSobreRecomendacion(idUsuarioQueRecomendo, idRecomendacion, false);
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("mensaje", "Recomendación eliminada");
@@ -81,7 +82,7 @@ public class ControladorAdmin {
                 recomendacion.getCancion().getUri()
         );
 
-        servicioNotificacion.generarNotificacion(recomendacion.getUsuario().getId(), idRecomendacion, true);
+        servicioNotificacion.generarNotificacionSobreRecomendacion(recomendacion.getUsuario().getId(), idRecomendacion, true);
 
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
@@ -104,13 +105,14 @@ public class ControladorAdmin {
         return "redirect:/comunidad/" + idComunidad;
     }
 
+    /*
     @PostMapping("/notificacion/{idUsuario}/{idRecomendacion}/{idComunidad}/{estado}")
     public String notificarRecomendacion(@PathVariable Long idUsuario, @PathVariable Long idRecomendacion, @PathVariable boolean estado, @PathVariable Long idComunidad) {
 
-        servicioNotificacion.generarNotificacion(idUsuario, idRecomendacion,estado);
+        servicioNotificacion.generarNotificacionSobreRecomendacion(idUsuario, idRecomendacion,estado);
         return "redirect:/comunidad/" + idUsuario;
     }
-
+*/
     @MessageMapping("/chat.delete/{idComunidad}")
     public void delete(@Payload ChatMessage message,
                        @DestinationVariable String idComunidad) {

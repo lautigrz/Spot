@@ -60,7 +60,7 @@ public class RepositorioNotificacionTest {
 
         Notificacion notificacion = new Notificacion();
         notificacion.setUsuario(usuario);
-        notificacion.setRecomendacion(recomendacion);
+
         notificacion.setMensaje("Mensaje de notificacion");
 
         sessionFactory.getCurrentSession().save(notificacion);
@@ -97,18 +97,14 @@ public class RepositorioNotificacionTest {
 
         sessionFactory.getCurrentSession().save(recomendacion);
 
-        Notificacion notificacion = new Notificacion();
-        notificacion.setUsuario(usuario);
-        notificacion.setRecomendacion(recomendacion);
-        notificacion.setMensaje("Mensaje de notificacion");
 
-        repositorioNotificacion.guardarNotificacion(notificacion,usuario,recomendacion);
+        repositorioNotificacion.guardarNotificacion("Mensaje de notificacion",usuario);
 
         String hql = "FROM Notificacion";
         Query query = sessionFactory.getCurrentSession().createQuery(hql);
 
         assertThat(query.list().size(), equalTo(1));
-        assertThat(query.list().get(0), equalTo(notificacion));
+
 
     }
 
@@ -140,7 +136,7 @@ public class RepositorioNotificacionTest {
         Notificacion notificacion = new Notificacion();
         notificacion.setLeido(false);
         notificacion.setUsuario(usuario);
-        notificacion.setRecomendacion(recomendacion);
+
         notificacion.setMensaje("Mensaje de notificacion");
 
         sessionFactory.getCurrentSession().save(notificacion);
@@ -188,7 +184,7 @@ public class RepositorioNotificacionTest {
         Notificacion notificacion = new Notificacion();
         notificacion.setLeido(false);
         notificacion.setUsuario(usuario);
-        notificacion.setRecomendacion(recomendacion);
+
         notificacion.setMensaje("Mensaje de notificacion");
 
         sessionFactory.getCurrentSession().save(notificacion);
@@ -227,7 +223,7 @@ public class RepositorioNotificacionTest {
         Notificacion notificacion = new Notificacion();
         notificacion.setLeido(true);
         notificacion.setUsuario(usuario);
-        notificacion.setRecomendacion(recomendacion);
+
         notificacion.setMensaje("Mensaje de notificacion");
 
         sessionFactory.getCurrentSession().save(notificacion);

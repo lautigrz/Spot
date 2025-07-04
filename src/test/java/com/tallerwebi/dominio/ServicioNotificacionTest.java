@@ -17,12 +17,14 @@ public class ServicioNotificacionTest {
     private ServicioUsuario servicioUsuarioMock;
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     private ServicioNotificacion servicioNotificacion;
+    private ServicioComunidad servicioComunidad;
     @BeforeEach
     public void setUp() {
         repositorioNotificacionMock = mock(RepositorioNotificacion.class);
         servicioUsuarioMock = mock(ServicioUsuario.class);
         servicioRecomedacionComunidad = mock(ServicioRecomedacionComunidad.class);
-        servicioNotificacion = new ServicioNotificacionImpl(repositorioNotificacionMock,servicioUsuarioMock,servicioRecomedacionComunidad);
+       servicioComunidad = mock(ServicioComunidad.class);
+        servicioNotificacion = new ServicioNotificacionImpl(repositorioNotificacionMock,servicioUsuarioMock,servicioRecomedacionComunidad, servicioComunidad);
 
     }
 
@@ -71,18 +73,15 @@ public class ServicioNotificacionTest {
         when(servicioUsuarioMock.obtenerUsuarioPorId(idUsuario)).thenReturn(usuario);
         when(servicioRecomedacionComunidad.obtenerRecomendacionPorId(idRecomendacion)).thenReturn(recomendacion);
 
-        servicioNotificacion.generarNotificacion(idUsuario, idRecomendacion, estado);
+        servicioNotificacion.generarNotificacionSobreRecomendacion(idUsuario, idRecomendacion, estado);
 
 
         verify(repositorioNotificacionMock).guardarNotificacion(
-                argThat(notificacion ->
-                        notificacion.getLeido().equals(false)
-                                && notificacion.getMensaje().equals("Tu recomendación de la cancion 'Cancion Test' ha sido aceptada.")
-                                && notificacion.getRecomendacion().equals(recomendacion)
-                ),
-                eq(usuario),
-                eq(recomendacion)
+                eq("Tu recomendación de la cancion <strong>Cancion Test</strong> ha sido aceptada."),
+                eq(usuario)
         );
+
+
 
 
         verify(servicioUsuarioMock).obtenerUsuarioPorId(idUsuario);
@@ -109,18 +108,14 @@ public class ServicioNotificacionTest {
         when(servicioUsuarioMock.obtenerUsuarioPorId(idUsuario)).thenReturn(usuario);
         when(servicioRecomedacionComunidad.obtenerRecomendacionPorId(idRecomendacion)).thenReturn(recomendacion);
 
-        servicioNotificacion.generarNotificacion(idUsuario, idRecomendacion, estado);
+        servicioNotificacion.generarNotificacionSobreRecomendacion(idUsuario, idRecomendacion, estado);
 
 
         verify(repositorioNotificacionMock).guardarNotificacion(
-                argThat(notificacion ->
-                        notificacion.getLeido().equals(false)
-                                && notificacion.getMensaje().equals("Tu recomendación de la cancion 'Cancion Test' no ha sido aceptada.")
-                                && notificacion.getRecomendacion().equals(recomendacion)
-                ),
-                eq(usuario),
-                eq(recomendacion)
+                eq("Tu recomendación de la cancion <strong>Cancion Test</strong> no ha sido aceptada."),
+                eq(usuario)
         );
+
 
 
         verify(servicioUsuarioMock).obtenerUsuarioPorId(idUsuario);

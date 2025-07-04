@@ -23,8 +23,5 @@ public class Notificacion {
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recomendacion_id")
-    private Recomendacion recomendacion;
 
 }

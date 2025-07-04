@@ -21,7 +21,7 @@ public class RepositorioNotificacionImpl implements RepositorioNotificacion {
     @Override
     public List<Notificacion> obtenerNotificacionesPorUsuario(Long idUsuario) {
 
-        String hql = "SELECT n FROM Notificacion n JOIN FETCH n.usuario u WHERE u.id = :idUsuario";
+        String hql = "SELECT n FROM Notificacion n JOIN FETCH n.usuario u WHERE u.id = :idUsuario ORDER BY n.id DESC";
         Query<Notificacion> query = sessionFactory.getCurrentSession().createQuery(hql, Notificacion.class);
         query.setParameter("idUsuario", idUsuario);
 
@@ -29,9 +29,11 @@ public class RepositorioNotificacionImpl implements RepositorioNotificacion {
     }
 
     @Override
-    public void guardarNotificacion(Notificacion notificacion, Usuario usuario, Recomendacion recomendacion) {
+    public void guardarNotificacion(String mensaje, Usuario usuario) {
+        Notificacion notificacion = new Notificacion();
+        notificacion.setLeido(false);
+        notificacion.setMensaje(mensaje);
         notificacion.setUsuario(usuario);
-        notificacion.setRecomendacion(recomendacion);
         sessionFactory.getCurrentSession().save(notificacion);
     }
 

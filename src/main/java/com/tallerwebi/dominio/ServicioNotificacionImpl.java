@@ -13,12 +13,14 @@ public class ServicioNotificacionImpl implements ServicioNotificacion {
 
     private RepositorioNotificacion repositorioNotificacion;
     private ServicioUsuario servicioUsuario;
+    private ServicioComunidad servicioComunidad;
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     public ServicioNotificacionImpl(RepositorioNotificacion repositorioNotificacion,
                                     ServicioUsuario servicioUsuario,
-                                    ServicioRecomedacionComunidad servicioRecomedacionComunidad) {
+                                    ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioComunidad servicioComunidad) {
         this.repositorioNotificacion = repositorioNotificacion;
         this.servicioUsuario = servicioUsuario;
+        this.servicioComunidad = servicioComunidad;
         this.servicioRecomedacionComunidad = servicioRecomedacionComunidad;
     }
 
@@ -41,28 +43,43 @@ public class ServicioNotificacionImpl implements ServicioNotificacion {
     }
 
     @Override
-    public void generarNotificacion(Long idUsuario, Long idRecomendacion, Boolean estado) {
+    public void generarNotificacionSobreRecomendacion(Long idUsuario, Long idRecomendacion, Boolean estado) {
         String mensaje = "";
         Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
         Recomendacion recomendacion = servicioRecomedacionComunidad.obtenerRecomendacionPorId(idRecomendacion);
 
         if(estado){
-           mensaje = "Tu recomendación de la cancion '" + recomendacion.getCancion().getTitulo() + "' ha sido aceptada.";
+           mensaje = "Tu recomendación de la cancion <strong>" + recomendacion.getCancion().getTitulo() + "</strong> ha sido aceptada.";
         }else{
-            mensaje = "Tu recomendación de la cancion '" + recomendacion.getCancion().getTitulo() + "' no ha sido aceptada.";
+            mensaje = "Tu recomendación de la cancion <strong>" + recomendacion.getCancion().getTitulo() + "</strong> no ha sido aceptada.";
         }
 
-        Notificacion notificacion = new Notificacion();
-        notificacion.setLeido(false);
-        notificacion.setMensaje(mensaje);
-        notificacion.setRecomendacion(recomendacion);
-
-        repositorioNotificacion.guardarNotificacion(notificacion, usuario, recomendacion);
+        repositorioNotificacion.guardarNotificacion(mensaje, usuario);
     }
 
     @Override
     public void cambiarEstadoNotificacion(List<Long> idsNotificacion) {
         this.repositorioNotificacion.cambiarEstadoNotificacion(idsNotificacion);
+    }
+
+    @Override
+    public void generarNotificacionDeEliminacionDeUsuarioDeLaComunidad(Long idUsuario, Long idComunidad) {
+
+        Comunidad comunidad = servicioComunidad.obtenerComunidad(idComunidad);
+        Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
+
+        if(comunidad == null && usuario == null) {
+
+            throw new IllegalArgumentException("Comunidad o usuario no encontrado");
+
+        }
+
+        String mensaje = "Fuiste eliminado de la comunidad <strong>" + comunidad.getNombre() + "</strong> por el administrador.";
+
+        repositorioNotificacion.guardarNotificacion(mensaje, usuario);
+
+
+
     }
 
     @Override

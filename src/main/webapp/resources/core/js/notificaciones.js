@@ -31,15 +31,13 @@ document.querySelector('[data-bs-target="#notificacionesOffcanvas"]').addEventLi
                 saludo.textContent = `Hola ${notif.nombreUsuario}`;
 
                 const mensajeSpan = document.createElement('span');
-                mensajeSpan.textContent = notif.mensaje;
+                mensajeSpan.innerHTML = notif.mensaje;
 
-                const btnMarcarLeida = document.createElement('button');
-                btnMarcarLeida.innerHTML = '<i class="bi bi-check-lg"></i>';
-                btnMarcarLeida.title = 'Marcar como leída';
+
 
                 li.appendChild(saludo);
                 li.appendChild(mensajeSpan);
-                li.appendChild(btnMarcarLeida);
+
 
                 lista.appendChild(li);
             });

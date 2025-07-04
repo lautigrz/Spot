@@ -66,7 +66,7 @@ public class ControladorAdminTest {
         Map<String, Object> respuesta = controladorAdmin.eliminarRecomendacion(idRecomendacion, idComunidad);
 
         verify(servicioRecomedacionComunidad).eliminarRecomendacion(eq(idRecomendacion));
-        verify(servicioNotificacion).generarNotificacion(anyLong(), eq(idRecomendacion), eq(false));
+        verify(servicioNotificacion).generarNotificacionSobreRecomendacion(anyLong(), eq(idRecomendacion), eq(false));
         assertThat(respuesta, notNullValue());
         assertThat(respuesta.get("success"), equalTo(true));
         assertThat(respuesta.get("mensaje"),equalTo("Recomendación eliminada"));
