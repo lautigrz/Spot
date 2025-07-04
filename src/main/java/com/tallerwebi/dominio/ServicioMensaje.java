@@ -1,6 +1,8 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.presentacion.dto.UsuarioDto;
+
 public interface ServicioMensaje {
 
-    String eliminarMensaje(Long idMensaje);
+    UsuarioDto eliminarMensaje(Long idMensaje);
 }

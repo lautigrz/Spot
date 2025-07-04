@@ -81,31 +81,16 @@ public class RepositorioNotificacionTest {
 
         sessionFactory.getCurrentSession().save(usuario);
 
-        Comunidad comunidad = new Comunidad();
-        comunidad.setNombre("comunidad prueba");
-
-        Cancion cancion = new Cancion();
-        cancion.setUri("das:prueba");
-
-        sessionFactory.getCurrentSession().save(cancion);
-        sessionFactory.getCurrentSession().save(comunidad);
-
-        Recomendacion recomendacion = new Recomendacion();
-        recomendacion.setCancion(cancion);
-        recomendacion.setComunidad(comunidad);
-        recomendacion.setUsuario(usuario);
-
-        sessionFactory.getCurrentSession().save(recomendacion);
-
-
         repositorioNotificacion.guardarNotificacion("Mensaje de notificacion",usuario);
 
         String hql = "FROM Notificacion";
         Query query = sessionFactory.getCurrentSession().createQuery(hql);
 
+        Notificacion notificacion = (Notificacion) query.uniqueResult();
+
         assertThat(query.list().size(), equalTo(1));
-
-
+        assertThat(notificacion.getMensaje(), equalTo("Mensaje de notificacion"));
+        assertThat(notificacion.getUsuario().getUser(), equalTo("prueba"));
     }
 
     @Test
@@ -117,26 +102,9 @@ public class RepositorioNotificacionTest {
 
         sessionFactory.getCurrentSession().save(usuario);
 
-        Comunidad comunidad = new Comunidad();
-        comunidad.setNombre("comunidad prueba");
-
-        Cancion cancion = new Cancion();
-        cancion.setUri("das:prueba");
-
-        sessionFactory.getCurrentSession().save(cancion);
-        sessionFactory.getCurrentSession().save(comunidad);
-
-        Recomendacion recomendacion = new Recomendacion();
-        recomendacion.setCancion(cancion);
-        recomendacion.setComunidad(comunidad);
-        recomendacion.setUsuario(usuario);
-
-        sessionFactory.getCurrentSession().save(recomendacion);
-
         Notificacion notificacion = new Notificacion();
         notificacion.setLeido(false);
         notificacion.setUsuario(usuario);
-
         notificacion.setMensaje("Mensaje de notificacion");
 
         sessionFactory.getCurrentSession().save(notificacion);
@@ -165,22 +133,6 @@ public class RepositorioNotificacionTest {
 
         sessionFactory.getCurrentSession().save(usuario);
 
-        Comunidad comunidad = new Comunidad();
-        comunidad.setNombre("comunidad prueba");
-
-        Cancion cancion = new Cancion();
-        cancion.setUri("das:prueba");
-
-        sessionFactory.getCurrentSession().save(cancion);
-        sessionFactory.getCurrentSession().save(comunidad);
-
-        Recomendacion recomendacion = new Recomendacion();
-        recomendacion.setCancion(cancion);
-        recomendacion.setComunidad(comunidad);
-        recomendacion.setUsuario(usuario);
-
-        sessionFactory.getCurrentSession().save(recomendacion);
-
         Notificacion notificacion = new Notificacion();
         notificacion.setLeido(false);
         notificacion.setUsuario(usuario);
@@ -203,22 +155,6 @@ public class RepositorioNotificacionTest {
         usuario.setUrlFoto("aasdas");
 
         sessionFactory.getCurrentSession().save(usuario);
-
-        Comunidad comunidad = new Comunidad();
-        comunidad.setNombre("comunidad prueba");
-
-        Cancion cancion = new Cancion();
-        cancion.setUri("das:prueba");
-
-        sessionFactory.getCurrentSession().save(cancion);
-        sessionFactory.getCurrentSession().save(comunidad);
-
-        Recomendacion recomendacion = new Recomendacion();
-        recomendacion.setCancion(cancion);
-        recomendacion.setComunidad(comunidad);
-        recomendacion.setUsuario(usuario);
-
-        sessionFactory.getCurrentSession().save(recomendacion);
 
         Notificacion notificacion = new Notificacion();
         notificacion.setLeido(true);

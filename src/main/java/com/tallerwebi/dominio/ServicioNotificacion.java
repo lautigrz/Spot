@@ -9,6 +9,8 @@ public interface ServicioNotificacion {
     void generarNotificacionSobreRecomendacion(Long idUsuario, Long idRecomendacion, Boolean estado);
     void cambiarEstadoNotificacion(List<Long> idsNotificaciones);
     void generarNotificacionDeEliminacionDeUsuarioDeLaComunidad(Long idUsuario, Long idComunidad);
+    void generarNotificacionDeMensajeEliminacionDeUsuarioDeLaComunidad(Long idUsuario, Long idComunidad);
+    void generarNotificacionParaNuevoAdmin(Long idUsuario, Long idComunidad);
     Boolean elUsuarioTieneNotificaciones(Long idUsuario);
 
 }

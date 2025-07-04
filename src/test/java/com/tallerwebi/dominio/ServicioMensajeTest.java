@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,14 +22,16 @@ public class ServicioMensajeTest {
     }
 
     @Test
-    public void testEliminarMensajeYRetornaUrlDeImagen() {
+    public void testEliminarMensajeYRetornaUsuarioDtoDelMensaje() {
 
         String url = "http://example.com/image.jpg";
+        UsuarioDto usuarioDto = new UsuarioDto();
+        usuarioDto.setUrlFoto(url);
+        usuarioDto.setId(2L);
+        when(repositorioMensajeMock.eliminarMensaje(anyLong())).thenReturn(usuarioDto);
+        UsuarioDto resultado = servicioMensaje.eliminarMensaje(1L);
 
-        when(repositorioMensajeMock.eliminarMensaje(anyLong())).thenReturn(url);
-        String resultado = servicioMensaje.eliminarMensaje(1L);
-
-        assertThat(resultado, equalTo(url));
+        assertThat(resultado, equalTo(usuarioDto));
 
     }
 }

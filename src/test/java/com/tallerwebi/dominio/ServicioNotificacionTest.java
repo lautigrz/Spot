@@ -8,6 +8,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
@@ -17,14 +18,14 @@ public class ServicioNotificacionTest {
     private ServicioUsuario servicioUsuarioMock;
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     private ServicioNotificacion servicioNotificacion;
-    private ServicioComunidad servicioComunidad;
+    private ServicioUsuarioComunidad servicioUsuarioComunidad;
     @BeforeEach
     public void setUp() {
         repositorioNotificacionMock = mock(RepositorioNotificacion.class);
         servicioUsuarioMock = mock(ServicioUsuario.class);
         servicioRecomedacionComunidad = mock(ServicioRecomedacionComunidad.class);
-       servicioComunidad = mock(ServicioComunidad.class);
-        servicioNotificacion = new ServicioNotificacionImpl(repositorioNotificacionMock,servicioUsuarioMock,servicioRecomedacionComunidad, servicioComunidad);
+        servicioUsuarioComunidad = mock(ServicioUsuarioComunidad.class);
+        servicioNotificacion = new ServicioNotificacionImpl(repositorioNotificacionMock, servicioUsuarioComunidad,servicioRecomedacionComunidad,servicioUsuarioMock);
 
     }
 
@@ -141,6 +142,109 @@ public class ServicioNotificacionTest {
         verify(repositorioNotificacionMock).cambiarEstadoNotificacion(ids);
     }
 
+    @Test
+    public void seDebegenerarNotificacionCuandoSeEliminaAUsuarioDeLaComunidad(){
+        Usuario usuario = mock(Usuario.class);
 
+        Comunidad comunidad = mock(Comunidad.class);
+        when(comunidad.getNombre()).thenReturn("Comunidad Test");
+
+        UsuarioComunidad usuarioComunidad = mock(UsuarioComunidad.class);
+        when(usuarioComunidad.getUsuario()).thenReturn(usuario);
+        when(usuarioComunidad.getComunidad()).thenReturn(comunidad);
+
+        when(servicioUsuarioComunidad.obtenerUsuarioEnComunidad(anyLong(), anyLong()))
+                .thenReturn(usuarioComunidad);
+
+        when(servicioUsuarioComunidad.obtenerUsuarioEnComunidad(anyLong(), anyLong()))
+                .thenReturn(usuarioComunidad);
+
+        servicioNotificacion.generarNotificacionDeEliminacionDeUsuarioDeLaComunidad(1L, 1L);
+
+
+        String mensajeEsperado = "Fuiste eliminado de la comunidad <strong>" + usuarioComunidad.getComunidad().getNombre() + "</strong> por el administrador.";
+
+        verify(repositorioNotificacionMock).guardarNotificacion(
+                eq(mensajeEsperado),
+                eq(usuario)
+        );
+
+    }
+
+    @Test
+    public void seDebegenerarNotificacionDeMensajeEliminacionParaUnUsuarioDeLaComunidad(){
+        Usuario usuario = mock(Usuario.class);
+
+        Comunidad comunidad = mock(Comunidad.class);
+        when(comunidad.getNombre()).thenReturn("Comunidad Test");
+
+        UsuarioComunidad usuarioComunidad = mock(UsuarioComunidad.class);
+        when(usuarioComunidad.getUsuario()).thenReturn(usuario);
+        when(usuarioComunidad.getComunidad()).thenReturn(comunidad);
+
+        when(servicioUsuarioComunidad.obtenerUsuarioEnComunidad(anyLong(), anyLong()))
+                .thenReturn(usuarioComunidad);
+
+        when(servicioUsuarioComunidad.obtenerUsuarioEnComunidad(anyLong(), anyLong()))
+                .thenReturn(usuarioComunidad);
+
+        servicioNotificacion.generarNotificacionDeMensajeEliminacionDeUsuarioDeLaComunidad(1L, 1L);
+
+
+        String mensajeEsperado = "Su mensaje fue eliminado por un administrador de la comunidad <strong>" + usuarioComunidad.getComunidad().getNombre() + "</strong> por no cumplir las normas establecidas.";
+
+        verify(repositorioNotificacionMock).guardarNotificacion(
+                eq(mensajeEsperado),
+                eq(usuario)
+        );
+
+    }
+
+    @Test
+    public void seDebeLanzarExcepcionSiUsuarioNoPerteneceALaComunidad() {
+
+        when(servicioUsuarioComunidad.obtenerUsuarioEnComunidad(anyLong(), anyLong()))
+                .thenReturn(null);
+
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> servicioNotificacion.generarNotificacionDeMensajeEliminacionDeUsuarioDeLaComunidad(1L, 1L)
+        );
+
+        assertThat(exception.getMessage(), equalTo("Comunidad o usuario no encontrado"));
+
+
+        verify(repositorioNotificacionMock, never()).guardarNotificacion(anyString(), any());
+    }
+
+    @Test
+    public void seDebegenerarNotificacionCuandoSeHaceAdminAUnMiembro(){
+        Usuario usuario = mock(Usuario.class);
+
+        Comunidad comunidad = mock(Comunidad.class);
+        when(comunidad.getNombre()).thenReturn("Comunidad Test");
+
+        UsuarioComunidad usuarioComunidad = mock(UsuarioComunidad.class);
+        when(usuarioComunidad.getUsuario()).thenReturn(usuario);
+        when(usuarioComunidad.getComunidad()).thenReturn(comunidad);
+
+        when(servicioUsuarioComunidad.obtenerUsuarioEnComunidad(anyLong(), anyLong()))
+                .thenReturn(usuarioComunidad);
+
+        when(servicioUsuarioComunidad.obtenerUsuarioEnComunidad(anyLong(), anyLong()))
+                .thenReturn(usuarioComunidad);
+
+        servicioNotificacion.generarNotificacionParaNuevoAdmin(1L, 1L);
+
+
+        String mensajeEsperado = "Felicidades!, Ahora usted es nuevo administrador de la comunidad <strong>" + usuarioComunidad.getComunidad().getNombre() + ".";
+
+        verify(repositorioNotificacionMock).guardarNotificacion(
+                eq(mensajeEsperado),
+                eq(usuario)
+        );
+
+    }
 
 }

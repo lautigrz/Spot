@@ -13,14 +13,14 @@ public class ServicioNotificacionImpl implements ServicioNotificacion {
 
     private RepositorioNotificacion repositorioNotificacion;
     private ServicioUsuario servicioUsuario;
-    private ServicioComunidad servicioComunidad;
+    private ServicioUsuarioComunidad servicioUsuarioComunidad;
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     public ServicioNotificacionImpl(RepositorioNotificacion repositorioNotificacion,
-                                    ServicioUsuario servicioUsuario,
-                                    ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioComunidad servicioComunidad) {
+                                    ServicioUsuarioComunidad servicioUsuarioComunidad,
+                                    ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioUsuario servicioUsuario) {
         this.repositorioNotificacion = repositorioNotificacion;
         this.servicioUsuario = servicioUsuario;
-        this.servicioComunidad = servicioComunidad;
+        this.servicioUsuarioComunidad = servicioUsuarioComunidad;
         this.servicioRecomedacionComunidad = servicioRecomedacionComunidad;
     }
 
@@ -65,20 +65,50 @@ public class ServicioNotificacionImpl implements ServicioNotificacion {
     @Override
     public void generarNotificacionDeEliminacionDeUsuarioDeLaComunidad(Long idUsuario, Long idComunidad) {
 
-        Comunidad comunidad = servicioComunidad.obtenerComunidad(idComunidad);
-        Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
-
-        if(comunidad == null && usuario == null) {
+       UsuarioComunidad usuarioComunidad = servicioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario,idComunidad);
+        System.out.println("usuario:" + usuarioComunidad);
+        if(usuarioComunidad == null) {
 
             throw new IllegalArgumentException("Comunidad o usuario no encontrado");
 
         }
 
-        String mensaje = "Fuiste eliminado de la comunidad <strong>" + comunidad.getNombre() + "</strong> por el administrador.";
+        String mensaje = "Fuiste eliminado de la comunidad <strong>" + usuarioComunidad.getComunidad().getNombre() + "</strong> por el administrador.";
 
-        repositorioNotificacion.guardarNotificacion(mensaje, usuario);
+        repositorioNotificacion.guardarNotificacion(mensaje, usuarioComunidad.getUsuario());
 
 
+
+    }
+
+    @Override
+    public void generarNotificacionDeMensajeEliminacionDeUsuarioDeLaComunidad(Long idUsuario, Long idComunidad) {
+        UsuarioComunidad usuarioComunidad = servicioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario,idComunidad);
+
+        if(usuarioComunidad == null) {
+
+            throw new IllegalArgumentException("Comunidad o usuario no encontrado");
+
+        }
+
+        String mensaje = "Su mensaje fue eliminado por un administrador de la comunidad <strong>" + usuarioComunidad.getComunidad().getNombre() + "</strong> por no cumplir las normas establecidas.";
+
+        repositorioNotificacion.guardarNotificacion(mensaje, usuarioComunidad.getUsuario());
+    }
+
+    @Override
+    public void generarNotificacionParaNuevoAdmin(Long idUsuario, Long idComunidad) {
+        UsuarioComunidad usuarioComunidad = servicioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario,idComunidad);
+
+        if(usuarioComunidad == null) {
+
+            throw new IllegalArgumentException("Comunidad o usuario no encontrado");
+
+        }
+
+        String mensaje = "Felicidades!, Ahora usted es nuevo administrador de la comunidad <strong>" + usuarioComunidad.getComunidad().getNombre() + ".";
+
+        repositorioNotificacion.guardarNotificacion(mensaje, usuarioComunidad.getUsuario());
 
     }
 

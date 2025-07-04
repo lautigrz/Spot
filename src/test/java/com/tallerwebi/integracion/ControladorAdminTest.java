@@ -2,11 +2,18 @@ package com.tallerwebi.integracion;
 
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.presentacion.ControladorAdmin;
+import com.tallerwebi.presentacion.dto.ChatMessage;
+import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.internal.matchers.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.ui.Model;
 
+import javax.persistence.Access;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +24,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 public class ControladorAdminTest {
+
     private ServicioAdmin servicioAdmin;
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     private ServicioPlaylist servicioPlaylist;
@@ -24,16 +32,18 @@ public class ControladorAdminTest {
     private ServicioNotificacion servicioNotificacion;
     private ServicioMensaje servicioMensaje;
     private ControladorAdmin controladorAdmin;
-
+    private SimpMessagingTemplate messagingTemplate;
     @BeforeEach
     public void setUp() {
         servicioAdmin = mock(ServicioAdmin.class);
+        messagingTemplate = mock(SimpMessagingTemplate.class);
         servicioRecomedacionComunidad = mock(ServicioRecomedacionComunidad.class);
         servicioNotificacion = mock(ServicioNotificacion.class);
         servicioPlaylist = mock(ServicioPlaylist.class);
         servicioEvento = mock(ServicioEvento.class);
         servicioMensaje = mock(ServicioMensaje.class);
         controladorAdmin = new ControladorAdmin(servicioAdmin, servicioRecomedacionComunidad, servicioPlaylist, servicioEvento, servicioNotificacion, servicioMensaje);
+        ReflectionTestUtils.setField(controladorAdmin, "messagingTemplate", messagingTemplate);
     }
 
     @Test
@@ -103,7 +113,7 @@ public class ControladorAdminTest {
 
         Map<String, Object> respuesta = controladorAdmin.aceptarRecomendacion(idComunidad, idRecomendacion);
 
-
+        verify(servicioNotificacion).generarNotificacionSobreRecomendacion(anyLong(), eq(idRecomendacion), eq(true));
         verify(servicioRecomedacionComunidad).aceptarRecomendacion(idRecomendacion);
         verify(servicioPlaylist).obtenerPlaylistsRelacionadasAUnaComunidad(idComunidad);
         verify(servicioPlaylist).agregarCancionALaPlaylist(
@@ -141,5 +151,51 @@ public class ControladorAdminTest {
         assertThat(vista, equalTo("redirect:/comunidad/" + idComunidad));
     }
 
+    @Test
+    public void eliminarMiembroDeComunidad_deberiaLlamarServiciosYRedirigir() {
 
+        Long idComunidad = 1L;
+        Long idMiembro = 2L;
+
+
+        String resultado = controladorAdmin.eliminarMiembroDeComunidad(idComunidad, idMiembro);
+
+
+        verify(servicioNotificacion).generarNotificacionDeEliminacionDeUsuarioDeLaComunidad(idMiembro, idComunidad);
+        verify(servicioAdmin).eliminarMiembroDeComunidad(idComunidad, idMiembro);
+        assertThat("redirect:/comunidad/" + idComunidad, equalTo(resultado));
+    }
+    @Test
+    public void testDelete_deberiaEliminarMensajeGenerarNotificacionYEnviarMensaje() {
+
+
+        ChatMessage inputMessage = new ChatMessage();
+        inputMessage.setId("123");
+        inputMessage.setType(ChatMessage.MessageType.DELETE);
+
+        UsuarioDto usuarioDto = new UsuarioDto();
+        usuarioDto.setId(1L);
+        usuarioDto.setUrlFoto("foto.jpg");
+
+        when(servicioMensaje.eliminarMensaje(123L)).thenReturn(usuarioDto);
+
+        String idComunidad = "10";
+
+
+        controladorAdmin.delete(inputMessage, idComunidad);
+
+
+        verify(servicioMensaje).eliminarMensaje(123L);
+        verify(servicioNotificacion).generarNotificacionDeMensajeEliminacionDeUsuarioDeLaComunidad(1L, 10L);
+
+        ArgumentCaptor<ChatMessage> messageCaptor = ArgumentCaptor.forClass(ChatMessage.class);
+
+        verify(messagingTemplate).convertAndSend(eq("/topic/" + idComunidad), messageCaptor.capture());
+
+        ChatMessage eliminado = messageCaptor.getValue();
+
+        assertThat("123",equalTo(eliminado.getId()));
+        assertThat("foto.jpg", equalTo(eliminado.getImage()));
+        assertThat(ChatMessage.MessageType.DELETE, equalTo(eliminado.getType()));
+    }
 }

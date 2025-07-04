@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +15,7 @@ public class ServicioMensajeImpl implements ServicioMensaje {
     }
 
     @Override
-    public String eliminarMensaje(Long idMensaje) {
+    public UsuarioDto eliminarMensaje(Long idMensaje) {
         return this.repositorioMensaje.eliminarMensaje(idMensaje);
     }
 }

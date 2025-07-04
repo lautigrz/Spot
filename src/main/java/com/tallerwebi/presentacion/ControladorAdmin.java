@@ -7,6 +7,7 @@ import com.tallerwebi.dominio.*;
 import com.tallerwebi.presentacion.dto.CancionDto;
 
 import com.tallerwebi.presentacion.dto.ChatMessage;
+import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -43,14 +44,15 @@ public class ControladorAdmin {
 
     @PostMapping("/eliminarMiembro/{idComunidad}/{idMiembro}")
     public String eliminarMiembroDeComunidad(@PathVariable Long idComunidad,@PathVariable Long idMiembro) {
-        servicioAdmin.eliminarMiembroDeComunidad(idComunidad, idMiembro);
         servicioNotificacion.generarNotificacionDeEliminacionDeUsuarioDeLaComunidad(idMiembro,idComunidad);
+        servicioAdmin.eliminarMiembroDeComunidad(idComunidad, idMiembro);
         return "redirect:/comunidad/" + idComunidad;
     }
 
     @PostMapping("/hacerAdmin/{idComunidad}/{idMiembro}")
     public String hacerAdminAUnMiembro(@PathVariable Long idComunidad, @PathVariable Long idMiembro) {
         servicioAdmin.hacerAdminAUnMiembro(idComunidad, idMiembro);
+        servicioNotificacion.generarNotificacionParaNuevoAdmin(idMiembro, idComunidad);
         return "redirect:/comunidad/" + idComunidad;
     }
 
@@ -121,11 +123,13 @@ public class ControladorAdmin {
             Long idMensaje = Long.parseLong(message.getId());
 
 
-            String image = servicioMensaje.eliminarMensaje(idMensaje);
+            UsuarioDto usuarioDto = servicioMensaje.eliminarMensaje(idMensaje);
+
+            servicioNotificacion.generarNotificacionDeMensajeEliminacionDeUsuarioDeLaComunidad(usuarioDto.getId(),Long.parseLong(idComunidad));
 
             ChatMessage eliminado = new ChatMessage();
             eliminado.setId(message.getId());
-            eliminado.setImage(image);
+            eliminado.setImage(usuarioDto.getUrlFoto());
             eliminado.setType(ChatMessage.MessageType.DELETE);
 
             messagingTemplate.convertAndSend("/topic/" + idComunidad, eliminado);
