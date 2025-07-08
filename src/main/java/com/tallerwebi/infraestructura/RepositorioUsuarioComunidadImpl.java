@@ -97,4 +97,15 @@ public class RepositorioUsuarioComunidadImpl implements RepositorioUsuarioComuni
 
         return result > 0;
     }
+
+    @Override
+    public UsuarioComunidad obtenerUsuarioPorNombreEnComunidad(String usuario, Long idComunidad) {
+        String hql = "FROM UsuarioComunidad uc WHERE uc.usuario.user = :usuario AND uc.comunidad.id = :idComunidad";
+        Query<UsuarioComunidad> query = sessionFactory.getCurrentSession().createQuery(hql, UsuarioComunidad.class);
+        query.setParameter("usuario", usuario);
+        query.setParameter("idComunidad", idComunidad);
+        UsuarioComunidad resultado = query.uniqueResult();
+
+        return resultado;
+    }
 }

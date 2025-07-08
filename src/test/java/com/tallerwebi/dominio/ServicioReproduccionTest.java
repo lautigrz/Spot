@@ -3,6 +3,7 @@ package com.tallerwebi.dominio;
 import com.google.gson.JsonArray;
 import com.tallerwebi.presentacion.dto.CancionDto;
 import com.tallerwebi.presentacion.dto.Sincronizacion;
+import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -37,15 +38,16 @@ public class ServicioReproduccionTest {
     private ServicioReproduccion servicioReproduccion;
     private RepositorioComunidad repositorioComunidad;
     private RepositorioUsuarioComunidad repositorioUsuarioComunidad;
-
+    private ServicioUsuario servicioUsuario;
     @BeforeEach
     public void setUp() {
         servicioInstancia = mock(ServicioInstancia.class);
         servicioSpotify = mock(ServicioSpotify.class);
         servicioComunidad = mock(ServicioComunidad.class);
         repositorioComunidad = mock(RepositorioComunidad.class);
+        servicioUsuario = mock(ServicioUsuario.class);
         repositorioUsuarioComunidad = mock(RepositorioUsuarioComunidad.class);
-        servicioReproduccion = new ServicioReproduccionImpl(servicioInstancia, servicioSpotify, repositorioComunidad, servicioComunidad, repositorioUsuarioComunidad);
+        servicioReproduccion = new ServicioReproduccionImpl(servicioInstancia, servicioSpotify, repositorioComunidad, servicioComunidad, repositorioUsuarioComunidad, servicioUsuario);
     }
 
     @Test
@@ -148,6 +150,12 @@ public class ServicioReproduccionTest {
 
     @Test
     public void debeRetornarLaCancionSonandoEnUnaComunidad() throws Exception {
+        UsuarioDto usuarioDto = new UsuarioDto();
+        usuarioDto.setId(1L);
+        usuarioDto.setUser("lautigrz");
+
+        Usuario usuarioMock = mock(Usuario.class);
+
 
         List<String> usuarios = new ArrayList<>(List.of("lautigrz"));
         String token = "token";
@@ -188,6 +196,12 @@ public class ServicioReproduccionTest {
         when(trackMock.getAlbum()).thenReturn(albumMock);
         when(albumMock.getImages()).thenReturn(new Image[]{imageMock});
         when(imageMock.getUrl()).thenReturn("http://imagen.com/img.jpg");
+
+        when(servicioComunidad.obtenerUsuarioPorSuNombreEnUnaComunidad(anyString() , anyLong())).thenReturn(usuarioDto);
+        when(servicioUsuario.obtenerUsuarioPorId(anyLong())).thenReturn(usuarioMock);
+        when(usuarioMock.getToken()).thenReturn("fake-token");
+        when(usuarioMock.getId()).thenReturn(2L);
+
 
         CancionDto cancionDto = servicioReproduccion.obtenerCancionSonandoEnLaComunidad(1L);
 
