@@ -34,13 +34,15 @@ public class ControladorPerfil {
     private ServicioFavorito servicioFavorito;
     private ServicioPreescucha servicioPreescucha;
     private ServicioReproduccion servicioReproduccion;
+    private ServicioLike servicioLike;
     @Autowired
-    public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioEstadoDeAnimo servicioEstadoDeAnimo, ServicioRecomendaciones servicioRecomendaciones, ServicioUsuario servicioUsuario, ServicioReproduccion servicioReproduccion) {
+    public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioEstadoDeAnimo servicioEstadoDeAnimo, ServicioRecomendaciones servicioRecomendaciones, ServicioUsuario servicioUsuario, ServicioReproduccion servicioReproduccion, ServicioLike servicioLike) {
         this.servicioPerfil = servicioPerfil;
         this.servicioEstadoDeAnimo = servicioEstadoDeAnimo;
         this.servicioReproduccion = servicioReproduccion;
         this.servicioRecomendaciones = servicioRecomendaciones;
         this.servicioUsuario = servicioUsuario;
+        this.servicioLike = servicioLike;
     }
 
     @Autowired
@@ -193,8 +195,6 @@ public class ControladorPerfil {
         Usuario usuario = servicioUsuario.obtenerUsuarioPorId(usuarioId);
 
 
-
-
         try {
             User user = servicioPerfil.obtenerPerfilUsuario(token);
 
@@ -208,6 +208,7 @@ public class ControladorPerfil {
             model.addAttribute("escuchando", servicioPerfil.obtenerReproduccionActualDelUsuario(token));
             model.addAttribute("listaDeEstadosDeAnimo", servicioEstadoDeAnimo.obtenerTodosLosEstadosDeAnimo());
             model.addAttribute("usuarioId", usuarioId);
+            model.addAttribute("post",servicioLike.obtenerPostConLikeDeUsuario(usuarioId));
             EstadoDeAnimo estado = servicioPerfil.obtenerEstadoDeAnimoDelUsuario(token);
             System.out.println("Estado desde servicioPerfil: " + (estado != null ? estado.getNombre() : "null"));
 

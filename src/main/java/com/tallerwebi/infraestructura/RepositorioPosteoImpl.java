@@ -44,4 +44,9 @@ public class RepositorioPosteoImpl implements RepositorioPosteo {
         query.setParameter("id", artistaId);
         return query.list();
     }
+
+    @Override
+    public Post obtenerPosteoPorId(Long idPosteo) {
+        return sessionFactory.getCurrentSession().get(Post.class, idPosteo);
+    }
 }

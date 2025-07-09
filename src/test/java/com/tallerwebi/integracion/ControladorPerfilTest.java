@@ -34,7 +34,7 @@ public class ControladorPerfilTest {
         servicioRecomendaciones = mock(ServicioRecomendaciones.class);
         servicioUsuario = mock(ServicioUsuario.class);
         servicioReproduccion = mock(ServicioReproduccion.class);
-        controladorPerfil = new ControladorPerfil(servicioPerfil, servicioEstadoDeAnimo, servicioRecomendaciones, servicioUsuario, servicioReproduccion);
+        controladorPerfil = new ControladorPerfil(servicioPerfil, servicioEstadoDeAnimo, servicioRecomendaciones, servicioUsuario, servicioReproduccion, null);
         session = mock(HttpSession.class);
         model = mock(Model.class);
     }

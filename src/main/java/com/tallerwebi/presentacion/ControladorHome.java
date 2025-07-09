@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 
 import com.tallerwebi.dominio.*;
+import com.tallerwebi.presentacion.dto.PostLikeDto;
 import org.dom4j.rule.Mode;
 
 import com.tallerwebi.dominio.ServicioComunidad;
@@ -25,6 +26,7 @@ import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 public class ControladorHome {
@@ -36,14 +38,15 @@ public class ControladorHome {
     private ServicioNotificacion servicioNotificacion;
     private ServicioInstancia spotify;
     private ServicioPosteo servicioPosteo;
+    private ServicioLike servicioLike;
 
-
-    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo) {
+    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike) {
             this.servicioArtista = servicioArtista;
         this.servicioUsuario = servicioUsuario;
         this.servicioComunidad = servicioComunidad;
         this.servicioNotificacion = servicioNotificacion;
         this.spotify = spotify;
+        this.servicioLike = servicioLike;
         this.servicioPosteo = servicioPosteo;
     }
 
@@ -59,7 +62,14 @@ public class ControladorHome {
             modelMap.put("usuario", usuario);
 
             List<Post> posteos = servicioPosteo.obtenerPosteosDeArtistasFavoritos(usuario);
-            modelMap.put("posteos", posteos);
+            List<Long> idsDePostConLike = servicioLike.devolverIdsDePostConLikeDeUsuarioDeUnaListaDePosts(idUsuario, posteos.stream().map(Post::getId).collect(Collectors.toList()));
+
+            List<PostLikeDto> postsConLike = posteos.stream()
+                    .map(p -> new PostLikeDto(p, idsDePostConLike.contains(p.getId())))
+                    .collect(Collectors.toList());
+
+
+            modelMap.put("posteos", postsConLike);
 
 
             modelMap.put("notificacion", servicioNotificacion.elUsuarioTieneNotificaciones(idUsuario));
@@ -67,9 +77,13 @@ public class ControladorHome {
             Artista artista = (Artista) artistaObj;
             modelMap.put("artista", artista);
 
-            //Muestra sus propios posteos
             List<Post> posteos = servicioPosteo.obtenerPosteosDeArtista(artista);
-            modelMap.put("posteos", posteos);
+            List<PostLikeDto> postsConLike = posteos.stream()
+                    .map(p -> new PostLikeDto(p, false))
+                    .collect(Collectors.toList());
+
+
+            modelMap.put("posteos", postsConLike);
         } else {
             return new ModelAndView("redirect:/login");
         }
@@ -123,18 +137,7 @@ public class ControladorHome {
         return "redirect:/login";
     }
 
-    @PostMapping("/postear")
-    public String postearTexto(@RequestParam("texto") String texto, HttpSession session) {
-        Object artistaObj = session.getAttribute("artista");
-        if (artistaObj == null) {
-            // No es artista, por lo tanto no puede subir un post
-            return "redirect:/home";
-        }
 
-        Artista artista = (Artista) artistaObj;
-        servicioPosteo.publicarPosteo(artista, texto);
-        return "redirect:/home";
-    }
 
 }
 

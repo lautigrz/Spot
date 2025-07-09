@@ -185,5 +185,37 @@ body.sidebar-collapsed .avatar-user {
 .list-group-item button:hover {
     color: #388e3c;
 }
+.btn-like:hover, .btn-share:hover {
+    background-color: #e0e0e0;
+    color: #000;
+    cursor: pointer;
+}
+
+.btn-like.liked {
+    color: white !important;
+    border-color: #198754 !important;
+    transform: scale(1.1) !important;
+    background-color: #198754 !important;
+}
+
+.btn-like.liked:hover {
+    background-color: #0b5ed7;
+    border-color: #0b5ed7;
+}
+
+/* Animación pop */
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1.1); }
+}
+
+.btn-like.pop {
+    animation: pop 0.3s ease;
+}
+
+.feed-card{
+ margin-top: 15px !important;
+}
 
 

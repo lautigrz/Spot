@@ -10,6 +10,7 @@
 </head>
 <body>
 <input type="hidden" id="usuarioID" th:if="${usuario != null}" th:value="${usuario.id}"/>
+<input type="hidden" id="artistaID" th:if="${artista != null}" th:value="${artista.id}"/>
 <div class="container-fluid">
     <div class="row">
 
@@ -89,19 +90,38 @@
 
 
             <!-- Muestro los posteos -->
-            <div th:each="post : ${posteos}">
+            <div th:each="postDto : ${posteos}">
                 <div class="card feed-card p-3 mb-4" style="background-color: #1e1e1e;">
                     <div class="d-flex align-items-center mb-3">
-                        <img th:src="${post.artista.fotoPerfil != null} ? ${post.artista.fotoPerfil} : '/images/default-avatar.png'"
+                        <img th:src="${postDto.post.artista.fotoPerfil != null} ? ${postDto.post.artista.fotoPerfil} : '/images/default-avatar.png'"
                              class="rounded-circle me-2 avatar-user" alt="Avatar" style="width:40px; height:40px;" />
                         <div>
-                            <strong th:text="${post.artista.nombre}">Nombre Artista</strong><br />
-                            <small class="text-secondary" th:text="${post.fechaFormateada}">Fecha</small>
+                            <strong th:text="${postDto.post.artista.nombre}">Nombre Artista</strong><br />
+                            <small class="text-secondary" th:text="${postDto.post.fechaFormateada}">Fecha</small>
                         </div>
                     </div>
-                    <p class="text-black" th:text="${post.contenido}">Contenido del post</p>
+                    <p class="text-black" th:text="${postDto.post.contenido}">Contenido del post</p>
+                </div>
+
+                <div class="d-flex justify-content-start gap-3 mt-3 px-1">
+                    <button th:classappend="${postDto.liked} ? ' liked' : ''"
+                            class="btn-like btn btn-sm d-flex align-items-center rounded-pill px-3"
+                            th:attr="data-post-id=${postDto.post.id}"
+                            th:disabled="${usuario == null}"
+                            style="background-color: #f5f5f5; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd; transition: background-color 0.3s, color 0.3s, transform 0.2s;">
+                        <i class="bi bi-hand-thumbs-up me-2"></i>
+                        <span class="like-text">Me gusta</span>
+                        <span class="like-count" style="margin-left:6px; font-weight:600;">42</span>
+                    </button>
+
+                    <button class="btn-share btn btn-sm d-flex align-items-center rounded-pill px-3"
+                            th:attr="data-post-id=${postDto.post.id}"
+                            style="background-color: #f5f5f5; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #ddd; transition: background-color 0.3s, color 0.3s;">
+                        <i class="bi bi-share me-2"></i> Compartir
+                    </button>
                 </div>
             </div>
+
 
         </div>
 
@@ -152,8 +172,49 @@
     </div>
 </div>
 
+
+<!-- Modal Compartir -->
+<div class="modal fade" id="compartirModal" tabindex="-1" aria-labelledby="compartirModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="compartirModalLabel">Compartir publicación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Selecciona usuarios para enviar:</p>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="user1">
+                    <label class="form-check-label" for="user1">
+                        Usuario 1
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="user2">
+                    <label class="form-check-label" for="user2">
+                        Usuario 2
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="user3">
+                    <label class="form-check-label" for="user3">
+                        Usuario 3
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary">Enviar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/notificaciones.js}"></script>
+<script th:src="@{/js/like.js}"></script>
 <script>
     const toggleBtn = document.getElementById('toggleSidebar');
     const sidebar = document.getElementById('sidebar');
@@ -171,6 +232,13 @@
         sidebar.classList.toggle('collapsed');
         document.body.classList.toggle('sidebar-collapsed');
 
+    });
+
+    // Compartir abre modal
+    const btnShare = document.getElementById('btn-share');
+    btnShare.addEventListener('click', () => {
+        const compartirModal = new bootstrap.Modal(document.getElementById('compartirModal'));
+        compartirModal.show();
     });
 </script>
 
