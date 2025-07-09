@@ -28,4 +28,28 @@ public class VistaLogin extends VistaWeb {
     public void darClickEnIniciarSesion(){
         this.darClickEnElElemento("#btn-login");
     }
+
+    public void darClickEnContinuarConSpotify(){
+        this.darClickEnElElemento("a.btn-spotify");
+    }
+
+    public void darClickEnAceptarAlSerRedirigidoAlAutenticadorDeSpotify(){
+        this.darClickEnElElemento("button:has-text('Aceptar')");
+    }
+
+    public void darClickEnBotonPerfil() {
+        this.darClickEnElElemento("a:has-text('Perfil')");
+    }
+
+    public void seleccionarEstadoDeAnimo(String selectorCSS, String opcionElegida) {
+        this.seleccionarOpcion(selectorCSS, opcionElegida);
+    }
+
+    public void actualizarEstadoDeAnimo() {
+        this.darClickEnElElemento("button:has-text('Actualizar')");
+    }
+
+    public void obtenerTextoDeLaBarraDeEstadoDeAnimo() {
+        this.obtenerTextoDelElemento("");
+    }
 }
