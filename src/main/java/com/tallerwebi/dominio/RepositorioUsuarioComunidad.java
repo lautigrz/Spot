@@ -14,4 +14,8 @@ public interface RepositorioUsuarioComunidad {
     Boolean eliminarUsuarioDeComunidad(Long idUsuario, Long idComunidad);
 
     UsuarioComunidad obtenerUsuarioPorNombreEnComunidad(String usuario, Long idComunidad);
+
+    List<Comunidad> obtenerComunidadesDondeElUsuarioEsteUnido(Usuario usuario);
+
+    void compartirPosteoEnComunidad(Post post, List<Comunidad> comunidads, Usuario usuario);
 }

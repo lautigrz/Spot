@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.TypedQuery;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -133,4 +134,9 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
     }
 
 
-}
+
+
+    }
+
+
+

@@ -26,4 +26,6 @@ public interface ServicioComunidad {
     List<ComunidadDto> buscarComunidadesPorNombre(String nombreComunidad);
 
     UsuarioDto obtenerUsuarioPorSuNombreEnUnaComunidad(String usuario, Long idComunidad);
+
+
 }

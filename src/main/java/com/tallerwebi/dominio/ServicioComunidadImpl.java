@@ -29,6 +29,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
     private ServicioReproduccion servicioReproduccion;
 
+
     public ServicioComunidadImpl(RepositorioComunidad repositorioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad, @Lazy ServicioReproduccion servicioReproduccion) {
         this.repositorioUsuarioComunidad = repositorioUsuarioComunidad;
         this.repositorioComunidad = repositorioComunidad;
@@ -213,6 +214,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
 
     }
+
 
     public static void limpiarCanales() {
         canales.clear();

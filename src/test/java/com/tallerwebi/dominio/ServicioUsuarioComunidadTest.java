@@ -3,20 +3,23 @@ package com.tallerwebi.dominio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ServicioUsuarioComunidadTest {
 
     private RepositorioUsuarioComunidad repositorioUsuarioComunidadMock;
     private ServicioUsuarioComunidad servicioUsuarioComunidad;
+    private ServicioPosteo servicioPosteoMock;
     @BeforeEach
     public void setUp() {
+        servicioPosteoMock = mock(ServicioPosteo.class);
       repositorioUsuarioComunidadMock = mock(RepositorioUsuarioComunidad.class);
-      servicioUsuarioComunidad = new ServicioUsuarioComunidadImpl(repositorioUsuarioComunidadMock);
+      servicioUsuarioComunidad = new ServicioUsuarioComunidadImpl(repositorioUsuarioComunidadMock, servicioPosteoMock);
 
     }
 
@@ -94,4 +97,33 @@ public class ServicioUsuarioComunidadTest {
 
         assertThat(resultado, equalTo(false));
     }
+
+    @Test
+    public void seDebeCompartirUnPostComoMensajeParaUnaComunidad() {
+
+        Long idPost = 1L;
+        Long idComunidad = 5L;
+        Long idUsuario = 1L;
+
+        Post postMock = new Post();
+        Comunidad comunidadMock = new Comunidad();
+        Usuario usuarioMock = new Usuario();
+
+        UsuarioComunidad usuarioComunidadMock = new UsuarioComunidad();
+        usuarioComunidadMock.setComunidad(comunidadMock);
+        usuarioComunidadMock.setUsuario(usuarioMock);
+
+        when(servicioPosteoMock.obtenerPosteoPorId(idPost)).thenReturn(postMock);
+        when(repositorioUsuarioComunidadMock.obtenerUsuarioEnComunidad(idUsuario, idComunidad))
+                .thenReturn(usuarioComunidadMock);
+
+
+        servicioUsuarioComunidad.compartirPosteoEnComunidad(idPost, List.of(idComunidad), idUsuario);
+
+
+        verify(servicioPosteoMock).obtenerPosteoPorId(idPost);
+        verify(repositorioUsuarioComunidadMock).obtenerUsuarioEnComunidad(idUsuario, idComunidad);
+        verify(repositorioUsuarioComunidadMock).compartirPosteoEnComunidad(postMock, List.of(comunidadMock), usuarioMock);
+    }
+
 }
