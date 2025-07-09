@@ -36,13 +36,15 @@ public class ControladorHome {
     private ServicioUsuario servicioUsuario;
     private ServicioComunidad servicioComunidad;
     private ServicioNotificacion servicioNotificacion;
+    private ServicioUsuarioComunidad servicioUsuarioComunidad;
     private ServicioInstancia spotify;
     private ServicioPosteo servicioPosteo;
     private ServicioLike servicioLike;
 
-    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike) {
+    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad) {
             this.servicioArtista = servicioArtista;
         this.servicioUsuario = servicioUsuario;
+        this.servicioUsuarioComunidad = servicioUsuarioComunidad;
         this.servicioComunidad = servicioComunidad;
         this.servicioNotificacion = servicioNotificacion;
         this.spotify = spotify;
@@ -70,6 +72,8 @@ public class ControladorHome {
 
 
             modelMap.put("posteos", postsConLike);
+
+            modelMap.put("usuarioComunidad", servicioUsuarioComunidad.obtenerComunidadesDondeElUsuarioEsteUnido(idUsuario));
 
 
             modelMap.put("notificacion", servicioNotificacion.elUsuarioTieneNotificaciones(idUsuario));

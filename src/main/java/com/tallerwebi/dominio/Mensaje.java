@@ -26,6 +26,10 @@ public class Mensaje {
    @JoinColumn(name = "comunidad_id")
    private Comunidad comunidad;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "post_id")
+    private Post postCompartido;
+
     @PrePersist
     public void prePersist() {
         fechaCreacion = LocalDateTime.now();

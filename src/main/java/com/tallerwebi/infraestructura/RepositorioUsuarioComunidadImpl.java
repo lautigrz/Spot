@@ -1,11 +1,7 @@
 package com.tallerwebi.infraestructura;
 
-import com.tallerwebi.dominio.Comunidad;
-import com.tallerwebi.dominio.RepositorioUsuarioComunidad;
-import com.tallerwebi.dominio.Usuario;
-import com.tallerwebi.dominio.UsuarioComunidad;
+import com.tallerwebi.dominio.*;
 import com.tallerwebi.presentacion.dto.UsuarioDto;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,5 +103,38 @@ public class RepositorioUsuarioComunidadImpl implements RepositorioUsuarioComuni
         UsuarioComunidad resultado = query.uniqueResult();
 
         return resultado;
+    }
+
+    @Override
+    public List<Comunidad> obtenerComunidadesDondeElUsuarioEsteUnido(Usuario usuario) {
+
+        String hql = "SELECT uc.comunidad FROM UsuarioComunidad uc WHERE uc.usuario.id = :idUsuario";
+        Query<Comunidad> query = sessionFactory.getCurrentSession().createQuery(hql, Comunidad.class);
+        query.setParameter("idUsuario", usuario.getId());
+        List<Comunidad> comunidades = query.getResultList();
+
+        return comunidades;
+    }
+
+    @Override
+    public void compartirPosteoEnComunidad(Post post, List<Comunidad> comunidades, Usuario usuario) {
+
+        if (post == null || usuario == null) {
+            throw new IllegalArgumentException("Post y usuario no pueden ser nulos.");
+        }
+
+        if (comunidades == null || comunidades.isEmpty()) {
+            throw new IllegalArgumentException("Debe especificar al menos una comunidad para compartir el post.");
+        }
+
+        for (Comunidad comunidad : comunidades) {
+            Mensaje mensaje = new Mensaje();
+            mensaje.setComunidad(comunidad);
+            mensaje.setPostCompartido(post);
+            mensaje.setUsuario(usuario);
+            mensaje.setEstadoMensaje(true);
+
+            sessionFactory.getCurrentSession().save(mensaje);
+        }
     }
 }

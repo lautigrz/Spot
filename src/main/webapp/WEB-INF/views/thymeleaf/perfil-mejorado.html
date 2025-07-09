@@ -147,7 +147,7 @@
                 <div class="card-header fw-bold">Posts que gustaron</div>
                 <div class="card-body">
                     <div class="feed-post mb-3 d-flex gap-3" th:each="posteo : ${post}">
-                        <img th:src="${posteo.getArtista().getFotoPerfil()}" alt="user" class="rounded-circle" width="45" height="45" />
+                        <img th:src="${posteo.getArtista().getFotoPerfil()}" alt="user" class="rounded-circle" width="45" height="45" style="object-fit: cover" />
                         <div>
                             <h6 class="mb-0 fw-semibold" th:text="${posteo.getArtista().getNombre()}"></h6>
                             <small class="text-muted" th:text="${posteo.getFechaFormateada()}"></small>

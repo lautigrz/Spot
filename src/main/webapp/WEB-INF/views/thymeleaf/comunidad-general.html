@@ -140,9 +140,26 @@
                                        th:text="${mensaje.fechaCreacion.format(formatter)}">
                                 </small>
 
+                                <!-- Texto del mensaje (si existe) -->
+                                <p class="mb-0 d-inline" th:if="${mensaje.getTexto() != null}" th:text="${mensaje.getTexto()}"></p>
 
+                                <!-- Bloque para post compartido -->
+                                <div th:if="${mensaje.getPostCompartido() != null}" class="mt-2 p-2 border rounded" style="background-color: rgb(223 223 223);">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <img th:src="${mensaje.getPostCompartido().getArtista().getFotoPerfil()}"
+                                             class="rounded-circle me-2"
+                                             alt="Artista"
+                                             style="width: 30px; height: 30px; object-fit: cover;">
+                                        <strong th:text="${mensaje.getPostCompartido().getArtista().getNombre()}"></strong>
+                                    </div>
+                                    <small class="text-muted">
 
-                                <p class="mb-0 d-inline" th:text="${mensaje.getTexto()}"></p>
+                                        <span th:with="formatter=${T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yy HH:mm')}"
+                                              th:text="${mensaje.getPostCompartido().getFecha().format(formatter)}"></span>
+                                    </small>
+                                    <p class="mb-1" th:text="${mensaje.getPostCompartido().getContenido()}"></p>
+
+                                </div>
                             </div>
                             <i class="fas fa-heart ms-3 corazon" style="cursor:pointer;" title="Like"></i>
                         </div>
