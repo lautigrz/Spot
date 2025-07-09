@@ -48,7 +48,7 @@ public class ControladorPost {
 
         Map<String, Object> response = new HashMap<>();
         response.put("mensaje", "Like dado correctamente");
-        // podés agregar más info como nuevo contador, etc.
+
 
         return ResponseEntity.ok(response);
 
@@ -64,7 +64,7 @@ public class ControladorPost {
 
         Map<String, Object> response = new HashMap<>();
         response.put("mensaje", "dislike dado correctamente");
-        // podés agregar más info como nuevo contador, etc.
+
 
         return ResponseEntity.ok(response);
 

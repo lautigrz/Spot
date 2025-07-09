@@ -40,6 +40,7 @@ public class RepositorioLikeImpl implements RepositorioLike {
                 .setParameter("usuarioId", usuario.getId())
                 .uniqueResult();
 
+        posteo.getLikes().remove(like);
         sessionFactory.getCurrentSession().delete(like);
 
     }
