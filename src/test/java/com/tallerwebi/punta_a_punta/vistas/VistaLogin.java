@@ -1,12 +1,13 @@
 package com.tallerwebi.punta_a_punta.vistas;
 
+import com.microsoft.playwright.Frame;
 import com.microsoft.playwright.Page;
 
 public class VistaLogin extends VistaWeb {
 
     public VistaLogin(Page page) {
         super(page);
-        page.navigate("localhost:8080/spring/login");
+        page.navigate("https://4361834a412b.ngrok-free.app/spring/login");
     }
 
     public String obtenerTextoDeLaBarraDeNavegacion(){
@@ -49,7 +50,75 @@ public class VistaLogin extends VistaWeb {
         this.darClickEnElElemento("button:has-text('Actualizar')");
     }
 
-    public void obtenerTextoDeLaBarraDeEstadoDeAnimo() {
-        this.obtenerTextoDelElemento("");
+    public String obtenerTextoDeLaBarraDeEstadoDeAnimo() {
+        page.waitForSelector("h5.mb-0 span");
+        return this.obtenerTextoDelElemento("h5.mb-0 span");
+    }
+
+    public void waitTimeOut() {
+        page.waitForTimeout(3000);
+    }
+
+    public void buscarArtista(String selector, String artista) {
+        this.escribirEnElElemento(selector, artista);
+        this.page.press(selector, "Enter");
+    }
+
+
+    public void hacerClickEnComprarPreescucha() {
+        this.darClickEnElElemento("button:has-text('Comprar pre-escucha')");
+    }
+
+
+    public void hacerClickEnIngresarAMercadoPago() {
+        this.darClickEnElElemento("button.andes-list__item-action:has(.icon_mercado_pago_yellow)");
+    }
+
+    public void ingresarUsuarioMercadoPago(String selector, String usuario) {
+        this.escribirEnElElemento(selector, usuario);
+    }
+
+    public void ingresarPassMercadoPago(String selectorMpPass, String passMp) {
+        this.escribirEnElElemento(selectorMpPass, passMp);
+    }
+
+    public void hacerClickEnSeleccionCuotas() {
+        this.darClickEnElElemento("#installments-Cuotas-trigger");
+        page.waitForSelector("#installments-Cuotas-menu-list");
+    }
+
+    public void hacerClickEnCantidadCuotas(){
+        this.darClickEnElElemento("#installments-Cuotas-menu-list-option-1");
+    }
+
+    public void cambiarFocoAInputYCompletarCodigoSeguridad(String selector, String codigoSeguridad) {
+        Frame codigoSeguridadFrame = page.frames()
+                .stream()
+                .filter(f -> "securityCode".equals(f.name()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No se encontró el frame con name='securityCode'"));
+
+        codigoSeguridadFrame.fill(selector, codigoSeguridad);
+    }
+
+    public void hacerClickEnPagar(){
+        this.darClickEnElElemento("button:has-text('Pagar')");
+    }
+
+
+    public void hacerClickEnContinuar() {
+        this.darClickEnElElemento("button:has-text('Continuar')");
+    }
+
+    public void hacerClickEnIniciarSesion() {
+        this.darClickEnElElemento("button:has-text('Iniciar sesión')");
+    }
+
+    public void hacerClickEnVisitSite() {
+        this.darClickEnElElemento("button:has-text('Visit Site')");
+    }
+
+    public void hacerClickEnVolverAlPerfil() {
+        this.darClickEnElElemento("a[href='/spring/perfil']");
     }
 }
