@@ -24,3 +24,4 @@ application.properties
 src/main/webapp/resources/core/js/node_modules
 uploads/
 .env
+.sesionSpotify.json
