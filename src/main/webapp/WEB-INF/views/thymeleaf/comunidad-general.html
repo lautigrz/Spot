@@ -112,7 +112,7 @@
                             <i class="fas fa-headphones me-2"></i> Sincronizarme a escuchar
                         </button>
 
-                        <a href="#" th:href="@{/reproducir/{id}(id=${comunidad.getId()})}" class="btn btn-spotify btn-sm"
+                        <a id="reproduccion" th:href="@{/reproducir/{id}(id=${comunidad.getId()})}" class="btn btn-spotify btn-sm"
                            th:unless="${hayUsuarios}">
                             <i class="fas fa-play me-2"></i> Empezar reproducción
                         </a>

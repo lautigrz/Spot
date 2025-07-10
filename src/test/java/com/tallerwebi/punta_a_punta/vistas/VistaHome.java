@@ -6,7 +6,7 @@ public class VistaHome extends VistaWeb{
 
     public VistaHome(Page page) {
         super(page);
-        page.navigate("https://37957abfbd3d.ngrok-free.app/spring/home");
+        page.navigate("http://localhost:8080/spring/home");
 
     }
 
@@ -35,5 +35,12 @@ public class VistaHome extends VistaWeb{
     public String obtenerPrimerFavorito(){
         return this.obtenerTextoDelElemento("div:has(h4:has-text('Mis Favoritos')) ul li a");
     }
+
+    public void darClickEnCrearNuevaComunidad(){
+
+        this.darClickEnElElemento("a[href='/spring/nueva-comunidad']");
+
+    }
+
 
 }

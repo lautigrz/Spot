@@ -7,7 +7,11 @@ public class VistaLogin extends VistaWeb {
 
     public VistaLogin(Page page) {
         super(page);
-        page.navigate("https://37957abfbd3d.ngrok-free.app/spring/login");
+        page.navigate("http://localhost:8080/spring/login");
+    }
+
+    public Page getPage() {
+        return this.page;
     }
 
     public void darClickEnBotonSpotify(){
@@ -24,6 +28,7 @@ public class VistaLogin extends VistaWeb {
 
     public void esperarRedireccionAlHome() {
         this.page.waitForURL("**/spring/home**", new Page.WaitForURLOptions().setTimeout(10000));
+
 
     }
 

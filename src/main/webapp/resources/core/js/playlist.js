@@ -30,16 +30,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const idComunidad = document.getElementById('comunidad').value;
         const nombrePlaylist = document.getElementById('nombrePlaylist').value;
         const imagenInput = document.getElementById("imagenPlaylist");
-        const imagen = imagenInput.files[0];
+        let imagen = imagenInput.files[0];
 
         console.log('Input imagenPlaylist:', imagenInput);
         console.log('Archivos seleccionados:', imagenInput.files);
         console.log('Primer archivo:', imagen);
 
         console.log('nombre:', nombrePlaylist);
-        if (!nombrePlaylist || !imagen) {
+        if (!nombrePlaylist) {
             alert("Faltan datos para crear la playlist.");
             return;
+        }
+        if(!imagen){
+            imagen = new File([""], "default.jpg", { type: "image/jpeg" });
         }
 
         const formData = new FormData();

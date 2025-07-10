@@ -91,8 +91,11 @@ public class ControladorComunidad {
         try {
             Comunidad comunidad = servicioComunidad.obtenerComunidad(idComunidad);
 
+            String urlImagen = "";
+            if(imagen != null){
+                servicioGuardarImagen.guardarImagenDePlaylist(imagen);
+            }
 
-            String urlImagen = servicioGuardarImagen.guardarImagenDePlaylist(imagen);
 
             ObjectMapper mapper = new ObjectMapper();
             List<CancionDto> cancionesDto = mapper.readValue(cancionesJson, new TypeReference<List<CancionDto>>() {});
