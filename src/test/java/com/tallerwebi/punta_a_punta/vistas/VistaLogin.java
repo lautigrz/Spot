@@ -8,7 +8,7 @@ public class VistaLogin extends VistaWeb {
 
     public VistaLogin(Page page) {
         super(page);
-        page.navigate("http://localhost:8080/spring/login");
+        page.navigate("https://34d6d3a8d142.ngrok-free.app/spring/login");
     }
 
     public Page getPage() {
