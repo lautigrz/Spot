@@ -37,22 +37,29 @@ public class ControladorCrearPreescucha {
 
     @PostMapping("/crear-preescucha")
     public String procesarPreescucha(@ModelAttribute Preescucha preescucha,
-                                     @RequestParam("imagenPortada") MultipartFile imagen, HttpSession session) throws IOException {
+                                     @RequestParam("imagenPortada") MultipartFile imagen,@RequestParam("archivoAudio") MultipartFile archivoAudio, HttpSession session) throws IOException {
 
         Artista artista = (Artista) session.getAttribute("artista");
         String urlImagen = servicioGuardarImagen.guardarImagenPreescucha(imagen);
         preescucha.setPreescuchaFotoUrl(urlImagen);
+
+        String urlAudio = servicioGuardarImagen.guardarAudioPreescucha(archivoAudio);
+        preescucha.setRutaAudio(urlAudio);
         preescucha.setArtista(artista);
+
+
 
         servicioPreescucha.crearPreescuchaLocal(
                 preescucha.getPrecio(),
                 preescucha.getTitulo(),
                 preescucha.getPreescuchaFotoUrl(),
+                preescucha.getRutaAudio(),
                 artista);
 
         System.out.println("Preescucha creada");
         System.out.println("Titulo: " + preescucha.getTitulo());
         System.out.println("URL Imagen: " + preescucha.getPreescuchaFotoUrl());
+        System.out.println("Audio: " + preescucha.getRutaAudio());
         System.out.println("Precio: " + preescucha.getPrecio());
         System.out.println("Artista: " + preescucha.getArtista().getNombre());
 

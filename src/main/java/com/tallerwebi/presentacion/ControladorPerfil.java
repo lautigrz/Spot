@@ -97,6 +97,9 @@ public class ControladorPerfil {
             List<Album> albumesComprados = servicioPerfil.obtenerAlbumesDePreescuchaCompradosPorElUsuario(albumsId, token);
             model.addAttribute("albumesCompradosDetalle", albumesComprados);
 
+            List<Preescucha> preescuchasLocales = servicioPreescucha.obtenerPreescuchasCompradasLocalmente(usuario);
+            model.addAttribute("preescuchasLocales", preescuchasLocales);
+
             Set<UsuarioDto> seguidos = servicioUsuario.obtenerSeguidos(usuarioId);
             Set<UsuarioDto> seguidores = servicioUsuario.obtenerSeguidores(usuarioId);
 
