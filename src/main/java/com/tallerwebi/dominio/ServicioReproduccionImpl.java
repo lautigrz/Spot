@@ -28,13 +28,15 @@ public class ServicioReproduccionImpl implements ServicioReproduccion {
     private ServicioInstancia servicioInstancia;
     private ServicioSpotify servicioSpotify;
     private ServicioComunidad servicioComunidad;
+    private ServicioUsuario servicioUsuario;
     private RepositorioComunidad repositorioComunidad;
     private RepositorioUsuarioComunidad repositorioUsuarioComunidad;
     @Autowired
     public ServicioReproduccionImpl(ServicioInstancia servicioInstancia, ServicioSpotify servicioSpotify, RepositorioComunidad repositorioComunidad
-            , ServicioComunidad servicioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad) {
+            , ServicioComunidad servicioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad, ServicioUsuario servicioUsuario) {
         this.servicioInstancia = servicioInstancia;
         this.servicioSpotify = servicioSpotify;
+        this.servicioUsuario = servicioUsuario;
         this.repositorioUsuarioComunidad = repositorioUsuarioComunidad;
         this.repositorioComunidad = repositorioComunidad;
         this.servicioComunidad = servicioComunidad;
@@ -97,7 +99,8 @@ public class ServicioReproduccionImpl implements ServicioReproduccion {
             }
 
             try {
-                CancionDto cancion = obtenerCancionActualDeUsuario(usuario, idComunidad);
+                Long idUsuario = servicioComunidad.obtenerUsuarioPorSuNombreEnUnaComunidad(usuario, idComunidad).getId();
+                CancionDto cancion = obtenerCancionActualDeUsuario(idUsuario);
                 if (cancion != null) {
                     return cancion;
                 }
@@ -119,10 +122,10 @@ public class ServicioReproduccionImpl implements ServicioReproduccion {
     }
 
     @Override
-    public CancionDto obtenerCancionActualDeUsuario(String usuario, Long idComunidad)
+    public CancionDto obtenerCancionActualDeUsuario(Long id)
             throws IOException, ParseException, SpotifyWebApiException {
 
-        String token = repositorioComunidad.obtenerTokenDelUsuarioQuePerteneceAUnaComunidad(usuario, idComunidad);
+        String token = servicioUsuario.obtenerUsuarioPorId(id).getToken();
 
         SpotifyApi spotifyApi = servicioInstancia.obtenerInstanciaDeSpotifyConToken(token);
 

@@ -60,4 +60,12 @@ public class RepositorioPreescuchaImpl  implements RepositorioPreescucha {
         return (Preescucha) query.uniqueResult();
     }
 
+    @Override
+    public List<Preescucha> obtenerPreescuchasLocalesCompradasPorUsuario(Long usuarioId) {
+        String hql = "FROM Preescucha p WHERE p.usuario.id = :usuarioId AND p.fechaCompra IS NOT NULL";
+        Query<Preescucha> query = sessionFactory.getCurrentSession().createQuery(hql, Preescucha.class);
+        query.setParameter("usuarioId", usuarioId);
+        return query.list();
+    }
+
 }

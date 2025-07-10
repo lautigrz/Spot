@@ -8,4 +8,5 @@ public interface RepositorioPreescucha {
     List<Preescucha> obtenerComprasPorUsuario(Long usuarioId);
     boolean existeCompraLocal(int preescuchaId, Long id);
     Preescucha buscarPreescuchaPorId(int preescuchaId);
+    List<Preescucha> obtenerPreescuchasLocalesCompradasPorUsuario(Long usuarioId);
 }

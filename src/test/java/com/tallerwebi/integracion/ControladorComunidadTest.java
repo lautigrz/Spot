@@ -474,6 +474,42 @@ public class ControladorComunidadTest {
         verify(servicioUsuarioComunidadMock).eliminarUsuarioDeComunidad(idUsuario, idComunidad);
     }
 
+
+    @Test
+    public void compartirPosteoEnComunidad_DeberiaRetornarOk() throws Exception {
+        Long postId = 1L;
+        Long usuarioId = 2L;
+        List<Long> comunidades = List.of(5L, 6L);
+
+
+        doNothing().when(servicioUsuarioComunidadMock).compartirPosteoEnComunidad(postId, comunidades, usuarioId);
+
+        mockMvc.perform(post("/compartir-post/{idPost}/{idUsuario}", postId, usuarioId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("[5,6]"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Post compartido correctamente")));
+
+        verify(servicioUsuarioComunidadMock).compartirPosteoEnComunidad(postId, comunidades, usuarioId);
+    }
+
+    @Test
+   public void compartirPosteoEnComunidad_DeberiaRetornarError() throws Exception {
+        Long postId = 1L;
+        Long usuarioId = 2L;
+        List<Long> comunidades = List.of(5L, 6L);
+
+        doThrow(new RuntimeException("Error")).when(servicioUsuarioComunidadMock)
+                .compartirPosteoEnComunidad(postId, comunidades, usuarioId);
+
+        mockMvc.perform(post("/compartir-post/{idPost}/{idUsuario}", postId, usuarioId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("[5,6]"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().string(containsString("Error al compartir el post")));
+
+        verify(servicioUsuarioComunidadMock).compartirPosteoEnComunidad(postId, comunidades, usuarioId);
+    }
 }
 
 

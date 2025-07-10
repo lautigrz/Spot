@@ -6,8 +6,9 @@ let intervaloProgreso = null;
 document.addEventListener("DOMContentLoaded", () => {
 
     const idComunidad = document.getElementById("comunidad").value;
-
+    obtenerCancionActualDesdeServidor(idComunidad);
 });
+
 function obtenerCancionActualDesdeServidor(idComunidad) {
     fetch(`/spring/cancion/${idComunidad}`)
         .then(response => {
@@ -82,6 +83,18 @@ function actualizarFooterCancion(dt) {
 
         footer.style.background = gradient;
         footer.style.display = "flex";
+
+        const luminance = 0.299 * color1[0] + 0.587 * color1[1] + 0.114 * color1[2];
+
+        console.log("luminaria",luminance);
+        if (luminance > 162) {
+            footer.style.setProperty("color", "black", "important");
+
+        } else {
+
+            footer.style.setProperty("color", "white", "important");
+
+        }
     }
 }
 

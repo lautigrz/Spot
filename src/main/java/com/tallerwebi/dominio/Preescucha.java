@@ -24,6 +24,7 @@ public class Preescucha {
     private Double precio;
     private String titulo;
     private String preescuchaFotoUrl;
+    private String rutaAudio;
 
 
     @ManyToOne
@@ -33,4 +34,5 @@ public class Preescucha {
     @ManyToOne
     @JoinColumn(name = "artista_id")
     private Artista artista;
+
 }

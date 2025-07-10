@@ -3,6 +3,7 @@ package com.tallerwebi.integracion;
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.integracion.config.SpringWebTestConfig;
 import com.tallerwebi.presentacion.ControladorHome;
+import com.tallerwebi.presentacion.dto.PostLikeDto;
 import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.apache.maven.model.Model;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,8 @@ public class ControladorHomeTest {
 
     private ServicioPosteo servicioPosteoMock;
     private ServicioNotificacion servicioNotificacionMock;
-
+    private ServicioLike servicioLikeMock;
+    private ServicioUsuarioComunidad servicioUsuarioComunidadMock;
     private ControladorHome controladorHome;
 
     @BeforeEach
@@ -43,12 +45,13 @@ public class ControladorHomeTest {
         servicioUsuarioMock = mock(ServicioUsuario.class);
         servicioComunidadMock = mock(ServicioComunidad.class);
         servicioInstanciaMock = mock(ServicioInstancia.class);
-
+        servicioLikeMock = mock(ServicioLike.class);
         servicioPosteoMock = mock(ServicioPosteo.class);
+        servicioUsuarioComunidadMock = mock(ServicioUsuarioComunidad.class);
 
         servicioNotificacionMock = mock(ServicioNotificacion.class);
 
-        controladorHome = new ControladorHome(servicioArtistaMock,servicioUsuarioMock, servicioComunidadMock, servicioInstanciaMock, servicioNotificacionMock, servicioPosteoMock);
+        controladorHome = new ControladorHome(servicioArtistaMock,servicioUsuarioMock, servicioComunidadMock, servicioInstanciaMock, servicioNotificacionMock, servicioPosteoMock, servicioLikeMock, servicioUsuarioComunidadMock);
 
     }
 
@@ -63,6 +66,18 @@ public class ControladorHomeTest {
         HttpSession sessionMock = mock(HttpSession.class);
         when(sessionMock.getAttribute("user")).thenReturn(idUsuario);
 
+        Post post = new Post();
+        post.setId(10L);
+        List<Post> posteos = List.of(post);
+        List<Long> idsDePostConLike = List.of(10L);
+
+        when(servicioPosteoMock.obtenerPosteosDeArtistasFavoritos(usuario)).thenReturn(posteos);
+        when(servicioLikeMock.devolverIdsDePostConLikeDeUsuarioDeUnaListaDePosts(idUsuario, List.of(10L)))
+                .thenReturn(idsDePostConLike);
+
+
+
+
         List<Comunidad> comunidadesMock = List.of(new Comunidad(), new Comunidad());
 
 
@@ -72,12 +87,39 @@ public class ControladorHomeTest {
 
         ModelAndView modelAndView = controladorHome.vistaHome(sessionMock);
 
-
+        List<PostLikeDto> posteosConLike = (List<PostLikeDto>) modelAndView.getModel().get("posteos");
+        assertThat(posteosConLike.size(), equalTo(1));
+        assertThat(posteosConLike.get(0).getPost(), equalTo(post));
+        assertThat(posteosConLike.get(0).isLiked(), equalTo(true));
         assertThat(modelAndView.getViewName(), equalTo("home"));
         assertThat(modelAndView.getModel().get("usuario"), equalTo(usuario));
         assertThat(modelAndView.getModel().get("notificacion"), equalTo(true));
         assertThat(((List<?>) modelAndView.getModel().get("comunidades")).size(), equalTo(2));
     }
+
+    @Test
+   public void debeRetornarVistaHomeParaArtista() {
+        Artista artista = new Artista();
+        artista.setNombre("Artista Prueba");
+
+        HttpSession sessionMock = mock(HttpSession.class);
+        when(sessionMock.getAttribute("user")).thenReturn(null);
+        when(sessionMock.getAttribute("artista")).thenReturn(artista);
+
+        List<Post> posteos = List.of(new Post(), new Post());
+        when(servicioPosteoMock.obtenerPosteosDeArtista(artista)).thenReturn(posteos);
+        when(servicioComunidadMock.obtenerTodasLasComunidades()).thenReturn(List.of());
+
+        ModelAndView modelAndView = controladorHome.vistaHome(sessionMock);
+
+        assertThat(modelAndView.getViewName(), equalTo("home"));
+        assertThat(modelAndView.getModel().get("artista"), equalTo(artista));
+
+        List<PostLikeDto> posteosConLike = (List<PostLikeDto>) modelAndView.getModel().get("posteos");
+        assertThat(posteosConLike.size(), equalTo(2));
+        assertThat(posteosConLike.stream().allMatch(p -> !p.isLiked()), equalTo(true));
+    }
+
 
 
     @Test

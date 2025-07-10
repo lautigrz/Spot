@@ -8,6 +8,7 @@ import com.tallerwebi.infraestructura.RepositorioUsuarioImpl;
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.infraestructura.RepositorioUsuarioImpl;
+import com.tallerwebi.presentacion.dto.CancionDto;
 import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -32,13 +33,16 @@ public class ControladorPerfil {
     private ServicioUsuario servicioUsuario;
     private ServicioFavorito servicioFavorito;
     private ServicioPreescucha servicioPreescucha;
-
+    private ServicioReproduccion servicioReproduccion;
+    private ServicioLike servicioLike;
     @Autowired
-    public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioEstadoDeAnimo servicioEstadoDeAnimo, ServicioRecomendaciones servicioRecomendaciones, ServicioUsuario servicioUsuario) {
+    public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioEstadoDeAnimo servicioEstadoDeAnimo, ServicioRecomendaciones servicioRecomendaciones, ServicioUsuario servicioUsuario, ServicioReproduccion servicioReproduccion, ServicioLike servicioLike) {
         this.servicioPerfil = servicioPerfil;
         this.servicioEstadoDeAnimo = servicioEstadoDeAnimo;
+        this.servicioReproduccion = servicioReproduccion;
         this.servicioRecomendaciones = servicioRecomendaciones;
         this.servicioUsuario = servicioUsuario;
+        this.servicioLike = servicioLike;
     }
 
     @Autowired
@@ -92,6 +96,9 @@ public class ControladorPerfil {
             List<String> albumsId = servicioPreescucha.obtenerAlbumesComprados(usuario);
             List<Album> albumesComprados = servicioPerfil.obtenerAlbumesDePreescuchaCompradosPorElUsuario(albumsId, token);
             model.addAttribute("albumesCompradosDetalle", albumesComprados);
+
+            List<Preescucha> preescuchasLocales = servicioPreescucha.obtenerPreescuchasCompradasLocalmente(usuario);
+            model.addAttribute("preescuchasLocales", preescuchasLocales);
 
             Set<UsuarioDto> seguidos = servicioUsuario.obtenerSeguidos(usuarioId);
             Set<UsuarioDto> seguidores = servicioUsuario.obtenerSeguidores(usuarioId);
@@ -183,5 +190,70 @@ public class ControladorPerfil {
         servicioUsuario.dejarDeSeguirUsuario(idLogueado, id);
         return "redirect:/perfil/" + id;
     }
+    @GetMapping("/perfilMejorado")
+    public String perfilMejorado(HttpSession session, Model model) throws Exception {
+        String token = (String) session.getAttribute("token");
+        String refreshToken = (String) session.getAttribute("refreshToken");
+        Long usuarioId = (Long) session.getAttribute("user");
+        Usuario usuario = servicioUsuario.obtenerUsuarioPorId(usuarioId);
+
+
+        try {
+            User user = servicioPerfil.obtenerPerfilUsuario(token);
+
+            model.addAttribute("inicio", "Se inicio correctamente");
+            model.addAttribute("nombre",user.getDisplayName());
+            model.addAttribute("foto", user.getImages()[0].getUrl());
+            model.addAttribute("seguidos", servicioPerfil.obtenerCantidadDeArtistaQueSigueElUsuario(token));
+            model.addAttribute("mejores", servicioPerfil.obtenerMejoresArtistasDelUsuario(token));
+            model.addAttribute("playlist", servicioPerfil.obtenerNombreDePlaylistDelUsuario(token));
+            model.addAttribute("totalPlaylist", servicioPerfil.obtenerCantidadDePlaylistDelUsuario(token));
+            model.addAttribute("escuchando", servicioPerfil.obtenerReproduccionActualDelUsuario(token));
+            model.addAttribute("listaDeEstadosDeAnimo", servicioEstadoDeAnimo.obtenerTodosLosEstadosDeAnimo());
+            model.addAttribute("usuarioId", usuarioId);
+            model.addAttribute("post",servicioLike.obtenerPostConLikeDeUsuario(usuarioId));
+            EstadoDeAnimo estado = servicioPerfil.obtenerEstadoDeAnimoDelUsuario(token);
+            System.out.println("Estado desde servicioPerfil: " + (estado != null ? estado.getNombre() : "null"));
+
+            if (servicioPerfil.obtenerEstadoDeAnimoDelUsuario(token) != null){
+                model.addAttribute("estadoDeAnimoActual", servicioPerfil.obtenerEstadoDeAnimoDelUsuario(token));
+            }
+
+            if (usuarioId != null) {
+                model.addAttribute("favoritos", servicioFavorito.obtenerFavoritos(usuario));
+            }
+
+            if (!model.containsAttribute("recomendaciones")) {
+                model.addAttribute("recomendaciones", new ArrayList<Track>());
+            }
+
+            List<String> albumsId = servicioPreescucha.obtenerAlbumesComprados(usuario);
+            List<Album> albumesComprados = servicioPerfil.obtenerAlbumesDePreescuchaCompradosPorElUsuario(albumsId, token);
+            model.addAttribute("albumesCompradosDetalle", albumesComprados);
+
+            Set<UsuarioDto> seguidos = servicioUsuario.obtenerSeguidos(usuarioId);
+            Set<UsuarioDto> seguidores = servicioUsuario.obtenerSeguidores(usuarioId);
+
+            if (seguidos == null) seguidos = Collections.emptySet();
+            if (seguidores == null) seguidores = Collections.emptySet();
+
+            model.addAttribute("misSeguidos", seguidos);
+            model.addAttribute("misSeguidores", seguidores);
+
+        }catch (Exception e) {
+            e.printStackTrace();
+
+        }
+
+        return "perfil-mejorado";
+    }
+
+    @GetMapping("/escuchando/{idUsuario}")
+    @ResponseBody
+    public CancionDto escuchando(@PathVariable Long idUsuario) throws Exception {
+        CancionDto cancionDto = servicioReproduccion.obtenerCancionActualDeUsuario(idUsuario);
+        return cancionDto;
+    }
+
 
 }

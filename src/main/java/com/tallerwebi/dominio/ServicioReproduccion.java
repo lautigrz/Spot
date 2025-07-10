@@ -11,6 +11,7 @@ public interface ServicioReproduccion {
     Boolean reproducirCancion(String token, Long idComunidad, Long idUsuario) throws Exception;
     CancionDto obtenerCancionSonandoEnLaComunidad(Long idComunidad) throws IOException, ParseException, SpotifyWebApiException;
     Sincronizacion obtenerSincronizacion(String user, Long idComunidad) throws IOException, ParseException, SpotifyWebApiException;
-    CancionDto obtenerCancionActualDeUsuario(String usuario, Long idComunidad)  throws IOException, ParseException, SpotifyWebApiException;
+    CancionDto obtenerCancionActualDeUsuario(Long id)  throws IOException, ParseException, SpotifyWebApiException;
     Boolean estaEscuchandoMusica(String usuario);
+
 }

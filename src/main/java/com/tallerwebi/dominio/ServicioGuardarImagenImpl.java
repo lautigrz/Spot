@@ -57,4 +57,15 @@ public class ServicioGuardarImagenImpl implements ServicioGuardarImagen {
         String urlImagen = "/spring/uploads/portadas-preescucha/" + nombreArchivo;
         return urlImagen;
     }
+
+    @Override
+    public String guardarAudioPreescucha(MultipartFile archivoAudio) throws IOException {
+        String nombreArchivo = UUID.randomUUID() + "-" + archivoAudio.getOriginalFilename();
+        String ruta = "uploads/preescuchas-audio/" + nombreArchivo;
+        archivoAudio.transferTo(new File(ruta));
+        String urlAudio = "/spring/uploads/preescuchas-audio/" + nombreArchivo;
+        return urlAudio;
+    }
+
+
 }

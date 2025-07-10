@@ -234,9 +234,41 @@
         </div>
     </div>
 
-</div>
+    <div class="mb-5">
+        <h4 class="fw-bold mb-3">Mis Preescuchas Locales</h4>
+        <div th:if="${preescuchasLocales != null and #lists.isEmpty(preescuchasLocales) == false}">
+            <ul>
+                <li th:each="pre, iter : ${preescuchasLocales}" class="d-flex align-items-center mb-2">
+                    <img th:src="${pre.preescuchaFotoUrl}" alt="Foto preescucha"
+                         style="width:30px; height:30px; border-radius:50%; margin-right:10px;">
 
-<div class="container mt-4">
+                    <span th:text="${pre.titulo}"></span>&nbsp;-&nbsp;
+                    <span>$<span th:text="${pre.precio}"></span></span>
+
+
+                    <button type="button" class="btn btn-sm btn-success ms-3"
+                            th:onclick="'document.getElementById(\'audio-'+${iter.index}+'\').play()'">
+                        ▶️ Escuchar
+                    </button>
+
+
+                    <button type="button" class="btn btn-sm btn-danger ms-2"
+                            th:onclick="'document.getElementById(\'audio-'+${iter.index}+'\').pause()'">
+                        ⏸️ Pausar
+                    </button>
+
+
+                    <audio th:id="'audio-'+${iter.index}" th:src="${pre.rutaAudio}"></audio>
+                </li>
+            </ul>
+        </div>
+        <div th:unless="${preescuchasLocales != null and #lists.isEmpty(preescuchasLocales) == false}">
+            <p>No compraste ninguna preescucha local aún.</p>
+        </div>
+    </div>
+
+
+    <div class="container mt-4">
 
     <div th:if="${estadoDeAnimoActual != null}" class="alert alert-info text-center">
         <h5 class="mb-0">

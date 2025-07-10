@@ -61,4 +61,10 @@ public class ServicioPosteoImpl implements ServicioPosteo {
     public List<Post> obtenerPosteosDeArtista(Artista artista) {
        return repositorioPosteo.obtenerPostsPorArtista(artista.getId());
     }
+
+    @Override
+    public Post obtenerPosteoPorId(Long idPosteo) {
+        return repositorioPosteo.obtenerPosteoPorId(idPosteo);
+
+    }
 }

@@ -88,6 +88,15 @@
     <div class="preescucha-detalles">
       <p class="preescucha-titulo" th:text="${pre.titulo}">Título preescucha</p>
       <p>Precio: $<span th:text="${pre.precio}">0.00</span></p>
+
+      <form th:action="@{/artistas-locales/{artistaId}/comprar-preescucha/{preescuchaId}(artistaId=${artistaLocal.id}, preescuchaId=${pre.id})}" method="post"
+            th:if="${#lists.contains(preescuchasCompradasIds, pre.id) == false}">
+        <button type="submit">Comprar Pre-escucha</button>
+      </form>
+
+      <p th:if="${#lists.contains(preescuchasCompradasIds, pre.id)}" style="color: green; font-weight: bold;">
+        Ya compraste esta pre-escucha
+      </p>
     </div>
   </div>
 </div>

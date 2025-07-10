@@ -29,6 +29,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
     private ServicioReproduccion servicioReproduccion;
 
+
     public ServicioComunidadImpl(RepositorioComunidad repositorioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad, @Lazy ServicioReproduccion servicioReproduccion) {
         this.repositorioUsuarioComunidad = repositorioUsuarioComunidad;
         this.repositorioComunidad = repositorioComunidad;
@@ -161,7 +162,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
 
             }
 
-            CancionDto cancionDto = servicioReproduccion.obtenerCancionActualDeUsuario(usuario.getUser(), idComunidad);
+            CancionDto cancionDto = servicioReproduccion.obtenerCancionActualDeUsuario(usuario.getId());
             String escuchando = "No escuchando musica en este momento";
             if(cancionDto != null) {
                 escuchando = cancionDto.getArtista() + " - " + cancionDto.getTitulo();
@@ -195,6 +196,25 @@ public class ServicioComunidadImpl implements ServicioComunidad {
         
         return comunidadesDto;
     }
+
+    @Override
+    public UsuarioDto obtenerUsuarioPorSuNombreEnUnaComunidad(String usuario, Long idComunidad) {
+
+        UsuarioComunidad usuarioComunidad = repositorioUsuarioComunidad.obtenerUsuarioPorNombreEnComunidad(usuario, idComunidad);
+        if (usuarioComunidad == null) {
+            return null; // Usuario no encontrado en la comunidad
+        }
+
+        UsuarioDto usuarioDto = new UsuarioDto();
+        usuarioDto.setId(usuarioComunidad.getUsuario().getId());
+        usuarioDto.setUser(usuarioComunidad.getUsuario().getUser());
+        usuarioDto.setUrlFoto(usuarioComunidad.getUsuario().getUrlFoto());
+
+        return usuarioDto;
+
+
+    }
+
 
     public static void limpiarCanales() {
         canales.clear();

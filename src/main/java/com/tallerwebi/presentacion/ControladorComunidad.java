@@ -26,10 +26,7 @@ import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -94,8 +91,11 @@ public class ControladorComunidad {
         try {
             Comunidad comunidad = servicioComunidad.obtenerComunidad(idComunidad);
 
+            String urlImagen = "";
+            if(imagen != null){
+                servicioGuardarImagen.guardarImagenDePlaylist(imagen);
+            }
 
-            String urlImagen = servicioGuardarImagen.guardarImagenDePlaylist(imagen);
 
             ObjectMapper mapper = new ObjectMapper();
             List<CancionDto> cancionesDto = mapper.readValue(cancionesJson, new TypeReference<List<CancionDto>>() {});
@@ -295,6 +295,25 @@ public class ControladorComunidad {
             // Otros errores del backend o parseo
             System.err.println("Error al procesar la canción: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // 500
+        }
+    }
+
+
+    @PostMapping("/compartir-post/{idPost}/{idUsuario}")
+    @ResponseBody
+    public ResponseEntity<?> compartirPosteoEnComunidad(@PathVariable Long idPost,
+                                                        @RequestBody List<Long> comunidades,
+                                                        @PathVariable Long idUsuario) {
+        try {
+            servicioUsuarioComunidad.compartirPosteoEnComunidad(idPost, comunidades, idUsuario);
+            Map<String, Object> response = new HashMap<>();
+            response.put("mensaje", "Post compartido correctamente");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, Object> response = new HashMap<>();
+            response.put("mensaje", "Error al compartir el post");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
