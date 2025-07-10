@@ -3,7 +3,7 @@ import com.microsoft.playwright.*;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
-public class GuardarSesionSpotify {
+public class GuardarSesionSpotify_thomi {
     public static void main(String[] args) {
         try (Playwright playwright = Playwright.create()) {
             Browser browser = playwright.chromium().launch(
