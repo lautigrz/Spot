@@ -137,7 +137,7 @@
     <div class="perfil-info">
       <h1 th:text="${artista.name}">Nombre del Artista</h1>
       <form th:action="@{/artistas/{id}/favorito(id=${artista.id})}" method="post" th:if="${!esFavorito}">
-        <button type="submit">Agregar a favoritos</button>
+        <button type="submit" name="favorito">Agregar a favoritos</button>
       </form>
       <p class="favorito-info" th:if="${esFavorito}">Ya es tu favorito.</p>
     </div>

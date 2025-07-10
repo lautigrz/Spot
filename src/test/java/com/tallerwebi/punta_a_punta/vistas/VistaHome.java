@@ -6,7 +6,7 @@ public class VistaHome extends VistaWeb{
 
     public VistaHome(Page page) {
         super(page);
-        page.navigate("https://fc42020d921b.ngrok-free.app/spring/home");
+        page.navigate("https://37957abfbd3d.ngrok-free.app/spring/home");
 
     }
 
@@ -23,4 +23,17 @@ public class VistaHome extends VistaWeb{
     public String obtenerNombreArtista() {
         return this.obtenerTextoDelElemento("h1");
     }
+
+    public void agregarArtistaAFavoritos(){
+        this.darClickEnElElemento("button[name='favorito']");
+    }
+
+    public void esperarRedireccionAPerfil(){
+        this.page.waitForURL("**/spring/perfil");
+    }
+
+    public String obtenerPrimerFavorito(){
+        return this.obtenerTextoDelElemento("div:has(h4:has-text('Mis Favoritos')) ul li a");
+    }
+
 }

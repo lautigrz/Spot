@@ -62,7 +62,7 @@ public class PruebaFacu {
 
    @Test
     void deberiaBuscarArtistaYMostrarDetalle(){
-       Page page = context.newPage();    // UNA sola pestaña
+       Page page = context.newPage();
        VistaLogin vistaLogin = new VistaLogin(page);
        vistaLogin.darClickEnBotonSpotify();
        vistaLogin.aceptarPermisosEnSpotify();
@@ -74,6 +74,24 @@ public class PruebaFacu {
 
        String nombreArtista = vistaHome.obtenerNombreArtista();
        assertThat(nombreArtista, containsStringIgnoringCase("Airbag"));
+    }
+
+    @Test
+    void deberiaAgregarAlArtistaAFavoritosYVerloEnElPerfil(){
+        Page page = context.newPage();
+        VistaLogin vistaLogin = new VistaLogin(page);
+        vistaLogin.darClickEnBotonSpotify();
+        vistaLogin.aceptarPermisosEnSpotify();
+        vistaLogin.esperarRedireccionAlHome();
+
+        VistaHome vistaHome = new VistaHome(page);
+        vistaHome.buscarArtista("Airbag");
+        vistaHome.esperarDetalleArtista();
+        vistaHome.agregarArtistaAFavoritos();
+        vistaHome.esperarRedireccionAPerfil();
+
+        String favorito = vistaHome.obtenerPrimerFavorito();
+        assertThat(favorito, containsStringIgnoringCase("Airbag"));
     }
 
 }
