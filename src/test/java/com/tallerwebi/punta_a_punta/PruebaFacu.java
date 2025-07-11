@@ -62,8 +62,7 @@ public class PruebaFacu {
 
    @Test
     void deberiaBuscarArtistaYMostrarDetalle(){
-       Page page = context.newPage();
-       VistaLogin vistaLogin = new VistaLogin(page);
+       Page page = vistaLogin.getPage();
        vistaLogin.darClickEnBotonSpotify();
        vistaLogin.aceptarPermisosEnSpotify();
        vistaLogin.esperarRedireccionAlHome();
@@ -78,8 +77,7 @@ public class PruebaFacu {
 
     @Test
     void deberiaAgregarAlArtistaAFavoritosYVerloEnElPerfil(){
-        Page page = context.newPage();
-        VistaLogin vistaLogin = new VistaLogin(page);
+        Page page = vistaLogin.getPage();
         vistaLogin.darClickEnBotonSpotify();
         vistaLogin.aceptarPermisosEnSpotify();
         vistaLogin.esperarRedireccionAlHome();
