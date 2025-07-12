@@ -47,7 +47,7 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
     }
     @Override
     public List<Comunidad> obtenerComunidades() {
-        String hql = "FROM Comunidad";
+        String hql = "FROM Comunidad c WHERE c.preescucha IS NULL ORDER BY c.id DESC";
         TypedQuery<Comunidad> query = sessionFactory.getCurrentSession().createQuery(hql, Comunidad.class);
         return query.getResultList();
     }
@@ -133,10 +133,35 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
         return query.getResultList();
     }
 
+    @Override
+    public Long crearComunidadParaUnaPreescucha(Preescucha preescucha) {
+        Comunidad comunidad = new Comunidad();
+        comunidad.setNombre(preescucha.getTitulo());
+        comunidad.setDescripcion("Comunidad creada para la preescucha de " + preescucha.getArtista().getNombre());
+        comunidad.setUrlFoto(preescucha.getPreescuchaFotoUrl());
+        comunidad.setUrlPortada(preescucha.getPreescuchaFotoUrl());
+        comunidad.setPreescucha(preescucha);
+        comunidad.setHost(preescucha.getArtista());
 
+        preescucha.setComunidad(comunidad);
+        preescucha.getArtista().getComunidades().add(comunidad);
+        sessionFactory.getCurrentSession().save(comunidad);
 
-
+        return comunidad.getId();
     }
+
+    @Override
+    public List<Comunidad> obtenerComunidadesDeArtista(Long idArtista) {
+        String hql = "FROM Comunidad c WHERE c.host.id = :idArtista";
+        TypedQuery<Comunidad> query = sessionFactory.getCurrentSession().createQuery(hql, Comunidad.class);
+        query.setParameter("idArtista", idArtista);
+        List<Comunidad> comunidades = query.getResultList();
+
+        return comunidades;
+    }
+
+
+}
 
 
 

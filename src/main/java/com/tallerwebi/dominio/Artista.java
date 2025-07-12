@@ -28,4 +28,7 @@ public class Artista {
 
     @OneToMany(mappedBy = "artista", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Preescucha> preescuchas = new ArrayList<>();
+
+    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comunidad> comunidades = new ArrayList<>();
 }

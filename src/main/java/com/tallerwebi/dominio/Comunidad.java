@@ -33,9 +33,19 @@ public class Comunidad {
     @OneToMany(mappedBy = "comunidad", fetch = FetchType.LAZY)
     private List<Playlist> playlists = new ArrayList<>();
 
+    @OneToOne
+    @JoinColumn(name = "preescucha_id")
+    private Preescucha preescucha;
+
+
+    @ManyToOne
+    @JoinColumn(name = "artista_id")
+    private Artista host;
+
+
     public void agregarMensaje(Mensaje mensaje) {
         mensajes.add(mensaje);
-        mensaje.setComunidad(this); // ← este es el punto clave
+        mensaje.setComunidad(this);
     }
 
 

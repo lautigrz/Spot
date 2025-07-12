@@ -18,5 +18,7 @@ public interface RepositorioComunidad {
     Playlist obtenerPlaylistDeUnaComunidad(Long idComunidad);
     List<Usuario> obtenerUsuariosPorComunidad(Long idComunidad);
     List<Comunidad> buscarComunidadesPorNombre(String nombreComunidad);
+    Long crearComunidadParaUnaPreescucha(Preescucha preescucha);
+    List<Comunidad> obtenerComunidadesDeArtista(Long idArtista);
 
 }

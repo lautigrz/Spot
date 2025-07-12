@@ -28,10 +28,11 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     private RepositorioUsuarioComunidad repositorioUsuarioComunidad;
 
     private ServicioReproduccion servicioReproduccion;
+    private ServicioPreescucha servicioPreescucha;
 
-
-    public ServicioComunidadImpl(RepositorioComunidad repositorioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad, @Lazy ServicioReproduccion servicioReproduccion) {
+    public ServicioComunidadImpl(RepositorioComunidad repositorioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad, @Lazy ServicioReproduccion servicioReproduccion, ServicioPreescucha servicioPreescucha) {
         this.repositorioUsuarioComunidad = repositorioUsuarioComunidad;
+        this.servicioPreescucha = servicioPreescucha;
         this.repositorioComunidad = repositorioComunidad;
         this.servicioReproduccion = servicioReproduccion;
     }
@@ -213,6 +214,21 @@ public class ServicioComunidadImpl implements ServicioComunidad {
         return usuarioDto;
 
 
+    }
+
+    @Override
+    public Long crearComunidadParaUnaPreescucha(Long idPreescucha) {
+        Preescucha preescucha = servicioPreescucha.obtenerPreescuchaLocal(idPreescucha);
+        if (preescucha == null) {
+            return null;
+        }
+        return repositorioComunidad.crearComunidadParaUnaPreescucha(preescucha);
+    }
+
+    @Override
+    public List<ComunidadPreescuchaDto> obtenerComunidadDePreescucha(Long idArtista) {
+
+       return null;
     }
 
 

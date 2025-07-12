@@ -32,11 +32,7 @@ public class ServicioPreescuchaImpl implements ServicioPreescucha {
     @Override
     public void comprarPreescucha(String albumId, Usuario usuario) {
         if(!repositorioPreescucha.existeCompra(albumId, usuario.getId())){
-            Preescucha preescucha = new Preescucha();
-            preescucha.setSpotifyAlbumId(albumId);
-            preescucha.setUsuario(usuario);
-            preescucha.setFechaCompra(LocalDateTime.now());
-            repositorioPreescucha.guardar(preescucha);
+
         }
 
     }
@@ -50,32 +46,22 @@ public class ServicioPreescuchaImpl implements ServicioPreescucha {
     }
 
     @Override
-    public void crearPreescuchaLocal(Double precio, String titulo, String preescuchaFotoUrl, String rutaAudio, Artista artista){
+    public Long crearPreescuchaLocal(Double precio, String titulo, String preescuchaFotoUrl, String rutaAudio, LocalDateTime local, Artista artista){
         Preescucha nuevaPreescucha = new Preescucha();
         nuevaPreescucha.setPrecio(precio);
         nuevaPreescucha.setTitulo(titulo);
         nuevaPreescucha.setPreescuchaFotoUrl(preescuchaFotoUrl);
         nuevaPreescucha.setRutaAudio(rutaAudio);
         nuevaPreescucha.setArtista(artista);
+        nuevaPreescucha.setFechaEscucha(local);
         repositorioPreescucha.guardar(nuevaPreescucha);
+        return nuevaPreescucha.getId();
     }
 
     @Override
     public void comprarPreescuchaLocal(int preescuchaId, Usuario usuario) {
-        if (!repositorioPreescucha.existeCompraLocal(preescuchaId, usuario.getId())) {
-            Preescucha original = repositorioPreescucha.buscarPreescuchaPorId(preescuchaId);
-            if (original != null && usuario != null) {
-                Preescucha copia = new Preescucha();
-                copia.setPrecio(original.getPrecio());
-                copia.setTitulo(original.getTitulo());
-                copia.setPreescuchaFotoUrl(original.getPreescuchaFotoUrl());
-                copia.setRutaAudio(original.getRutaAudio());
-                copia.setArtista(original.getArtista());
-                copia.setUsuario(usuario);
-                copia.setFechaCompra(LocalDateTime.now());
-                repositorioPreescucha.guardar(copia);
-            }
-        }
+
+
     }
 
     @Override
@@ -85,5 +71,15 @@ public class ServicioPreescuchaImpl implements ServicioPreescucha {
 
     public List<Preescucha> obtenerPreescuchasCompradasLocalmente(Usuario usuario){
         return repositorioPreescucha.obtenerPreescuchasLocalesCompradasPorUsuario(usuario.getId());
+    }
+
+    @Override
+    public Preescucha obtenerPreescuchaLocal(Long id) {
+        return repositorioPreescucha.buscarPreescuchaPorId(id);
+    }
+
+    @Override
+    public List<Preescucha> obtenerPreescuchasPorArtista(Long idArtista) {
+        return repositorioPreescucha.obtenerPreescuchasPorArtista(idArtista);
     }
 }

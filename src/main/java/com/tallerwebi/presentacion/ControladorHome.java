@@ -41,9 +41,13 @@ public class ControladorHome {
     private ServicioPosteo servicioPosteo;
     private ServicioLike servicioLike;
 
-    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad) {
+
+    private ServicioPreescucha servicioPreescucha;
+
+    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioPreescucha servicioPreescucha) {
             this.servicioArtista = servicioArtista;
         this.servicioUsuario = servicioUsuario;
+        this.servicioPreescucha = servicioPreescucha;
         this.servicioUsuarioComunidad = servicioUsuarioComunidad;
         this.servicioComunidad = servicioComunidad;
         this.servicioNotificacion = servicioNotificacion;
@@ -86,8 +90,8 @@ public class ControladorHome {
                     .map(p -> new PostLikeDto(p, false))
                     .collect(Collectors.toList());
 
-
             modelMap.put("posteos", postsConLike);
+            modelMap.put("preescucha", servicioPreescucha.obtenerPreescuchasPorArtista(artista.getId()));
         } else {
             return new ModelAndView("redirect:/login");
         }

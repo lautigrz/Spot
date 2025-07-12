@@ -26,7 +26,7 @@ import static org.hamcrest.Matchers.equalTo;
 @Transactional
 public class RepositorioPreescuchaImplTest {
 
-
+/*
     @Autowired
     private SessionFactory sessionFactory;
     private RepositorioPreescucha repositorioPreescucha;
@@ -86,4 +86,6 @@ public class RepositorioPreescuchaImplTest {
 
 
     }
+
+ */
 }

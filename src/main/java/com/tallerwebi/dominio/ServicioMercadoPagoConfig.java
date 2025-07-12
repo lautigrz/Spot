@@ -8,7 +8,7 @@ import javax.annotation.PostConstruct;
 public class ServicioMercadoPagoConfig {
     @PostConstruct
     public void init() throws Exception{
-        MercadoPagoConfig.setAccessToken("APP_USR-1079416156893757-062912-47f33f73dd02effe79fa45bff0eeb84a-2521568719");
+        MercadoPagoConfig.setAccessToken("APP_USR-3263206858514125-051615-1d525d361fd3448675a2d3edeb67032d-2441404485");
     }
 
 }
