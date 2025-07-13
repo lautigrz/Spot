@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -29,11 +31,15 @@ public class ControladorPreescucha {
     private ServicioUsuario servicioUsuario;
     private ServicioMercadoPago servicioMercadoPago;
     private ServicioUsuarioPreescucha servicioUsuarioPreescucha;
-    @Autowired
+    private ServicioUsuarioComunidad servicioUsuarioComunidad;
+
+
+
     public ControladorPreescucha(ServicioPreescucha servicioPreescucha,
-                                 ServicioGuardarImagen servicioGuardarImagen, ServicioComunidad servicioComunidad, ServicioUsuario servicioUsuario, ServicioMercadoPago servicioMercadoPago, ServicioUsuarioPreescucha servicioUsuarioPreescucha) {
+                                 ServicioGuardarImagen servicioGuardarImagen, ServicioComunidad servicioComunidad, ServicioUsuario servicioUsuario, ServicioMercadoPago servicioMercadoPago, ServicioUsuarioPreescucha servicioUsuarioPreescucha, ServicioUsuarioComunidad servicioUsuarioComunidad) {
         this.servicioPreescucha = servicioPreescucha;
         this.servicioGuardarImagen = servicioGuardarImagen;
+        this.servicioUsuarioComunidad = servicioUsuarioComunidad;
         this.servicioMercadoPago = servicioMercadoPago;
         this.servicioComunidad = servicioComunidad;
         this.servicioUsuario = servicioUsuario;
@@ -47,32 +53,48 @@ public class ControladorPreescucha {
     }
 
     @PostMapping("/crear-preescucha")
-    public String procesarPreescucha(@ModelAttribute Preescucha preescucha,
-                                     @RequestParam("imagenPortada") MultipartFile imagen,@RequestParam("archivoAudio") MultipartFile archivoAudio, HttpSession session) throws IOException {
+    public String procesarPreescucha(
+            @ModelAttribute Preescucha preescucha,
+            @RequestParam("imagenPortada") MultipartFile imagen,
+            @RequestParam("archivoAudio") List<MultipartFile> archivos,
+            @RequestParam("titulosCanciones") List<String> titulos,
+            HttpSession session) throws IOException {
 
-
-        System.out.println("Fecha recibida: " + preescucha.getFechaEscucha());
         Artista artista = (Artista) session.getAttribute("artista");
+
+        // Guardar imagen de portada
         String urlImagen = servicioGuardarImagen.guardarImagenPreescucha(imagen);
         preescucha.setPreescuchaFotoUrl(urlImagen);
 
-        String urlAudio = servicioGuardarImagen.guardarAudioPreescucha(archivoAudio);
-        preescucha.setRutaAudio(urlAudio);
+        // Asignar artista
         preescucha.setArtista(artista);
 
+        // Crear lista de audios
+        List<Audio> audios = new ArrayList<>();
+        for (int i = 0; i < archivos.size(); i++) {
+            MultipartFile archivo = archivos.get(i);
+            if (!archivo.isEmpty()) {
+                String url = servicioGuardarImagen.guardarAudioPreescucha(archivo);
+
+                Audio audio = new Audio();
+                audio.setTitulo(titulos.get(i));
+                audio.setRutaAudio(url);
+                audio.setPreescucha(preescucha);
+
+                audios.add(audio);
+            }
+        }
+
+        preescucha.setAudios(audios);
+
+        servicioPreescucha.crearPreescuchaLocal(preescucha);
 
 
-        Long id = servicioPreescucha.crearPreescuchaLocal(
-                preescucha.getPrecio(),
-                preescucha.getTitulo(),
-                preescucha.getPreescuchaFotoUrl(),
-                preescucha.getRutaAudio(), preescucha.getFechaEscucha(),
-                artista);
-
-      servicioComunidad.crearComunidadParaUnaPreescucha(id);
+        servicioComunidad.crearComunidadParaUnaPreescucha(preescucha.getId());
 
         return "redirect:/home";
     }
+
 
 
     @PostMapping("/artistas/{id}/comprar-preescucha")
@@ -127,16 +149,16 @@ public class ControladorPreescucha {
 
                 System.out.println("ids:" + idUsuario + " - " + idPreescucha);
 
-                String urlExito = "https://a6e02a706421.ngrok-free.app/spring/pago-exitoso/" + preescucha.getId() + "/" + idUsuario;
+                String urlExito = "https://da6acb8aaa73.ngrok-free.app/spring/pago-exitoso/" + preescucha.getId() + "/" + idUsuario;
 
 
-                String notificationUrl = "https://a6e02a706421.ngrok-free.app/spring/mercadopago/notification";
+                String notificationUrl = "https://da6acb8aaa73.ngrok-free.app/spring/mercadopago/notification";
 
                 Preference pref = servicioMercadoPago.crearPreferenciaPago(
                         "Pre-escucha exclusiva de " + preescucha.getTitulo(),
                         BigDecimal.valueOf(preescucha.getPrecio()),
                         urlExito,
-                        "https://a6e02a706421.ngrok-free.app/spring/pago-error",
+                        "https://da6acb8aaa73.ngrok-free.app/spring/pago-error",
                         preescucha.getTitulo(),
                         idUsuario,
                         idPreescucha,
@@ -213,6 +235,7 @@ public class ControladorPreescucha {
 
 
             servicioUsuarioPreescucha.guardar(usuarioId, preescuchaId);
+            servicioUsuarioComunidad.agregarUsuarioAComunidadDePreescucha(usuarioId,preescuchaId, "Oyente");
 
             return ResponseEntity.ok().build();
 

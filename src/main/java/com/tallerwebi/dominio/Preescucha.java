@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -23,13 +24,15 @@ public class Preescucha {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String spotifyAlbumId;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime fechaEscucha;
     private Double precio;
     private String titulo;
     private String preescuchaFotoUrl;
     private String rutaAudio;
 
-    @OneToMany(mappedBy = "preescucha", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "preescucha", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Audio> audios = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER)

@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -27,5 +29,10 @@ public class UsuarioPreescucha {
     @ManyToOne
     @JoinColumn(name = "preescucha_id")
     private Preescucha preescucha;
-    private LocalDate fechaCompra;
+    private LocalDateTime fechaCompra;
+
+    public String getFechaFormateada() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        return this.fechaCompra.format(formatter);
+    }
 }

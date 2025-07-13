@@ -160,6 +160,15 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
         return comunidades;
     }
 
+    @Override
+    public Comunidad obtenerComuniadDePreescucha(Long idPreescucha) {
+        String hql = "FROM Comunidad c WHERE c.preescucha.id = :idPreescucha";
+        TypedQuery<Comunidad> query = sessionFactory.getCurrentSession().createQuery(hql, Comunidad.class);
+        query.setParameter("idPreescucha", idPreescucha);
+
+        return query.getSingleResult();
+    }
+
 
 }
 

@@ -10,5 +10,5 @@ public interface ServicioUsuarioComunidad {
     Boolean eliminarUsuarioDeComunidad(Long idUsuario, Long idComunidad);
     List<Comunidad> obtenerComunidadesDondeElUsuarioEsteUnido(Long idUsuario);
     void compartirPosteoEnComunidad(Long idPost, List<Long> comunidades, Long idUsuario);
-
+    Boolean agregarUsuarioAComunidadDePreescucha(Long id, Long idPreescucha, String rol);
 }

@@ -20,5 +20,5 @@ public interface RepositorioComunidad {
     List<Comunidad> buscarComunidadesPorNombre(String nombreComunidad);
     Long crearComunidadParaUnaPreescucha(Preescucha preescucha);
     List<Comunidad> obtenerComunidadesDeArtista(Long idArtista);
-
+    Comunidad obtenerComuniadDePreescucha(Long idPreescucha);
 }

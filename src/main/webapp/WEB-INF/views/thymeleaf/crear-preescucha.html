@@ -25,6 +25,11 @@
                        placeholder="Ej: 1000.00" step="0.01" required />
             </div>
 
+            <div class="mb-4">
+                <label for="fechaEscucha" class="form-label">🗓️ Fecha y hora</label>
+                <input type="datetime-local" id="fechaEscucha" th:field="*{fechaEscucha}"
+                       class="form-control" required>
+            </div>
 
 
             <div class="mb-4">
@@ -32,11 +37,19 @@
                 <input type="file" id="imagenPortada" name="imagenPortada" class="form-control bg-dark text-white border-secondary" required />
             </div>
 
-            <div class="mb-4">
-                <label for="archivoAudio" class="form-label">🎧 Archivo MP3</label>
-                <input type="file" id="archivoAudio" name="archivoAudio" accept="audio/mpeg"
-                       class="form-control bg-dark text-white border-secondary" required />
+            <div id="canciones-container">
+                <div class="mb-3 cancion-group">
+                    <label class="form-label">Título de la canción</label>
+                    <input type="text" name="titulosCanciones" class="form-control" required>
+
+                    <label class="form-label">🎧 Archivo MP3</label>
+                    <input type="file" name="archivoAudio" class="form-control" accept="audio/*" required>
+                </div>
             </div>
+
+            <button type="button" id="agregar-cancion" class="btn btn-secondary mb-3">Agregar otra canción</button>
+
+
 
 
             <div class="d-grid mt-4">
@@ -48,6 +61,25 @@
         </form>
     </div>
 </div>
+
+<script>
+    let index = 1;
+    document.getElementById('agregar-cancion').addEventListener('click', function() {
+        const container = document.getElementById('canciones-container');
+        const newGroup = document.createElement('div');
+        newGroup.classList.add('mb-3', 'cancion-group');
+
+        newGroup.innerHTML = `
+      <label class="form-label">Título de la canción</label>
+      <input type="text" name="titulosCanciones" class="form-control" required>
+
+      <label class="form-label">Archivo MP3</label>
+      <input type="file" name="archivoAudio" class="form-control" accept="audio/*" required>
+    `;
+        container.appendChild(newGroup);
+        index++;
+    });
+</script>
 
 
 </body>

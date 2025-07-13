@@ -8,7 +8,7 @@ public interface ServicioPreescucha {
     void comprarPreescucha(String albumId, Usuario usuario);
     List<String> obtenerAlbumesComprados(Usuario usuario);
     void comprarPreescuchaLocal(int preescuchaId, Usuario usuario);
-    Long crearPreescuchaLocal(Double precio, String titulo, String preescuchaFotoUrl, String rutaAudio, LocalDateTime local, Artista artista);
+    Long crearPreescuchaLocal(Preescucha preescucha);
     boolean yaComproPreescuchaLocal(int preescuchaId, Usuario usuario);
     List<Preescucha> obtenerPreescuchasCompradasLocalmente(Usuario usuario);
     Preescucha obtenerPreescuchaLocal(Long id);

@@ -231,6 +231,12 @@ public class ServicioComunidadImpl implements ServicioComunidad {
        return null;
     }
 
+    @Override
+    public Comunidad obtenerComuniadDePreescucha(Long idPreescucha) {
+
+        return repositorioComunidad.obtenerComuniadDePreescucha(idPreescucha);
+    }
+
 
     public static void limpiarCanales() {
         canales.clear();

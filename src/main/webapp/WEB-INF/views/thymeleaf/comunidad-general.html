@@ -15,6 +15,7 @@
 <input type="hidden" id="token" th:value="${token}">
 <input type="hidden" id="rol" th:value="${rol}">
 <input type="hidden" id="comunidad" th:value="${comunidad.getId()}">
+<input type="hidden" id="preescucha" th:value="${preescucha.getId()}">
 <div class="container-fluid">
     <div class="row mt-10" >
 
@@ -106,16 +107,23 @@
                     <div class="d-flex justify-content-between">
                         <a href="#" class="btn btn-light btn-sm" th:if="${estaEnComunidad}" th:text="${rol}"></a>
 
-                        <a th:href="@{/unirme/{idComunidad}(idComunidad=${comunidad.getId()})}" class="btn btn-light btn-sm" th:unless="${estaEnComunidad}">Unirme a la comunidad</a>
+                        <a th:href="@{/unirme/{idComunidad}(idComunidad=${comunidad.getId()})}" th:if="${rol != 'Oyente' && rol != 'Artista'}" class="btn btn-light btn-sm" th:unless="${estaEnComunidad}">Unirme a la comunidad</a>
                         <div th:if="${estaEnComunidad}">
                         <button id="sincronizarse" class="btn btn-spotify btn-sm" th:if="${hayUsuarios}">
                             <i class="fas fa-headphones me-2"></i> Sincronizarme a escuchar
                         </button>
 
-                        <a id="reproduccion" th:href="@{/reproducir/{id}(id=${comunidad.getId()})}" class="btn btn-spotify btn-sm"
+                        <a id="reproduccion" th:href="@{/reproducir/{id}(id=${comunidad.getId()})}" th:if="${rol != 'Oyente' && rol != 'Artista'}" class="btn btn-spotify btn-sm"
                            th:unless="${hayUsuarios}">
                             <i class="fas fa-play me-2"></i> Empezar reproducción
                         </a>
+
+                            <button id="reproduccionPreescucha" th:if="${rol == 'Artista'}"
+                                    th:unless="${hayUsuarios}"
+                                    class="btn btn-spotify btn-sm"
+                                    >
+                                <i class="fas fa-play me-2"></i> Empezar preescucha
+                            </button>
                         </div>
 
                     </div>
@@ -204,6 +212,10 @@
             </section>
 
         </main>
+        <div id="playerContainer" style="display:none;">
+            <audio id="audioPlayer" controls></audio>
+            <ul id="playlist-escucha"></ul>
+        </div>
 
         <section class="friends-feed-fixed" th:if="${estaEnComunidad}">
 
@@ -627,6 +639,7 @@
     }
     /*]]>*/
 </script>
+
 
 
 <script>

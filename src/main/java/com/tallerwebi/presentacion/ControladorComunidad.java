@@ -26,6 +26,9 @@ import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,15 +45,18 @@ public class ControladorComunidad {
     private ServicioUsuario servicioUsuario;
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     private ServicioEventoCombinado servicioEventoCombinado;
+    private ServicioUsuarioPreescucha servicioUsuarioPreescucha;
 
+    @Autowired
+    private ServicioPreescucha servicioPreescucha;
 
     public ControladorComunidad(ServicioComunidad servicioComunidad, ServicioSpotify
             servicioSpotify, ServicioPlaylist servicioPlaylist,
                                 ServicioReproduccion servicioReproduccion, ServicioGuardarImagen servicioGuardarImagen
             ,ServicioUsuario servicioUsuario, ServicioUsuarioComunidad servicioUsuarioComunidad,
-                                ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioEventoCombinado servicioEventoCombinado) {
+                                ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioEventoCombinado servicioEventoCombinado, ServicioUsuarioPreescucha servicioUsuarioPreescucha) {
         this.servicioPlaylist = servicioPlaylist;
-
+        this.servicioUsuarioPreescucha = servicioUsuarioPreescucha;
         this.servicioGuardarImagen = servicioGuardarImagen;
         this.servicioReproduccion = servicioReproduccion;
         this.servicioComunidad = servicioComunidad;
@@ -316,5 +322,96 @@ public class ControladorComunidad {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+    @GetMapping("/comunidad-preescucha/{idPreescucha}")
+    public ModelAndView preescuchaComunidad(@PathVariable Long idPreescucha, HttpSession session, ModelMap model) throws IOException, ParseException, SpotifyWebApiException {
+        Long idUsuario = (Long) session.getAttribute("user");
+        Artista artista = (Artista) session.getAttribute("artista");
+
+        if (idUsuario == null && artista == null) {
+            return new ModelAndView("redirect:/login");
+        }
+
+        Comunidad comunidad = servicioComunidad.obtenerComuniadDePreescucha(idPreescucha);
+        if (comunidad == null) {
+            return new ModelAndView("error").addObject("mensaje", "No se encontró la comunidad");
+        }
+        boolean estaEnComunidad = false;
+        if(idUsuario != null) {
+            UsuarioComunidad usuarioComunidad = servicioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario, comunidad.getId());
+            boolean compro = servicioUsuarioPreescucha.comprobarSiYaCompro(idUsuario, idPreescucha);
+            LocalDateTime fechaEscucha = usuarioComunidad.getComunidad().getPreescucha().getFechaEscucha();
+
+            boolean esFuturo = fechaEscucha.isAfter(LocalDateTime.now());
+
+            if (compro && !esFuturo) {
+                model.put("usuariosActivos", servicioComunidad.obtenerUsuariosDeLaComunidad(comunidad.getId()));
+                model.put("fotoUsuario", servicioUsuario.obtenerUsuarioDtoPorId(idUsuario).getUrlFoto());
+                model.put("usuario", usuarioComunidad.getUsuario().getUser());
+                model.put("urlFoto", usuarioComunidad.getUsuario().getUrlFoto());
+                model.put("id", usuarioComunidad.getUsuario().getId());
+                model.put("token", usuarioComunidad.getUsuario().getToken());
+                model.put("hayUsuarios", hayAlguienEscuchandoMusica(comunidad.getId().toString()));
+                model.put("playlistsDeLaComunidad", servicioPlaylist.obtenerPlaylistsRelacionadasAUnaComunidad(comunidad.getId()));
+                model.put("mensajes", servicioComunidad.obtenerMensajes(comunidad.getId()));
+                model.put("rol", usuarioComunidad.getRol());
+                model.put("recomendaciones", servicioRecomedacionComunidad.obtenerRecomendacionesPorComunidadQueNoFueronLeidas(comunidad.getId()));
+                model.put("eventos", servicioEventoCombinado.obtenerEventos(comunidad.getArtista(), comunidad.getId()));
+                estaEnComunidad = true;
+            }else if(esFuturo){
+                Duration duracion = Duration.between(LocalDateTime.now(), fechaEscucha);
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                String fechaFormateada = fechaEscucha.format(formatter);
+
+                model.addAttribute("fechaFormateada", fechaFormateada);
+                model.addAttribute("faltanDias", duracion.toDays());
+                model.addAttribute("faltanHoras", duracion.toHoursPart());
+                model.addAttribute("faltanMinutos", duracion.toMinutesPart());
+
+                return new ModelAndView("preescucha-pendiente", model);
+
+            }
+        }
+        else if(comunidad.getHost().equals(artista)) {
+            model.put("usuariosActivos", servicioComunidad.obtenerUsuariosDeLaComunidad(comunidad.getId()));
+            model.put("usuario", artista.getNombre());
+            model.put("urlFoto", artista.getFotoPerfil());
+            model.put("id", artista.getId());
+            model.put("preescucha", servicioPreescucha.obtenerPreescuchaLocal(idPreescucha));
+
+            model.put("token", "");
+            model.put("mensajes", servicioComunidad.obtenerMensajes(comunidad.getId()));
+            model.put("rol", "Artista");
+            estaEnComunidad = true;
+        }
+
+
+        model.put("comunidad", comunidad);
+        model.put("estaEnComunidad", estaEnComunidad);
+
+
+        return new ModelAndView("comunidad-general", model);
+    }
+
+    @GetMapping("/api/preescucha/{id}/canciones")
+    @ResponseBody
+    public List<String> obtenerUrlsCanciones(@PathVariable Long id) {
+        Preescucha pre = servicioPreescucha.obtenerPreescuchaLocal(id);
+        return pre.getAudios().stream()
+                .map(Audio::getRutaAudio)
+                .collect(Collectors.toList());
+    }
+
+    @MessageMapping("/preescucha.iniciar.{idComunidad}")
+    public void iniciarPreescucha(@DestinationVariable Long idComunidad, String payload) {
+
+        messagingTemplate.convertAndSend(
+                "/topic/" + idComunidad,
+                payload
+        );
+    }
+
+
 
 }

@@ -40,12 +40,13 @@ public class ControladorHome {
     private ServicioInstancia spotify;
     private ServicioPosteo servicioPosteo;
     private ServicioLike servicioLike;
-
+    private ServicioUsuarioPreescucha servicioUsuarioPreescucha;
 
     private ServicioPreescucha servicioPreescucha;
 
-    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioPreescucha servicioPreescucha) {
+    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioPreescucha servicioPreescucha, ServicioUsuarioPreescucha servicioUsuarioPreescucha) {
             this.servicioArtista = servicioArtista;
+        this.servicioUsuarioPreescucha = servicioUsuarioPreescucha;
         this.servicioUsuario = servicioUsuario;
         this.servicioPreescucha = servicioPreescucha;
         this.servicioUsuarioComunidad = servicioUsuarioComunidad;
@@ -78,7 +79,7 @@ public class ControladorHome {
             modelMap.put("posteos", postsConLike);
 
             modelMap.put("usuarioComunidad", servicioUsuarioComunidad.obtenerComunidadesDondeElUsuarioEsteUnido(idUsuario));
-
+            modelMap.put("compras", servicioUsuarioPreescucha.buscarPorUsuario(idUsuario));
 
             modelMap.put("notificacion", servicioNotificacion.elUsuarioTieneNotificaciones(idUsuario));
         } else if (artistaObj != null) {
@@ -105,7 +106,7 @@ public class ControladorHome {
     public String buscarArtistaPorBuscador(String nombre, HttpSession session, Model model) {
 
         try {
-            //Primero se busca localmente el artista
+
             Artista artistaLocal = servicioArtista.buscarPorNombre(nombre);
             if (artistaLocal!=null){
                 return "redirect:/artistas-local/" + artistaLocal.getId();

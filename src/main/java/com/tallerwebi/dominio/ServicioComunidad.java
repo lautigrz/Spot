@@ -27,4 +27,5 @@ public interface ServicioComunidad {
     UsuarioDto obtenerUsuarioPorSuNombreEnUnaComunidad(String usuario, Long idComunidad);
     Long crearComunidadParaUnaPreescucha(Long idPreescucha);
     List<ComunidadPreescuchaDto> obtenerComunidadDePreescucha(Long idArtista);
+    Comunidad obtenerComuniadDePreescucha(Long idPreescucha);
 }

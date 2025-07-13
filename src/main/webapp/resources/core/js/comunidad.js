@@ -106,11 +106,10 @@ function onMessageReceived(payload) {
     </div>
   </div>
 `;
-
-
-
             mensajeDiv.classList.add("text-muted");
         }
+    }else if(message.type === "PREESCUCHA") {
+        mostrarPlayer(message);
     }
 
 }
@@ -304,6 +303,7 @@ window.addEventListener("load", function () {
         if (estado) {
             connect();
         }
+        connect();
     })();
 
 
@@ -367,6 +367,92 @@ async function existeUsuarioEnLaComunidad() {
         return false;
     }
 }
+
+
+function mostrarPlayer(message) {
+    const canciones = message.data.canciones;
+
+    if (!canciones || canciones.length === 0) {
+        console.error("No hay canciones para reproducir");
+        return;
+    }
+
+    // Mostrar contenedor
+    const playerContainer = document.getElementById("playerContainer");
+    playerContainer.style.display = "block";
+
+    const audioPlayer = document.getElementById("audioPlayer");
+    const playlist = document.getElementById("playlist-escucha");
+
+    // Limpiar playlist previa
+    playlist.innerHTML = "";
+
+    // Llenar playlist
+    canciones.forEach((cancionUrl, index) => {
+        const li = document.createElement("li");
+        li.textContent = `Canción ${index + 1}`;
+        playlist.appendChild(li);
+    });
+
+    let indice = 0;
+
+    function reproducirActual() {
+        audioPlayer.src = canciones[indice];
+        audioPlayer.play();
+
+        // Resaltar canción actual
+        Array.from(playlist.children).forEach((li, idx) => {
+            li.style.fontWeight = idx === indice ? "bold" : "normal";
+        });
+    }
+
+    audioPlayer.onended = function() {
+        indice++;
+        if (indice < canciones.length) {
+            reproducirActual();
+        } else {
+            console.log("Pre-escucha finalizada");
+        }
+    };
+
+    reproducirActual();
+}
+
+
+function reproducirCancion(url) {
+    const audioPlayer = document.getElementById('audioPlayer');
+    audioPlayer.src = url;
+    audioPlayer.play();
+}
+
+document.getElementById("reproduccionPreescucha").addEventListener("click", function() {
+    const idComunidad = document.getElementById("comunidad").value;
+    const idPreescucha = document.getElementById("preescucha").value;
+
+    fetch(`/spring/api/preescucha/${idPreescucha}/canciones`)
+        .then(response => response.json())
+        .then(canciones => {
+            console.log("Canciones recibidas:", canciones);
+
+            stompClient.send(
+                `/app/preescucha.iniciar.${idComunidad}`,
+                {},
+                JSON.stringify({
+                    type: "PREESCUCHA",
+                    data: {
+                        canciones: canciones
+                    }
+                })
+            );
+        })
+        .catch(error => console.error("Error al traer canciones:", error));
+});
+
+
+
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
     // Tu listener de corazón
     const heartIcons = document.querySelectorAll('.corazon');

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class RepositorioUsuarioPreescuchaImpl implements RepositorioUsuarioPrees
 
         usuarioPreescucha.setUsuario(usuario);
         usuarioPreescucha.setPreescucha(preescucha);
-        usuarioPreescucha.setFechaCompra(LocalDate.now());
+        usuarioPreescucha.setFechaCompra(LocalDateTime.now());
         usuario.getPreescuchasCompradas().add(usuarioPreescucha);
         preescucha.getUsuariosQueCompraron().add(usuarioPreescucha);
 

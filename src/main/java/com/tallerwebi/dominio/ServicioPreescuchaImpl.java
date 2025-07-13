@@ -46,16 +46,10 @@ public class ServicioPreescuchaImpl implements ServicioPreescucha {
     }
 
     @Override
-    public Long crearPreescuchaLocal(Double precio, String titulo, String preescuchaFotoUrl, String rutaAudio, LocalDateTime local, Artista artista){
-        Preescucha nuevaPreescucha = new Preescucha();
-        nuevaPreescucha.setPrecio(precio);
-        nuevaPreescucha.setTitulo(titulo);
-        nuevaPreescucha.setPreescuchaFotoUrl(preescuchaFotoUrl);
-        nuevaPreescucha.setRutaAudio(rutaAudio);
-        nuevaPreescucha.setArtista(artista);
-        nuevaPreescucha.setFechaEscucha(local);
-        repositorioPreescucha.guardar(nuevaPreescucha);
-        return nuevaPreescucha.getId();
+    public Long crearPreescuchaLocal(Preescucha preescucha) {
+
+        repositorioPreescucha.guardar(preescucha);
+        return preescucha.getId();
     }
 
     @Override
