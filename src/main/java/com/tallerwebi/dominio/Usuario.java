@@ -13,7 +13,7 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Usuario {
+public class    Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

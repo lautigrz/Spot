@@ -120,11 +120,25 @@
                         <i class="bi bi-share me-2"></i> Compartir
                     </button>
                 </div>
+
+                <!-- Comentarios -->
+                <div class="post-comentarios">
+                    <div th:each="comentario : ${postDto.comentarios}" class="comentario">
+                        <div class="comentario-usuario" th:text="${comentario.usuario.user}">Usuario</div>
+                        <div class="comentario-texto" th:text="${comentario.texto}">Texto del comentario</div>
+                        <div class="comentario-fecha" th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm').format(comentario.fecha)}">Fecha</div>
+                    </div>
+
+                <div th:if="${artista == null}">
+                    <form th:action="@{/comentar}" method="post" class="form-comentar">
+                        <input type="hidden" name="idPosteo" th:value="${postDto.post.id}" />
+                        <textarea name="texto" placeholder="Escribe un comentario..." required></textarea>
+                        <button type="submit">Comentar</button>
+                    </form>
+                </div>
+                </div>
             </div>
-
-
         </div>
-
 
 
                         <!-- Right column -->

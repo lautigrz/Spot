@@ -37,6 +37,7 @@ public class ControladorHomeTest {
     private ServicioNotificacion servicioNotificacionMock;
     private ServicioLike servicioLikeMock;
     private ServicioUsuarioComunidad servicioUsuarioComunidadMock;
+    private ServicioComentario servicioComentarioMock;
     private ControladorHome controladorHome;
 
     @BeforeEach
@@ -47,11 +48,12 @@ public class ControladorHomeTest {
         servicioInstanciaMock = mock(ServicioInstancia.class);
         servicioLikeMock = mock(ServicioLike.class);
         servicioPosteoMock = mock(ServicioPosteo.class);
+        servicioComentarioMock = mock(ServicioComentario.class);
         servicioUsuarioComunidadMock = mock(ServicioUsuarioComunidad.class);
 
         servicioNotificacionMock = mock(ServicioNotificacion.class);
 
-        controladorHome = new ControladorHome(servicioArtistaMock,servicioUsuarioMock, servicioComunidadMock, servicioInstanciaMock, servicioNotificacionMock, servicioPosteoMock, servicioLikeMock, servicioUsuarioComunidadMock);
+        controladorHome = new ControladorHome(servicioArtistaMock,servicioUsuarioMock, servicioComunidadMock, servicioInstanciaMock, servicioNotificacionMock, servicioPosteoMock, servicioLikeMock, servicioUsuarioComunidadMock, servicioComentarioMock);
 
     }
 
