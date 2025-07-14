@@ -20,7 +20,7 @@
     <div class="row mt-10" >
 
         <!-- Aside Menu -->
-        <aside class="col-md-2 p-3 d-flex flex-column" th:if="${estaEnComunidad}">
+        <aside class="col-md-2 p-3 d-flex flex-column" th:if="${estaEnComunidad and preescucha == null}">
             <h5>Comunidad</h5>
             <nav class="nav flex-column mt-3">
 
@@ -44,6 +44,16 @@
             </nav>
 
         </aside>
+
+        <aside class="col-md-2 p-3 d-flex flex-column" th:if="${estaEnComunidad and preescucha != null}">
+            <h5>Preescucha - Lista de canciones</h5>
+            <nav class="nav flex-column mt-3">
+                <ul id="playlist-escucha">
+
+                </ul>
+            </nav>
+        </aside>
+
 
 
         <!-- Main Content -->
@@ -214,7 +224,6 @@
         </main>
         <div id="playerContainer" style="display:none;">
             <audio id="audioPlayer" controls></audio>
-            <ul id="playlist-escucha"></ul>
         </div>
 
         <section class="friends-feed-fixed" th:if="${estaEnComunidad}">
@@ -280,23 +289,17 @@
     <div class="d-flex align-items-center z-1">
         <img id="imageTrack" class="rounded me-3" crossorigin="anonymous" style="width: 53px; height: 53px; object-fit: cover;">
         <div>
-            <strong id="artista" ></strong><br>
-            <small id="titulo" ></small>
+            <strong id="artista"></strong><br>
+            <small id="titulo"></small>
         </div>
     </div>
 
     <div class="position-absolute top-50 start-50 translate-middle text-center" id="centro" style="z-index: 2;">
         <div class="mb-2">
             <i class="fas fa-music fa-spin fa-lg text-success me-2"></i>
-            <span class="fw-light">Escuchando...</span>
+            <span class="fw-light">Preescucha..</span>
         </div>
-        <div class="d-flex align-items-center gap-2" style="font-size: 0.85rem; width: 220px;">
-            <small id="tiempoActual" class="text-white"></small>
-            <div class="progress flex-grow-1" style="height: 4px;">
-                <div id="barraProgreso" class="progress-bar bg-success" style="width: 0%;"></div>
-            </div>
-            <small id="tiempoTotal" class="text-white"></small>
-        </div>
+
     </div>
 
 

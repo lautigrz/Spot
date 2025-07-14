@@ -18,7 +18,11 @@ public class Audio {
 
     private String rutaAudio;
 
+    private String portadaUrl;
+
     private String titulo;
+
+    private Long duracion;
 
     @ManyToOne
     @JoinColumn(name = "preescucha_id")

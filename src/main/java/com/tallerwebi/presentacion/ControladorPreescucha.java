@@ -33,6 +33,8 @@ public class ControladorPreescucha {
     private ServicioUsuarioPreescucha servicioUsuarioPreescucha;
     private ServicioUsuarioComunidad servicioUsuarioComunidad;
 
+    @Autowired
+    private ServicioAudio servicioAudio;
 
 
     public ControladorPreescucha(ServicioPreescucha servicioPreescucha,
@@ -57,29 +59,34 @@ public class ControladorPreescucha {
             @ModelAttribute Preescucha preescucha,
             @RequestParam("imagenPortada") MultipartFile imagen,
             @RequestParam("archivoAudio") List<MultipartFile> archivos,
+            @RequestParam("portadaAudio") List<MultipartFile> portadaAudio,
             @RequestParam("titulosCanciones") List<String> titulos,
-            HttpSession session) throws IOException {
+            HttpSession session) throws Exception {
 
         Artista artista = (Artista) session.getAttribute("artista");
 
-        // Guardar imagen de portada
+
         String urlImagen = servicioGuardarImagen.guardarImagenPreescucha(imagen);
         preescucha.setPreescuchaFotoUrl(urlImagen);
 
-        // Asignar artista
+
         preescucha.setArtista(artista);
 
-        // Crear lista de audios
+
         List<Audio> audios = new ArrayList<>();
         for (int i = 0; i < archivos.size(); i++) {
             MultipartFile archivo = archivos.get(i);
+            MultipartFile portada = portadaAudio.get(i);
             if (!archivo.isEmpty()) {
                 String url = servicioGuardarImagen.guardarAudioPreescucha(archivo);
-
+                String urlPortada = servicioGuardarImagen.guardarImagenPreescucha(portada);
+                Long duracion = servicioAudio.duracionDeAudio(url);
                 Audio audio = new Audio();
                 audio.setTitulo(titulos.get(i));
                 audio.setRutaAudio(url);
+                audio.setPortadaUrl(urlPortada);
                 audio.setPreescucha(preescucha);
+                audio.setDuracion(duracion);
 
                 audios.add(audio);
             }
@@ -149,16 +156,16 @@ public class ControladorPreescucha {
 
                 System.out.println("ids:" + idUsuario + " - " + idPreescucha);
 
-                String urlExito = "https://da6acb8aaa73.ngrok-free.app/spring/pago-exitoso/" + preescucha.getId() + "/" + idUsuario;
+                String urlExito = "https://ff26a3a466f9.ngrok-free.app/spring/pago-exitoso/" + preescucha.getId() + "/" + idUsuario;
 
 
-                String notificationUrl = "https://da6acb8aaa73.ngrok-free.app/spring/mercadopago/notification";
+                String notificationUrl = "https://ff26a3a466f9.ngrok-free.app/spring/mercadopago/notification";
 
                 Preference pref = servicioMercadoPago.crearPreferenciaPago(
                         "Pre-escucha exclusiva de " + preescucha.getTitulo(),
                         BigDecimal.valueOf(preescucha.getPrecio()),
                         urlExito,
-                        "https://da6acb8aaa73.ngrok-free.app/spring/pago-error",
+                        "https://ff26a3a466f9.ngrok-free.app/spring/pago-error",
                         preescucha.getTitulo(),
                         idUsuario,
                         idPreescucha,

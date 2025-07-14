@@ -39,6 +39,10 @@
 
             <div id="canciones-container">
                 <div class="mb-3 cancion-group">
+                    <label class="form-label">Portada de la cancion</label>
+                    <input type="file" name="portadaAudio" class="form-control" required>
+
+
                     <label class="form-label">Título de la canción</label>
                     <input type="text" name="titulosCanciones" class="form-control" required>
 
@@ -70,8 +74,11 @@
         newGroup.classList.add('mb-3', 'cancion-group');
 
         newGroup.innerHTML = `
+
       <label class="form-label">Título de la canción</label>
       <input type="text" name="titulosCanciones" class="form-control" required>
+        <label class="form-label">Portada de la canción</label>
+      <input type="file" name="portadaAudio" class="form-control" required>
 
       <label class="form-label">Archivo MP3</label>
       <input type="file" name="archivoAudio" class="form-control" accept="audio/*" required>

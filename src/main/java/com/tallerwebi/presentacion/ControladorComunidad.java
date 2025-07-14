@@ -1,5 +1,7 @@
 package com.tallerwebi.presentacion;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tallerwebi.dominio.*;
 
@@ -345,6 +347,7 @@ public class ControladorComunidad {
             boolean esFuturo = fechaEscucha.isAfter(LocalDateTime.now());
 
             if (compro && !esFuturo) {
+                model.put("preescucha", servicioPreescucha.obtenerPreescuchaLocal(idPreescucha));
                 model.put("usuariosActivos", servicioComunidad.obtenerUsuariosDeLaComunidad(comunidad.getId()));
                 model.put("fotoUsuario", servicioUsuario.obtenerUsuarioDtoPorId(idUsuario).getUrlFoto());
                 model.put("usuario", usuarioComunidad.getUsuario().getUser());
@@ -396,20 +399,76 @@ public class ControladorComunidad {
 
     @GetMapping("/api/preescucha/{id}/canciones")
     @ResponseBody
-    public List<String> obtenerUrlsCanciones(@PathVariable Long id) {
+    public List<CancionSimpleDto> obtenerCanciones(@PathVariable Long id) {
         Preescucha pre = servicioPreescucha.obtenerPreescuchaLocal(id);
+
         return pre.getAudios().stream()
-                .map(Audio::getRutaAudio)
+                .map(audio -> new CancionSimpleDto(audio.getTitulo(), audio.getRutaAudio(),audio.getPreescucha().getArtista().getNombre(), audio.getPortadaUrl()))
                 .collect(Collectors.toList());
     }
 
     @MessageMapping("/preescucha.iniciar.{idComunidad}")
-    public void iniciarPreescucha(@DestinationVariable Long idComunidad, String payload) {
+    public void iniciarPreescucha(@DestinationVariable Long idComunidad, String payload) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(payload);
+        JsonNode cancionesNode = root.path("data").path("canciones");
+
+        List<CancionSimpleDto> canciones = new ArrayList<>();
+        for (JsonNode cancionNode : cancionesNode) {
+            CancionSimpleDto c = mapper.treeToValue(cancionNode, CancionSimpleDto.class);
+            canciones.add(c);
+        }
+
+        servicioPreescucha.iniciarPreescucha(idComunidad, canciones);
 
         messagingTemplate.convertAndSend(
                 "/topic/" + idComunidad,
                 payload
         );
+    }
+
+
+    @MessageMapping("/preescucha.estado.{idComunidad}")
+    public void estadoPreescucha(@DestinationVariable Long idComunidad) {
+        EstadoPreescucha estado = servicioPreescucha.obtenerEstado(idComunidad);
+
+        if (estado != null && estado.isReproduciendo()) {
+
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("type", "PREESCUCHA_ESTADO");
+            payload.put("canciones", estado.getCanciones());
+            payload.put("indiceActual", estado.getIndiceActual());
+            payload.put("idComunidad", idComunidad);
+
+
+            long segundosReproducidos = (System.currentTimeMillis() - estado.getTimestampInicio()) / 1000;
+            payload.put("segundosReproducidos", segundosReproducidos);
+
+            messagingTemplate.convertAndSend(
+                    "/topic/" + idComunidad,
+                    payload
+            );
+        }
+    }
+    @MessageMapping("/preescucha.actualizarEstado.{idComunidad}")
+    public void actualizarEstado(@DestinationVariable Long idComunidad, String payload) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(payload);
+
+        int indiceActual = root.path("indiceActual").asInt();
+        int segundosReproducidos = root.path("segundosReproducidos").asInt();
+
+        servicioPreescucha.actualizarEstado(idComunidad, indiceActual, segundosReproducidos);
+
+        EstadoPreescucha estado = servicioPreescucha.obtenerEstado(idComunidad);
+
+        Map<String, Object> payloadResponse = new HashMap<>();
+        payloadResponse.put("type", "PREESCUCHA_ESTADO");
+        payloadResponse.put("canciones", estado.getCanciones());
+        payloadResponse.put("indiceActual", estado.getIndiceActual());
+        payloadResponse.put("segundosReproducidos", segundosReproducidos);
+
+        messagingTemplate.convertAndSend("/topic/" + idComunidad, payloadResponse);
     }
 
 

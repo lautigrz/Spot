@@ -1,5 +1,7 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.presentacion.dto.CancionSimpleDto;
+import com.tallerwebi.presentacion.dto.EstadoPreescucha;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -9,12 +11,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
 public class ServicioPreescuchaImpl implements ServicioPreescucha {
     private final RepositorioPreescucha repositorioPreescucha;
     private SpotifyApi spotifyApi;
+
+    private final Map<Long, EstadoPreescucha> estadosPreescucha = new ConcurrentHashMap<>();
 
 
     @Autowired
@@ -23,6 +29,29 @@ public class ServicioPreescuchaImpl implements ServicioPreescucha {
         this.spotifyApi = spotifyApi;
 
     }
+    public EstadoPreescucha obtenerEstado(Long idComunidad) {
+        return estadosPreescucha.get(idComunidad);
+    }
+
+    @Override
+    public void actualizarEstado(Long idComunidad, int nuevoIndice, int nuevoSegundos) {
+        EstadoPreescucha estado = obtenerEstado(idComunidad);
+        if (estado != null) {
+            estado.setIndiceActual(nuevoIndice);
+            estado.setTimestampInicio(System.currentTimeMillis() - (nuevoSegundos * 1000));
+
+        }
+    }
+
+    public void iniciarPreescucha(Long idComunidad, List<CancionSimpleDto> canciones) {
+        EstadoPreescucha estado = new EstadoPreescucha();
+        estado.setCanciones(canciones);
+        estado.setIndiceActual(0);
+        estado.setTimestampInicio(System.currentTimeMillis());
+        estado.setReproduciendo(true);
+        estadosPreescucha.put(idComunidad, estado);
+    }
+
 
     @Override
     public boolean yaComproPreescucha(String albumId, Usuario usuario) {
