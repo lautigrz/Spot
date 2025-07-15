@@ -41,15 +41,13 @@ public class ControladorHome {
     private ServicioPosteo servicioPosteo;
     private ServicioLike servicioLike;
     private ServicioComentario servicioComentario;
-    private ServicioUsuarioPreescucha servicioUsuarioPreescucha;
 
-    private ServicioPreescucha servicioPreescucha;
 
-    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioPreescucha servicioPreescucha, ServicioUsuarioPreescucha servicioUsuarioPreescucha) {
+    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioComentario servicioComentario) {
             this.servicioArtista = servicioArtista;
-        this.servicioUsuarioPreescucha = servicioUsuarioPreescucha;
+
         this.servicioUsuario = servicioUsuario;
-        this.servicioPreescucha = servicioPreescucha;
+
         this.servicioUsuarioComunidad = servicioUsuarioComunidad;
         this.servicioComunidad = servicioComunidad;
         this.servicioNotificacion = servicioNotificacion;
@@ -74,7 +72,11 @@ public class ControladorHome {
             List<Long> idsDePostConLike = servicioLike.devolverIdsDePostConLikeDeUsuarioDeUnaListaDePosts(idUsuario, posteos.stream().map(Post::getId).collect(Collectors.toList()));
 
             List<PostLikeDto> postsConLike = posteos.stream()
-                    .map(p -> new PostLikeDto(p, idsDePostConLike.contains(p.getId())))
+                    .map(post -> {
+                        boolean liked = idsDePostConLike.contains(post.getId());
+                        List<Comentario> comentarios = servicioComentario.obtenerComentariosDePosteo(post.getId());
+                        return new PostLikeDto(post, liked, comentarios);
+                    })
                     .collect(Collectors.toList());
 
 
@@ -90,7 +92,10 @@ public class ControladorHome {
 
             List<Post> posteos = servicioPosteo.obtenerPosteosDeArtista(artista);
             List<PostLikeDto> postsConLike = posteos.stream()
-                    .map(p -> new PostLikeDto(p, false))
+                    .map(post -> {
+                        List<Comentario> comentarios = servicioComentario.obtenerComentariosDePosteo(post.getId());
+                        return new PostLikeDto(post, false, comentarios);
+                    })
                     .collect(Collectors.toList());
 
 
