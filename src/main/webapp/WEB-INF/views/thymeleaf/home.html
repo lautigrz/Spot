@@ -48,9 +48,29 @@
                 <a class="nav-link d-flex align-items-center px-3 py-2 text-start" href="#">
                     <i class="bi bi-star me-2 fs-5"></i> <span class="link-text">Mis artistas favoritos</span>
                 </a>
-                <a class="nav-link d-flex align-items-center px-3 py-2 text-start" href="#">
+                <a class="nav-link d-flex align-items-center px-3 py-2 text-start" href="#" th:if="${usuario != null}">
                     <i class="bi bi-people me-2 fs-5"></i> <span class="link-text">Mis comunidades</span>
                 </a>
+                <a
+                        class="nav-link d-flex align-items-center px-3 py-2 text-start"
+                        href="#"
+                        th:if="${usuario != null}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalMisPreescuchasCompradas">
+
+                    <i class="bi bi-music-player me-2 fs-5"></i>
+                    <span class="link-text">Pre-Escucha compradas</span>
+                </a>
+                <a
+                        class="nav-link d-flex align-items-center px-3 py-2 text-start"
+                        href="#"
+                        th:if="${artista != null}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalMisPreescuchas">
+                    <i class="bi bi-music-player me-2 fs-5"></i>
+                    <span class="link-text">Mis preescuchas</span>
+                </a>
+
 
                 <a class="nav-link d-flex align-items-center px-3 py-2 text-start" th:href="@{/cerrar}">
                     <i class="bi bi-box-arrow-left me-2 fs-5"></i> <span class="link-text">Cerrar sesión</span>
@@ -216,7 +236,110 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalMisPreescuchas" tabindex="-1" aria-labelledby="modalMisPreescuchasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg"> <!-- modal-lg para ancho -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalMisPreescuchasLabel">Mis Pre-escuchas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>Título</th>
+                            <th>Artista</th>
+                            <th>Precio</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Itera tus preescuchas -->
+                        <tr th:each="pre : ${preescucha}">
+                            <td>
+                                <img th:src="${pre.preescuchaFotoUrl}"
+                                     alt="Foto preescucha"
+                                     class="rounded-circle img-fluid"
+                                     style="width: 50px; height: 50px; object-fit: cover;">
+                            </td>
 
+                            <td th:text="${pre.titulo}"></td>
+                            <td th:text="${pre.artista.nombre}"></td>
+                            <td th:text="${pre.precio}"></td>
+                            <td th:text="${pre.getFechaFormateada()}"></td>
+
+                            <td>
+
+                                <a th:href="@{/comunidad-preescucha/{idPreescucha}(idPreescucha=${pre.id})}" class="btn btn-primary btn-sm">Ver</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalMisPreescuchasCompradas" tabindex="-1" aria-labelledby="modalMisPreescuchasCompradasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalMisPreescuchasCompradasLabel">Pre-escuchas compradas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>Título</th>
+                            <th>Artista</th>
+                            <th>Precio</th>
+                            <th>Fecha compra</th>
+                            <th>Fecha inicio</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Itera tus preescuchas -->
+                        <tr th:each="pre : ${compras}">
+                            <td>
+                                <img th:src="${pre.urlFotoPreescucha}"
+                                     alt="Foto preescucha"
+                                     class="rounded-circle img-fluid"
+                                     style="width: 50px; height: 50px; object-fit: cover;">
+                            </td>
+
+                            <td th:text="${pre.nombrePreescucha}"></td>
+                            <td th:text="${pre.artistaNombre}"></td>
+                            <td th:text="${pre.precio}"></td>
+                            <td th:text="${pre.fechaCompra}"></td>
+                            <td th:text="${pre.fechaInicio}"></td>
+
+                            <td>
+
+                                <a th:href="@{/comunidad-preescucha/{idPreescucha}(idPreescucha=${pre.idPreescucha})}" class="btn btn-primary btn-sm">Ir</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/notificaciones.js}"></script>

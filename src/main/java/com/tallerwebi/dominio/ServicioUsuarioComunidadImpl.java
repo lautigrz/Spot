@@ -15,6 +15,8 @@ public class ServicioUsuarioComunidadImpl implements ServicioUsuarioComunidad {
     @Autowired
     private ServicioUsuario servicioUsuario;
 
+    @Autowired
+    private ServicioComunidad servicioComunidad;
 
     private ServicioPosteo servicioPosteo;
 
@@ -66,5 +68,17 @@ public class ServicioUsuarioComunidadImpl implements ServicioUsuarioComunidad {
         }
 
         repositorioUsuarioComunidad.compartirPosteoEnComunidad(post,comunidads,usuario);
+    }
+
+    @Override
+    public Boolean agregarUsuarioAComunidadDePreescucha(Long id, Long idPreescucha, String rol) {
+
+        Comunidad comunidad = servicioComunidad.obtenerComuniadDePreescucha(idPreescucha);
+        Usuario usuario = servicioUsuario.obtenerUsuarioPorId(id);
+        if (comunidad == null || usuario == null) {
+            return false; // Comunidad o usuario no encontrado
+        }
+        return repositorioUsuarioComunidad.agregarUsuarioAComunidad(usuario, comunidad, rol);
+
     }
 }

@@ -36,6 +36,15 @@ function onConnected(datos) {
     console.log("Suscrito a: ", `/topic/${datos.idComunidad}`);
     stompClient.subscribe(`/topic/${datos.idComunidad}`, onMessageReceived);
 
+    let preescucha = document.getElementById("preescucha").value;
+
+    if(preescucha > 0) {
+        stompClient.subscribe(`/topic/estado-actual.${datos.idComunidad}`, function (message) {
+            console.log("Estado actual recibido en broadcast:", message);
+            var estado = JSON.parse(message.body);
+            mostrarPlayerSincronizado(estado.canciones, estado.indiceActual, estado.segundosReproducidos, estado.idComunidad);
+        });
+    }
 
     stompClient.send(
         `/app/chat.register/${datos.idComunidad}`,
@@ -44,7 +53,16 @@ function onConnected(datos) {
     );
 
 
-    obtenerCancionActualDesdeServidor(datos.idComunidad);
+    if (preescucha > 0) {
+    stompClient.send(
+        `/app/preescucha.estado.${datos.idComunidad}`,
+        {},
+        null
+    );
+    }
+
+
+   obtenerCancionActualDesdeServidor(datos.idComunidad);
 }
 
 function send(event){
@@ -106,14 +124,102 @@ function onMessageReceived(payload) {
     </div>
   </div>
 `;
-
-
-
             mensajeDiv.classList.add("text-muted");
         }
+    }else if(message.type === "PREESCUCHA") {
+        console.log("Mensaje recibidoen preescucha:", message);
+        mostrarPlayer(message.data.canciones, message.data.idComunidad);
+
+    } else if(message.type === "PREESCUCHA_ESTADO" || message.type === "ESTADO_ACTUAL") {
+        console.log("Estado sincronización recibido:", message);
+
+        const canciones = message.canciones;
+        const indiceActual = message.indiceActual;
+        const segundosReproducidos = message.segundosReproducidos;
+        const idComunidad = message.idComunidad;
+
+        mostrarPlayerSincronizado(canciones, indiceActual, segundosReproducidos, idComunidad);
     }
 
+
+
 }
+function mostrarPlayerSincronizado(canciones, indiceActual, segundosReproducidos, idComunidad) {
+    const audioPlayer = document.getElementById("audioPlayer");
+    const playlist = document.getElementById("playlist-escucha");
+    const footer = document.getElementById("footer");
+    const playerContainer = document.getElementById("playerContainer");
+
+    console.log("Mostrar player sincronizado con canciones:", canciones, indiceActual);
+
+
+    // Validar si ya terminó
+    if (indiceActual > canciones.length) {
+        console.log("Preescucha finalizada (usuario)");
+        playerContainer.style.display = "none";
+        footer.style.display = "none";
+        audioPlayer.pause();
+        return;
+    }
+
+    // Limpiar y armar playlist
+    playlist.innerHTML = "";
+    canciones.forEach((c, idx) => {
+        const li = document.createElement("li");
+        li.textContent = `Canción ${idx + 1}: ${c.titulo}`;
+        if (idx === indiceActual) li.style.fontWeight = "bold";
+        playlist.appendChild(li);
+    });
+
+    // Mostrar contenedor del player
+    playerContainer.style.display = "block";
+    footer.style.display = "flex";
+
+    // Función para reproducir la canción actual
+    function reproducirActual() {
+        const cancion = canciones[indiceActual];
+
+        audioPlayer.src = cancion.ruta;
+        audioPlayer.load();
+
+        actualizarFooterCancion({
+            urlImagen: cancion.urlPortada,
+            artista: cancion.artista || "Desconocido",
+            titulo: cancion.titulo,
+            progreso: segundosReproducidos * 1000,
+            duracion: cancion.duracion * 1000
+        });
+
+        Array.from(playlist.children).forEach((li, idx) => {
+            li.style.fontWeight = (idx === indiceActual) ? "bold" : "normal";
+        });
+
+        function handler() {
+            audioPlayer.currentTime = segundosReproducidos;
+            audioPlayer.play();
+            audioPlayer.removeEventListener("loadedmetadata", handler);
+        }
+
+        audioPlayer.removeEventListener("loadedmetadata", handler);
+        audioPlayer.addEventListener("loadedmetadata", handler);
+    }
+
+    // Limpiar listeners previos y definir uno nuevo
+    audioPlayer.onended = null;
+    audioPlayer.removeEventListener('ended', onSongEnded);
+
+    function onSongEnded() {
+        console.log("Canción finalizada (usuario sincronizado). Esperando host...");
+        // Opcional: mostrar UI de espera
+    }
+
+    audioPlayer.addEventListener('ended', onSongEnded);
+
+    reproducirActual();
+}
+
+
+
 
 function crearMensajeHTML(message) {
 
@@ -304,6 +410,7 @@ window.addEventListener("load", function () {
         if (estado) {
             connect();
         }
+
     })();
 
 
@@ -367,22 +474,155 @@ async function existeUsuarioEnLaComunidad() {
         return false;
     }
 }
-document.addEventListener('DOMContentLoaded', function() {
-    // Tu listener de corazón
-    const heartIcons = document.querySelectorAll('.corazon');
-    heartIcons.forEach(heartIcon => {
-        heartIcon.addEventListener('click', () => {
-            if (heartIcon.classList.contains('text-danger')) {
-                heartIcon.classList.remove('fas', 'fa-heart', 'ms-3', 'text-danger');
-                heartIcon.classList.add('fa-regular', 'fa-heart', 'ms-3');
-            } else {
-                heartIcon.classList.remove('fa-regular', 'fa-heart', 'ms-3');
-                heartIcon.classList.add('fas', 'fa-heart', 'ms-3', 'text-danger');
-            }
-        });
+
+function mostrarPlayer(canciones,idComunidad) {
+    const audioPlayer = document.getElementById("audioPlayer");
+    const playlist = document.getElementById("playlist-escucha");
+    const playerContainer = document.getElementById("playerContainer");
+    const footer = document.getElementById("footer");
+
+    playlist.innerHTML = "";
+
+    canciones.forEach((c, idx) => {
+        const li = document.createElement("li");
+        li.textContent = `Canción ${idx + 1}: ${c.titulo}`;
+        playlist.appendChild(li);
     });
 
+    playerContainer.style.display = "block";
+    footer.style.display = "flex";
 
+    let indiceActual = 0;
+    let segundosReproducidos = 0;
+
+    function reproducirActual() {
+        const cancionActual = canciones[indiceActual];
+        audioPlayer.src = cancionActual.ruta;
+        audioPlayer.play();
+
+        actualizarFooterCancion({
+            urlImagen: cancionActual.urlPortada,
+            artista: cancionActual.artista || "Desconocido",
+            titulo: cancionActual.titulo,
+            progreso: 0,
+            duracion: (cancionActual.duracion || 0) * 1000
+        });
+
+        Array.from(playlist.children).forEach((li, idx2) => {
+            li.style.fontWeight = idx2 === indiceActual ? "bold" : "normal";
+        });
+    }
+
+    function onSongEnded() {
+        indiceActual++;
+        segundosReproducidos = 0;
+        console.log("Canción finalizada. Reproduciendo la siguiente...");
+
+        if (stompClient && idComunidad) {
+            console.log("Enviando actualización de estado a la comunidad:", idComunidad);
+            stompClient.send(
+                `/app/preescucha.actualizarEstado.${idComunidad}`,
+                {},
+                JSON.stringify({
+                    type: 'ACTUALIZAR_ESTADO',
+                    indiceActual: indiceActual,
+                    segundosReproducidos: segundosReproducidos
+                })
+            );
+
+        } else {
+            console.error("stompClient o idComunidad no están definidos. No se puede enviar el estado.");
+        }
+
+
+        if (indiceActual < canciones.length) {
+            reproducirActual();
+        } else {
+            console.log("Preescucha finalizada");
+            playerContainer.style.display = "none";
+            footer.style.display = "none";
+        }
+    }
+
+    // Limpia listeners anteriores por seguridad
+    audioPlayer.onended = null;
+    audioPlayer.removeEventListener('ended', onSongEnded);
+    audioPlayer.addEventListener('ended', onSongEnded);
+
+    reproducirActual();
+}
+
+
+
+
+document.getElementById("reproduccionPreescucha").addEventListener("click", function() {
+    const idComunidad = document.getElementById("comunidad").value;
+    const idPreescucha = document.getElementById("preescucha").value;
+
+    fetch(`/spring/api/preescucha/${idPreescucha}/canciones`)
+        .then(response => response.json())
+        .then(canciones => {
+            console.log("Canciones recibidas:", canciones);
+
+            stompClient.send(
+                `/app/preescucha.iniciar.${idComunidad}`,
+                {},
+                JSON.stringify({
+                    type: "PREESCUCHA",
+                    data: {
+                        idComunidad: idComunidad,
+                        canciones: canciones
+                    }
+                })
+            );
+        })
+        .catch(error => console.error("Error al traer canciones:", error));
 });
+
+
+function actualizarFooterCancion(dt){
+    const colorThief = new ColorThief();
+    const imgElement = document.getElementById("imageTrack");
+    if (!imgElement) return;
+
+    imgElement.crossOrigin = "anonymous";
+    imgElement.src = dt.urlImagen;
+
+    console.log("datos",dt);
+
+    document.getElementById("artista").textContent = dt.artista;
+    document.getElementById("titulo").textContent = dt.titulo;
+
+
+    imgElement.onload = function () {
+        aplicarColoresDesdePaleta(colorThief, imgElement);
+    };
+
+    function aplicarColoresDesdePaleta(colorThief, img) {
+        const footer = document.getElementById("footer");
+        const palette = colorThief.getPalette(img, 5);
+        const [color1, color2] = palette;
+
+        const gradient = `linear-gradient(to right,
+                rgb(${color1[0]}, ${color1[1]}, ${color1[2]}),
+                rgb(${color2[0]}, ${color2[1]}, ${color2[2]}))`;
+
+        footer.style.background = gradient;
+        footer.style.display = "flex";
+
+        const luminance = 0.299 * color1[0] + 0.587 * color1[1] + 0.114 * color1[2];
+
+        console.log("luminaria",luminance);
+        if (luminance > 162) {
+            footer.style.setProperty("color", "black", "important");
+
+        } else {
+
+            footer.style.setProperty("color", "white", "important");
+
+        }
+    }
+}
+
 
 

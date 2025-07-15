@@ -77,7 +77,7 @@ public class ControladorComunidadTest {
         servicioEventoCombinadoMock = mock(ServicioEventoCombinado.class);
         servicioUsuarioComunidadMock = mock(ServicioUsuarioComunidad.class);
         controladorComunidad = new ControladorComunidad(servicioComunidadMock, servicioSpotify, servicioPlaylistMock, servicioReproduccion, servicioGuardarImagen,
-                servicioUsuarioMock, servicioUsuarioComunidadMock, servicioRecomedacionComunidadMock, servicioEventoCombinadoMock);
+                servicioUsuarioMock, servicioUsuarioComunidadMock, servicioRecomedacionComunidadMock, servicioEventoCombinadoMock, null);
 
         mockMvc = MockMvcBuilders.standaloneSetup(controladorComunidad).build();
 

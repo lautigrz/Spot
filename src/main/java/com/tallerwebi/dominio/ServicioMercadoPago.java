@@ -12,11 +12,15 @@ import com.mercadopago.resources.*;
 import com.mercadopago.resources.preference.PreferenceItem;
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class ServicioMercadoPago {
 
-    public Preference crearPreferenciaPago(String titulo, BigDecimal precio, String successUrl, String failureUrl, String albumId) throws Exception{
+    public Preference crearPreferenciaPago(String titulo, BigDecimal precio, String successUrl,
+                                           String failureUrl, String albumId,Long usuarioId, Long preescuchaId,
+                                           String notificationUrl) throws Exception{
         PreferenceItemRequest item =
                 PreferenceItemRequest.builder()
                         .title(titulo)
@@ -32,11 +36,18 @@ public class ServicioMercadoPago {
                 .failure(failureUrl)
                 .build();
 
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("usuarioId", usuarioId);
+        metadata.put("preescuchaId", preescuchaId);
+
+
         PreferenceRequest preferenceRequest =
                 PreferenceRequest.builder()
                         .items(Collections.singletonList(item))
                         .backUrls(backUrls)
+                        .notificationUrl(notificationUrl)
                         .externalReference(albumId)
+                        .metadata(metadata)
                         .autoReturn("approved")
                         .build();
 

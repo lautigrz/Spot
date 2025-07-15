@@ -41,10 +41,15 @@ public class ControladorHome {
     private ServicioPosteo servicioPosteo;
     private ServicioLike servicioLike;
     private ServicioComentario servicioComentario;
+    private ServicioUsuarioPreescucha servicioUsuarioPreescucha;
 
-    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioComentario servicioComentario) {
+    private ServicioPreescucha servicioPreescucha;
+
+    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioPreescucha servicioPreescucha, ServicioUsuarioPreescucha servicioUsuarioPreescucha) {
             this.servicioArtista = servicioArtista;
+        this.servicioUsuarioPreescucha = servicioUsuarioPreescucha;
         this.servicioUsuario = servicioUsuario;
+        this.servicioPreescucha = servicioPreescucha;
         this.servicioUsuarioComunidad = servicioUsuarioComunidad;
         this.servicioComunidad = servicioComunidad;
         this.servicioNotificacion = servicioNotificacion;
@@ -66,34 +71,28 @@ public class ControladorHome {
             modelMap.put("usuario", usuario);
 
             List<Post> posteos = servicioPosteo.obtenerPosteosDeArtistasFavoritos(usuario);
-            List<Long> idsDePostConLike = servicioLike.devolverIdsDePostConLikeDeUsuarioDeUnaListaDePosts(
-                    idUsuario,
-                    posteos.stream().map(Post::getId).collect(Collectors.toList())
-            );
+            List<Long> idsDePostConLike = servicioLike.devolverIdsDePostConLikeDeUsuarioDeUnaListaDePosts(idUsuario, posteos.stream().map(Post::getId).collect(Collectors.toList()));
 
             List<PostLikeDto> postsConLike = posteos.stream()
-                    .map(post -> {
-                        boolean liked = idsDePostConLike.contains(post.getId());
-                        List<Comentario> comentarios = servicioComentario.obtenerComentariosDePosteo(post.getId());
-                        return new PostLikeDto(post, liked, comentarios);
-                    })
+                    .map(p -> new PostLikeDto(p, idsDePostConLike.contains(p.getId())))
                     .collect(Collectors.toList());
 
-            modelMap.put("posteos", postsConLike);
-            modelMap.put("usuarioComunidad", servicioUsuarioComunidad.obtenerComunidadesDondeElUsuarioEsteUnido(idUsuario));
-            modelMap.put("notificacion", servicioNotificacion.elUsuarioTieneNotificaciones(idUsuario));
 
+            modelMap.put("posteos", postsConLike);
+
+            modelMap.put("usuarioComunidad", servicioUsuarioComunidad.obtenerComunidadesDondeElUsuarioEsteUnido(idUsuario));
+
+
+            modelMap.put("notificacion", servicioNotificacion.elUsuarioTieneNotificaciones(idUsuario));
         } else if (artistaObj != null) {
             Artista artista = (Artista) artistaObj;
             modelMap.put("artista", artista);
 
             List<Post> posteos = servicioPosteo.obtenerPosteosDeArtista(artista);
             List<PostLikeDto> postsConLike = posteos.stream()
-                    .map(post -> {
-                        List<Comentario> comentarios = servicioComentario.obtenerComentariosDePosteo(post.getId());
-                        return new PostLikeDto(post, false, comentarios);
-                    })
+                    .map(p -> new PostLikeDto(p, false))
                     .collect(Collectors.toList());
+
 
             modelMap.put("posteos", postsConLike);
         } else {

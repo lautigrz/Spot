@@ -105,7 +105,7 @@ public class ControladorArtista {
             List<Long> preescuchasCompradasIds = new ArrayList<>();
             if (usuario != null) {
                 for (Preescucha p : preescuchas) {
-                    if (servicioPreescucha.yaComproPreescuchaLocal(p.getId(), usuario)) {
+                    if (servicioPreescucha.yaComproPreescuchaLocal(1, usuario)) {
                         preescuchasCompradasIds.add((long) p.getId());
                     }
                 }
@@ -149,72 +149,7 @@ public class ControladorArtista {
         return "redirect:/perfil";
     }
 
-    @PostMapping("/artistas/{id}/comprar-preescucha")
-    public String comprarPreescucha(@PathVariable String id, HttpSession session, String albumId) {
-        Object usuarioIdObj = session.getAttribute("user");
 
-        if (usuarioIdObj != null) {
-            Long usuarioId = Long.valueOf(usuarioIdObj.toString());
-            Usuario usuario = servicioUsuario.obtenerUsuarioPorId(usuarioId);
-
-            if(!servicioPreescucha.yaComproPreescucha(albumId, usuario)){
-                try{
-                    Preference pref = servicioMercadoPago.crearPreferenciaPago(
-                            "Pre-escucha exclusiva del album " + albumId,
-                            new BigDecimal("100.00"),
-                            "https://01d477d4e984.ngrok-free.app/spring/pago-exitoso",
-                            "https://01d477d4e984.ngrok-free.app/spring/pago-error",
-                            albumId
-                    );
-                    return "redirect:" + pref.getInitPoint();
-                } catch (Exception e){
-                    e.printStackTrace();
-                    return "redirect:/perfil?errorPago";
-                }
-            }
-        }
-        return "redirect:/perfil";
-    }
-
-    @PostMapping("/artistas-locales/{artistaId}/comprar-preescucha/{preescuchaId}")
-    public String comprarPreescuchaLocal(@PathVariable Long artistaId, @PathVariable int preescuchaId, HttpSession session) {
-        Object usuarioIdObj = session.getAttribute("user");
-
-        if (usuarioIdObj != null) {
-            Long usuarioId = Long.valueOf(usuarioIdObj.toString());
-            Usuario usuario = servicioUsuario.obtenerUsuarioPorId(usuarioId);
-
-            if (!servicioPreescucha.yaComproPreescuchaLocal(preescuchaId, usuario)){
-                servicioPreescucha.comprarPreescuchaLocal(preescuchaId, usuario);
-                session.setAttribute("preescuchaExitosaLocal", "Compra exitosa de la preescucha");
-            }
-
-        }
-        return "redirect:/perfil";
-    }
-
-
-    @GetMapping("/pago-exitoso")
-    public String pagoExitoso(@RequestParam Map<String, String> params, HttpSession session, Model model){
-        Object usuarioIdObj = session.getAttribute("user");
-        if (usuarioIdObj != null) {
-            Long usuarioId = Long.valueOf(usuarioIdObj.toString());
-            Usuario usuario = servicioUsuario.obtenerUsuarioPorId(usuarioId);
-
-            String albumId = params.get("external_reference");
-
-            if(albumId != null && !servicioPreescucha.yaComproPreescucha(albumId, usuario)){
-                servicioPreescucha.comprarPreescucha(albumId, usuario);
-            }
-            model.addAttribute("albumId", albumId);
-        }
-        return "pago-exitoso";
-    }
-
-    @GetMapping("/pago-error")
-    public String pagoError(){
-        return "pago-error";
-    }
 
 
 }

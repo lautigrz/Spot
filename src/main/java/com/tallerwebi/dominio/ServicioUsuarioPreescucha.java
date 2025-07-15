@@ -1,0 +1,19 @@
+package com.tallerwebi.dominio;
+
+import com.tallerwebi.presentacion.dto.ComunidadPreescuchaDto;
+import com.tallerwebi.presentacion.dto.UsuarioPreescuchaDto;
+
+import java.util.List;
+
+public interface ServicioUsuarioPreescucha {
+    UsuarioPreescucha guardar(Long idUsuario, Long idPreescucha);
+
+    UsuarioPreescucha buscarPorId(Long id);
+
+    void eliminar(Long id);
+    Boolean comprobarSiYaCompro(Long idUsuario, Long idPreescucha);
+    List<UsuarioPreescuchaDto> buscarPorUsuario(Long id);
+
+    List<UsuarioPreescucha> buscarPorPreescucha(Long id);
+
+}

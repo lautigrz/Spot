@@ -140,8 +140,8 @@ public class RepositorioComunidadImplTest {
         List<Comunidad> comunidades = repositorioComunidad.obtenerComunidades();
 
         assertThat(comunidades.size(), equalTo(2));
-        assertThat(comunidades.get(0).getId(), equalTo(comunidad.getId()));
-        assertThat(comunidades.get(1).getId(), equalTo(comunidad2.getId()));
+        assertThat(comunidades.get(1).getId(), equalTo(comunidad.getId()));
+        assertThat(comunidades.get(0).getId(), equalTo(comunidad2.getId()));
     }
 
     @Test

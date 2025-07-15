@@ -15,11 +15,13 @@
 <input type="hidden" id="token" th:value="${token}">
 <input type="hidden" id="rol" th:value="${rol}">
 <input type="hidden" id="comunidad" th:value="${comunidad.getId()}">
+<input type="hidden" id="preescucha" th:value="${preescucha?.id ?: 0}">
+
 <div class="container-fluid">
     <div class="row mt-10" >
 
         <!-- Aside Menu -->
-        <aside class="col-md-2 p-3 d-flex flex-column" th:if="${estaEnComunidad}">
+        <aside class="col-md-2 p-3 d-flex flex-column" th:if="${estaEnComunidad and preescucha == null}">
             <h5>Comunidad</h5>
             <nav class="nav flex-column mt-3">
 
@@ -43,6 +45,16 @@
             </nav>
 
         </aside>
+
+        <aside class="col-md-2 p-3 d-flex flex-column" th:if="${estaEnComunidad and preescucha != null}">
+            <h5>Preescucha - Lista de canciones</h5>
+            <nav class="nav flex-column mt-3">
+                <ul id="playlist-escucha">
+
+                </ul>
+            </nav>
+        </aside>
+
 
 
         <!-- Main Content -->
@@ -106,16 +118,23 @@
                     <div class="d-flex justify-content-between">
                         <a href="#" class="btn btn-light btn-sm" th:if="${estaEnComunidad}" th:text="${rol}"></a>
 
-                        <a th:href="@{/unirme/{idComunidad}(idComunidad=${comunidad.getId()})}" class="btn btn-light btn-sm" th:unless="${estaEnComunidad}">Unirme a la comunidad</a>
+                        <a th:href="@{/unirme/{idComunidad}(idComunidad=${comunidad.getId()})}" th:if="${rol != 'Oyente' && rol != 'Artista'}" class="btn btn-light btn-sm" th:unless="${estaEnComunidad}">Unirme a la comunidad</a>
                         <div th:if="${estaEnComunidad}">
                         <button id="sincronizarse" class="btn btn-spotify btn-sm" th:if="${hayUsuarios}">
                             <i class="fas fa-headphones me-2"></i> Sincronizarme a escuchar
                         </button>
 
-                        <a id="reproduccion" th:href="@{/reproducir/{id}(id=${comunidad.getId()})}" class="btn btn-spotify btn-sm"
+                        <a id="reproduccion" th:href="@{/reproducir/{id}(id=${comunidad.getId()})}" th:if="${rol != 'Oyente' && rol != 'Artista'}" class="btn btn-spotify btn-sm"
                            th:unless="${hayUsuarios}">
                             <i class="fas fa-play me-2"></i> Empezar reproducción
                         </a>
+
+                            <button id="reproduccionPreescucha" th:if="${rol == 'Artista'}"
+                                    th:unless="${hayUsuarios}"
+                                    class="btn btn-spotify btn-sm"
+                                    >
+                                <i class="fas fa-play me-2"></i> Empezar preescucha
+                            </button>
                         </div>
 
                     </div>
@@ -161,7 +180,6 @@
 
                                 </div>
                             </div>
-                            <i class="fas fa-heart ms-3 corazon" style="cursor:pointer;" title="Like"></i>
                         </div>
                         <div class="position-absolute top-0 end-0 dropdown" th:if="${rol == 'Admin'}">
                             <button class="btn btn-sm btn-light dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border: none; box-shadow: none; padding: 0px 5px;">⋮</button>
@@ -204,6 +222,9 @@
             </section>
 
         </main>
+        <div id="playerContainer" style="display:none;">
+            <audio id="audioPlayer" controls></audio>
+        </div>
 
         <section class="friends-feed-fixed" th:if="${estaEnComunidad}">
 
@@ -227,7 +248,7 @@
                         </div>
                         <div>
                             <strong th:text="${usuarios.getUser()}"></strong><br>
-                            <small th:text="'🎧 ' + ${usuarios.getEscuchando()}"></small>
+                            <small th:if="${preescucha == null}" th:text="'🎧 ' + ${usuarios.getEscuchando()}"></small>
 
                         </div>
                         <div th:if="${rol == 'Admin' && usuarios.getId() != id }" class="dropdown">
@@ -268,23 +289,18 @@
     <div class="d-flex align-items-center z-1">
         <img id="imageTrack" class="rounded me-3" crossorigin="anonymous" style="width: 53px; height: 53px; object-fit: cover;">
         <div>
-            <strong id="artista" ></strong><br>
-            <small id="titulo" ></small>
+            <strong id="artista"></strong><br>
+            <small id="titulo"></small>
         </div>
     </div>
 
     <div class="position-absolute top-50 start-50 translate-middle text-center" id="centro" style="z-index: 2;">
         <div class="mb-2">
             <i class="fas fa-music fa-spin fa-lg text-success me-2"></i>
-            <span class="fw-light">Escuchando...</span>
+            <span th:text="${preescucha != null} ? 'Preescucha...' : 'Escuchando...'"></span>
+
         </div>
-        <div class="d-flex align-items-center gap-2" style="font-size: 0.85rem; width: 220px;">
-            <small id="tiempoActual" class="text-white"></small>
-            <div class="progress flex-grow-1" style="height: 4px;">
-                <div id="barraProgreso" class="progress-bar bg-success" style="width: 0%;"></div>
-            </div>
-            <small id="tiempoTotal" class="text-white"></small>
-        </div>
+
     </div>
 
 
@@ -627,6 +643,7 @@
     }
     /*]]>*/
 </script>
+
 
 
 <script>
