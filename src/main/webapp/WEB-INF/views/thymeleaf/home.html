@@ -48,8 +48,13 @@
                 <a class="nav-link d-flex align-items-center px-3 py-2 text-start" href="#">
                     <i class="bi bi-star me-2 fs-5"></i> <span class="link-text">Mis artistas favoritos</span>
                 </a>
-                <a class="nav-link d-flex align-items-center px-3 py-2 text-start" href="#" th:if="${usuario != null}">
-                    <i class="bi bi-people me-2 fs-5"></i> <span class="link-text">Mis comunidades</span>
+                <a class="nav-link d-flex align-items-center px-3 py-2 text-start"
+                   href="#"
+                   th:if="${usuario != null}"
+                   data-bs-toggle="modal"
+                   data-bs-target="#modalComunidades">
+                    <i class="bi bi-people me-2 fs-5"></i>
+                    <span class="link-text">Mis comunidades</span>
                 </a>
                 <a
                         class="nav-link d-flex align-items-center px-3 py-2 text-start"
@@ -339,6 +344,45 @@
         </div>
     </div>
 
+</div>
+
+<!-- MODAL -->
+<div class="modal fade" id="modalComunidades" tabindex="-1" aria-labelledby="modalComunidadesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalComunidadesLabel">Mis comunidades</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <ul class="list-group">
+                    <!-- Lista de comunidades -->
+                    <li class="list-group-item d-flex align-items-center"
+                        th:each="comunidad : ${usuarioComunidad}">
+                        <!-- Imagen redonda -->
+                        <img th:src="${comunidad.urlFoto}" alt="Imagen Comunidad"
+                             class="rounded-circle me-3"
+                             width="50" height="50" style="object-fit: cover;">
+
+                        <!-- Link al detalle de la comunidad -->
+                        <a th:href="@{/comunidad/{id}(id=${comunidad.id})}" class="text-decoration-none" style="margin-right: 10px;">
+                            <span th:text="${comunidad.nombre}">Nombre Comunidad</span>
+                        </a>
+                    </li>
+                </ul>
+                <!-- Si el usuario no tiene comunidades -->
+                <p th:if="${usuarioComunidad == null or #lists.isEmpty(usuarioComunidad)}"
+                   class="text-muted">No perteneces a ninguna comunidad todavía.</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

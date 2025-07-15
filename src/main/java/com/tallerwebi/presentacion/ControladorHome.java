@@ -82,7 +82,7 @@ public class ControladorHome {
 
             modelMap.put("posteos", postsConLike);
 
-            modelMap.put("usuarioComunidad", servicioUsuarioComunidad.obtenerComunidadesDondeElUsuarioEsteUnido(idUsuario));
+            modelMap.put("usuarioComunidad", servicioUsuarioComunidad.obtenerComunidadesDondeELUsuarioEsteUnido(idUsuario));
 
 
             modelMap.put("notificacion", servicioNotificacion.elUsuarioTieneNotificaciones(idUsuario));

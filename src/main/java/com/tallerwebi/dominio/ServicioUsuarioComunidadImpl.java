@@ -12,7 +12,7 @@ import java.util.List;
 public class ServicioUsuarioComunidadImpl implements ServicioUsuarioComunidad {
     @Autowired
     private RepositorioUsuarioComunidad repositorioUsuarioComunidad;
-    @Autowired
+
     private ServicioUsuario servicioUsuario;
 
     @Autowired
@@ -20,8 +20,9 @@ public class ServicioUsuarioComunidadImpl implements ServicioUsuarioComunidad {
 
     private ServicioPosteo servicioPosteo;
 
-    public ServicioUsuarioComunidadImpl(RepositorioUsuarioComunidad repositorioUsuarioComunidad, ServicioPosteo servicioPosteo) {
+    public ServicioUsuarioComunidadImpl(RepositorioUsuarioComunidad repositorioUsuarioComunidad, ServicioPosteo servicioPosteo,ServicioUsuario servicioUsuario) {
         this.repositorioUsuarioComunidad = repositorioUsuarioComunidad;
+        this.servicioUsuario = servicioUsuario;
         this.servicioPosteo = servicioPosteo;
     }
 
@@ -45,12 +46,6 @@ public class ServicioUsuarioComunidadImpl implements ServicioUsuarioComunidad {
     @Override
     public Boolean eliminarUsuarioDeComunidad(Long idUsuario, Long idComunidad) {
         return repositorioUsuarioComunidad.eliminarUsuarioDeComunidad(idUsuario, idComunidad);
-    }
-
-    @Override
-    public List<Comunidad> obtenerComunidadesDondeElUsuarioEsteUnido(Long idUsuario) {
-        Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
-        return repositorioUsuarioComunidad.obtenerComunidadesDondeElUsuarioEsteUnido(usuario);
     }
 
     @Override
@@ -80,5 +75,15 @@ public class ServicioUsuarioComunidadImpl implements ServicioUsuarioComunidad {
         }
         return repositorioUsuarioComunidad.agregarUsuarioAComunidad(usuario, comunidad, rol);
 
+    }
+
+    @Override
+    public List<Comunidad> obtenerComunidadesDondeELUsuarioEsteUnido(Long idUsuario) {
+      Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
+        if (usuario != null) {
+            return repositorioUsuarioComunidad.obtenerComunidadesDondeELUsuarioEsteUnido(usuario);
+        }
+
+        return List.of();
     }
 }

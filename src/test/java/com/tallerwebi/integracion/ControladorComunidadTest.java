@@ -77,7 +77,7 @@ public class ControladorComunidadTest {
         servicioEventoCombinadoMock = mock(ServicioEventoCombinado.class);
         servicioUsuarioComunidadMock = mock(ServicioUsuarioComunidad.class);
         controladorComunidad = new ControladorComunidad(servicioComunidadMock, servicioSpotify, servicioPlaylistMock, servicioReproduccion, servicioGuardarImagen,
-                servicioUsuarioMock, servicioUsuarioComunidadMock, servicioRecomedacionComunidadMock, servicioEventoCombinadoMock, null);
+                servicioUsuarioMock, servicioUsuarioComunidadMock, servicioRecomedacionComunidadMock, servicioEventoCombinadoMock);
 
         mockMvc = MockMvcBuilders.standaloneSetup(controladorComunidad).build();
 
@@ -120,6 +120,7 @@ public class ControladorComunidadTest {
         when(servicioComunidadMock.obtenerUsuariosDeLaComunidad(idComunidad)).thenReturn(usuariosActivosMock);
         when(servicioReproduccion.estaEscuchandoMusica(anyString())).thenReturn(true);
         when(servicioRecomedacionComunidadMock.obtenerRecomendacionesPorComunidadQueNoFueronLeidas(anyLong())).thenReturn(List.of(new Recomendacion()));
+        when(servicioUsuarioComunidadMock.obtenerComunidadesDondeELUsuarioEsteUnido(anyLong())).thenReturn(List.of(comunidadMock));
         ModelMap model = new ModelMap();
         ModelAndView mav = controladorComunidad.comunidad(sessionMock, idComunidad, model);
 
@@ -137,6 +138,7 @@ public class ControladorComunidadTest {
         assertThat(mav.getModel(), hasEntry("fotoUsuario", usuarioDtoMock.getUrlFoto()));
         assertThat(mav.getModel(), hasEntry("recomendaciones", servicioRecomedacionComunidadMock.obtenerRecomendacionesPorComunidadQueNoFueronLeidas(anyLong())));
         assertThat(mav.getModel(), hasEntry("comunidad", comunidadMock));
+        assertThat(mav.getModel(), hasEntry("usuarioComunidad", servicioUsuarioComunidadMock.obtenerComunidadesDondeELUsuarioEsteUnido(1L)));
         assertThat(mav.getModel(), hasEntry("estaEnComunidad", true));
         assertThat(mav.getModel(), hasEntry("usuariosActivos", usuariosActivosMock));
     }

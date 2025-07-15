@@ -6,16 +6,13 @@ import java.util.List;
 
 public interface RepositorioUsuarioComunidad {
     Boolean agregarUsuarioAComunidad(Usuario usuario, Comunidad comunidad, String rol);
-
     String obtenerRolDelUsuarioEnComunidad(Long idUsuario, Long idComunidad);
     UsuarioComunidad obtenerUsuarioEnComunidad(Long idUsuario, Long idComunidad);
     List<UsuarioDto> obtenerUsuariosDeLaComunidad(Long idComunidad);
     void actualizar(UsuarioComunidad usuarioComunidad);
     Boolean eliminarUsuarioDeComunidad(Long idUsuario, Long idComunidad);
-
     UsuarioComunidad obtenerUsuarioPorNombreEnComunidad(String usuario, Long idComunidad);
 
-    List<Comunidad> obtenerComunidadesDondeElUsuarioEsteUnido(Usuario usuario);
-
     void compartirPosteoEnComunidad(Post post, List<Comunidad> comunidads, Usuario usuario);
+    List<Comunidad> obtenerComunidadesDondeELUsuarioEsteUnido(Usuario usuario);
 }

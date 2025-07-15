@@ -1,7 +1,5 @@
 package com.tallerwebi.presentacion;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tallerwebi.dominio.*;
 
@@ -15,7 +13,6 @@ import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -29,10 +26,6 @@ import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
-import java.security.Principal;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,18 +42,15 @@ public class ControladorComunidad {
     private ServicioUsuario servicioUsuario;
     private ServicioRecomedacionComunidad servicioRecomedacionComunidad;
     private ServicioEventoCombinado servicioEventoCombinado;
-    private ServicioUsuarioPreescucha servicioUsuarioPreescucha;
 
-    @Autowired
-    private ServicioPreescucha servicioPreescucha;
 
     public ControladorComunidad(ServicioComunidad servicioComunidad, ServicioSpotify
             servicioSpotify, ServicioPlaylist servicioPlaylist,
                                 ServicioReproduccion servicioReproduccion, ServicioGuardarImagen servicioGuardarImagen
             ,ServicioUsuario servicioUsuario, ServicioUsuarioComunidad servicioUsuarioComunidad,
-                                ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioEventoCombinado servicioEventoCombinado, ServicioUsuarioPreescucha servicioUsuarioPreescucha) {
+                                ServicioRecomedacionComunidad servicioRecomedacionComunidad, ServicioEventoCombinado servicioEventoCombinado) {
         this.servicioPlaylist = servicioPlaylist;
-        this.servicioUsuarioPreescucha = servicioUsuarioPreescucha;
+
         this.servicioGuardarImagen = servicioGuardarImagen;
         this.servicioReproduccion = servicioReproduccion;
         this.servicioComunidad = servicioComunidad;
@@ -217,7 +207,7 @@ public class ControladorComunidad {
             model.put("playlistsDeLaComunidad", servicioPlaylist.obtenerPlaylistsRelacionadasAUnaComunidad(id));
             model.put("mensajes", servicioComunidad.obtenerMensajes(id));
             model.put("rol", usuarioComunidad.getRol());
-
+            model.put("usuarioComunidad", servicioUsuarioComunidad.obtenerComunidadesDondeELUsuarioEsteUnido(idUsuario));
             model.put("recomendaciones", servicioRecomedacionComunidad.obtenerRecomendacionesPorComunidadQueNoFueronLeidas(Long.parseLong(idComunidad)));
             model.put("eventos", servicioEventoCombinado.obtenerEventos(comunidad.getArtista(), id));
             estaEnComunidad = true;
@@ -270,8 +260,6 @@ public class ControladorComunidad {
         UsuarioComunidad usuarioComunidad = servicioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
 
         if(usuarioComunidad == null){
-
-            if(servicioComunidad.obtenerComunidadDeArtista(idComunidad,idUsuario)) return ResponseEntity.status(HttpStatus.OK).build();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -328,170 +316,5 @@ public class ControladorComunidad {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
-    @GetMapping("/comunidad-preescucha/{idPreescucha}")
-    public ModelAndView preescuchaComunidad(@PathVariable Long idPreescucha, HttpSession session, ModelMap model) throws IOException, ParseException, SpotifyWebApiException {
-        Long idUsuario = (Long) session.getAttribute("user");
-        Artista artista = (Artista) session.getAttribute("artista");
-
-        if (idUsuario == null && artista == null) {
-            return new ModelAndView("redirect:/login");
-        }
-
-        Comunidad comunidad = servicioComunidad.obtenerComuniadDePreescucha(idPreescucha);
-        if (comunidad == null) {
-            return new ModelAndView("error").addObject("mensaje", "No se encontró la comunidad");
-        }
-        boolean estaEnComunidad = false;
-        if(idUsuario != null) {
-            UsuarioComunidad usuarioComunidad = servicioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario, comunidad.getId());
-            boolean compro = servicioUsuarioPreescucha.comprobarSiYaCompro(idUsuario, idPreescucha);
-            LocalDateTime fechaEscucha = usuarioComunidad.getComunidad().getPreescucha().getFechaEscucha();
-
-            boolean esFuturo = fechaEscucha.isAfter(LocalDateTime.now());
-
-            if (compro && !esFuturo) {
-                model.put("preescucha", servicioPreescucha.obtenerPreescuchaLocal(idPreescucha));
-                model.put("usuariosActivos", servicioComunidad.obtenerUsuariosDeLaComunidad(comunidad.getId()));
-                model.put("fotoUsuario", servicioUsuario.obtenerUsuarioDtoPorId(idUsuario).getUrlFoto());
-                model.put("usuario", usuarioComunidad.getUsuario().getUser());
-                model.put("urlFoto", usuarioComunidad.getUsuario().getUrlFoto());
-                model.put("id", usuarioComunidad.getUsuario().getId());
-                model.put("token", usuarioComunidad.getUsuario().getToken());
-                model.put("hayUsuarios", hayAlguienEscuchandoMusica(comunidad.getId().toString()));
-                model.put("playlistsDeLaComunidad", servicioPlaylist.obtenerPlaylistsRelacionadasAUnaComunidad(comunidad.getId()));
-                model.put("mensajes", servicioComunidad.obtenerMensajes(comunidad.getId()));
-                model.put("rol", usuarioComunidad.getRol());
-                model.put("recomendaciones", servicioRecomedacionComunidad.obtenerRecomendacionesPorComunidadQueNoFueronLeidas(comunidad.getId()));
-                model.put("eventos", servicioEventoCombinado.obtenerEventos(comunidad.getArtista(), comunidad.getId()));
-                estaEnComunidad = true;
-            }else if(esFuturo){
-                Duration duracion = Duration.between(LocalDateTime.now(), fechaEscucha);
-
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-                String fechaFormateada = fechaEscucha.format(formatter);
-
-                model.addAttribute("fechaFormateada", fechaFormateada);
-                model.addAttribute("faltanDias", duracion.toDays());
-                model.addAttribute("faltanHoras", duracion.toHoursPart());
-                model.addAttribute("faltanMinutos", duracion.toMinutesPart());
-
-                return new ModelAndView("preescucha-pendiente", model);
-
-            }
-        }
-        else if(comunidad.getHost().equals(artista)) {
-            model.put("usuariosActivos", servicioComunidad.obtenerUsuariosDeLaComunidad(comunidad.getId()));
-            model.put("usuario", artista.getNombre());
-            model.put("urlFoto", artista.getFotoPerfil());
-            model.put("id", artista.getId());
-            model.put("preescucha", servicioPreescucha.obtenerPreescuchaLocal(idPreescucha));
-
-            model.put("token", "");
-            model.put("mensajes", servicioComunidad.obtenerMensajes(comunidad.getId()));
-            model.put("rol", "Artista");
-            estaEnComunidad = true;
-        }
-
-
-        model.put("comunidad", comunidad);
-        model.put("estaEnComunidad", estaEnComunidad);
-
-
-        return new ModelAndView("comunidad-general", model);
-    }
-
-    @GetMapping("/api/preescucha/{id}/canciones")
-    @ResponseBody
-    public List<CancionSimpleDto> obtenerCanciones(@PathVariable Long id) {
-        Preescucha pre = servicioPreescucha.obtenerPreescuchaLocal(id);
-
-        return pre.getAudios().stream()
-                .map(audio -> new CancionSimpleDto(audio.getTitulo(), audio.getRutaAudio(),audio.getPreescucha().getArtista().getNombre(), audio.getPortadaUrl()))
-                .collect(Collectors.toList());
-    }
-
-    @MessageMapping("/preescucha.iniciar.{idComunidad}")
-    public void iniciarPreescucha(@DestinationVariable Long idComunidad, String payload) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = mapper.readTree(payload);
-        JsonNode cancionesNode = root.path("data").path("canciones");
-
-        List<CancionSimpleDto> canciones = new ArrayList<>();
-        for (JsonNode cancionNode : cancionesNode) {
-            CancionSimpleDto c = mapper.treeToValue(cancionNode, CancionSimpleDto.class);
-            canciones.add(c);
-        }
-
-        servicioPreescucha.iniciarPreescucha(idComunidad, canciones);
-
-        messagingTemplate.convertAndSend(
-                "/topic/" + idComunidad,
-                payload
-        );
-    }
-
-
-    @MessageMapping("/preescucha.estado.{idComunidad}")
-    @SendTo("/topic/estado-actual.{idComunidad}")
-    public Map<String, Object> estadoPreescucha(@DestinationVariable Long idComunidad, Principal principal) {
-        System.out.println("Principal que pidió estado: " + principal.getName());
-
-        EstadoPreescucha estado = servicioPreescucha.obtenerEstado(idComunidad);
-        if (estado == null) {
-            System.out.println("No hay estado para comunidad " + idComunidad);
-            return null;
-        }
-
-        System.out.println("Estado encontrado para comunidad " + idComunidad);
-
-        if (estado.isReproduciendo()) {
-            Map<String, Object> payload = new HashMap<>();
-            payload.put("type", "ESTADO_ACTUAL");
-            payload.put("canciones", estado.getCanciones());
-            payload.put("indiceActual", estado.getIndiceActual());
-            payload.put("idComunidad", idComunidad);
-
-            long segundosReproducidos = (System.currentTimeMillis() - estado.getTimestampInicio()) / 1000;
-            payload.put("segundosReproducidos", segundosReproducidos);
-
-            System.out.println("Enviando payload a usuario " + principal.getName() + ": " + payload);
-            return payload;
-        }
-
-        return null;
-
-    }
-
-
-    @MessageMapping("/preescucha.actualizarEstado.{idComunidad}")
-    public void actualizarEstado(@DestinationVariable Long idComunidad, String payload) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = mapper.readTree(payload);
-
-        int indiceActual = root.path("indiceActual").asInt();
-        int segundosReproducidos = root.path("segundosReproducidos").asInt();
-
-        // Actualiza estado interno
-       servicioPreescucha.actualizarEstado(idComunidad, indiceActual, segundosReproducidos);
-        EstadoPreescucha estado = servicioPreescucha.obtenerEstado(idComunidad);
-        // Actualiza el timestamp para que futuros cálculos sean correctos
-        long nuevoTimestampInicio = System.currentTimeMillis() - (segundosReproducidos * 1000L);
-        estado.setTimestampInicio(nuevoTimestampInicio);
-
-        Map<String, Object> payloadResponse = new HashMap<>();
-        payloadResponse.put("type", "ESTADO_ACTUAL");
-        payloadResponse.put("canciones", estado.getCanciones());
-        payloadResponse.put("indiceActual", estado.getIndiceActual());
-        payloadResponse.put("segundosReproducidos", segundosReproducidos);
-        payloadResponse.put("idComunidad", idComunidad);
-        System.out.println("Enviando payload actualizado a todos los usuarios de la comunidad " + idComunidad + ": " + payloadResponse);
-
-
-        messagingTemplate.convertAndSend("/topic/" + idComunidad, payloadResponse);
-    }
-
-
-
 
 }

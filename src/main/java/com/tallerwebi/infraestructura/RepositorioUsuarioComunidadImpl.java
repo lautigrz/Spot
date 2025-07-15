@@ -7,6 +7,7 @@ import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,16 +106,6 @@ public class RepositorioUsuarioComunidadImpl implements RepositorioUsuarioComuni
         return resultado;
     }
 
-    @Override
-    public List<Comunidad> obtenerComunidadesDondeElUsuarioEsteUnido(Usuario usuario) {
-
-        String hql = "SELECT uc.comunidad FROM UsuarioComunidad uc WHERE uc.usuario.id = :idUsuario";
-        Query<Comunidad> query = sessionFactory.getCurrentSession().createQuery(hql, Comunidad.class);
-        query.setParameter("idUsuario", usuario.getId());
-        List<Comunidad> comunidades = query.getResultList();
-
-        return comunidades;
-    }
 
     @Override
     public void compartirPosteoEnComunidad(Post post, List<Comunidad> comunidades, Usuario usuario) {
@@ -136,5 +127,14 @@ public class RepositorioUsuarioComunidadImpl implements RepositorioUsuarioComuni
 
             sessionFactory.getCurrentSession().save(mensaje);
         }
+    }
+
+    @Override
+    public List<Comunidad> obtenerComunidadesDondeELUsuarioEsteUnido(Usuario usuario) {
+        String hql = "SELECT uc.comunidad FROM UsuarioComunidad uc WHERE uc.usuario.id = :idUsuario";
+        TypedQuery<Comunidad> comunidadesQuery = sessionFactory.getCurrentSession().createQuery(hql, Comunidad.class);
+        comunidadesQuery.setParameter("idUsuario", usuario.getId());
+
+        return comunidadesQuery.getResultList();
     }
 }
