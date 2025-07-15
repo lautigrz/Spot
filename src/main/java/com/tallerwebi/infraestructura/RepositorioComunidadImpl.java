@@ -151,13 +151,14 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
     }
 
     @Override
-    public List<Comunidad> obtenerComunidadesDeArtista(Long idArtista) {
-        String hql = "FROM Comunidad c WHERE c.host.id = :idArtista";
+    public Boolean obtenerComunidadDeArtista(Long idComunidad, Long idArtista) {
+        String hql = "FROM Comunidad c WHERE c.host.id = :idArtista AND c.id = :idComunidad";
         TypedQuery<Comunidad> query = sessionFactory.getCurrentSession().createQuery(hql, Comunidad.class);
         query.setParameter("idArtista", idArtista);
-        List<Comunidad> comunidades = query.getResultList();
+        query.setParameter("idComunidad", idComunidad);
+        Comunidad comunidad = query.getSingleResult();
 
-        return comunidades;
+        return comunidad != null;
     }
 
     @Override

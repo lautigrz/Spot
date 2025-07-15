@@ -15,6 +15,7 @@ import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -28,6 +29,7 @@ import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
+import java.security.Principal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -268,6 +270,8 @@ public class ControladorComunidad {
         UsuarioComunidad usuarioComunidad = servicioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
 
         if(usuarioComunidad == null){
+
+            if(servicioComunidad.obtenerComunidadDeArtista(idComunidad,idUsuario)) return ResponseEntity.status(HttpStatus.OK).build();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -429,27 +433,37 @@ public class ControladorComunidad {
 
 
     @MessageMapping("/preescucha.estado.{idComunidad}")
-    public void estadoPreescucha(@DestinationVariable Long idComunidad) {
+    @SendTo("/topic/estado-actual.{idComunidad}")
+    public Map<String, Object> estadoPreescucha(@DestinationVariable Long idComunidad, Principal principal) {
+        System.out.println("Principal que pidió estado: " + principal.getName());
+
         EstadoPreescucha estado = servicioPreescucha.obtenerEstado(idComunidad);
+        if (estado == null) {
+            System.out.println("No hay estado para comunidad " + idComunidad);
+            return null;
+        }
 
-        if (estado != null && estado.isReproduciendo()) {
+        System.out.println("Estado encontrado para comunidad " + idComunidad);
 
+        if (estado.isReproduciendo()) {
             Map<String, Object> payload = new HashMap<>();
-            payload.put("type", "PREESCUCHA_ESTADO");
+            payload.put("type", "ESTADO_ACTUAL");
             payload.put("canciones", estado.getCanciones());
             payload.put("indiceActual", estado.getIndiceActual());
             payload.put("idComunidad", idComunidad);
 
-
             long segundosReproducidos = (System.currentTimeMillis() - estado.getTimestampInicio()) / 1000;
             payload.put("segundosReproducidos", segundosReproducidos);
 
-            messagingTemplate.convertAndSend(
-                    "/topic/" + idComunidad,
-                    payload
-            );
+            System.out.println("Enviando payload a usuario " + principal.getName() + ": " + payload);
+            return payload;
         }
+
+        return null;
+
     }
+
+
     @MessageMapping("/preescucha.actualizarEstado.{idComunidad}")
     public void actualizarEstado(@DestinationVariable Long idComunidad, String payload) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
@@ -458,18 +472,25 @@ public class ControladorComunidad {
         int indiceActual = root.path("indiceActual").asInt();
         int segundosReproducidos = root.path("segundosReproducidos").asInt();
 
-        servicioPreescucha.actualizarEstado(idComunidad, indiceActual, segundosReproducidos);
-
+        // Actualiza estado interno
+       servicioPreescucha.actualizarEstado(idComunidad, indiceActual, segundosReproducidos);
         EstadoPreescucha estado = servicioPreescucha.obtenerEstado(idComunidad);
+        // Actualiza el timestamp para que futuros cálculos sean correctos
+        long nuevoTimestampInicio = System.currentTimeMillis() - (segundosReproducidos * 1000L);
+        estado.setTimestampInicio(nuevoTimestampInicio);
 
         Map<String, Object> payloadResponse = new HashMap<>();
-        payloadResponse.put("type", "PREESCUCHA_ESTADO");
+        payloadResponse.put("type", "ESTADO_ACTUAL");
         payloadResponse.put("canciones", estado.getCanciones());
         payloadResponse.put("indiceActual", estado.getIndiceActual());
         payloadResponse.put("segundosReproducidos", segundosReproducidos);
+        payloadResponse.put("idComunidad", idComunidad);
+        System.out.println("Enviando payload actualizado a todos los usuarios de la comunidad " + idComunidad + ": " + payloadResponse);
+
 
         messagingTemplate.convertAndSend("/topic/" + idComunidad, payloadResponse);
     }
+
 
 
 

@@ -15,7 +15,8 @@
 <input type="hidden" id="token" th:value="${token}">
 <input type="hidden" id="rol" th:value="${rol}">
 <input type="hidden" id="comunidad" th:value="${comunidad.getId()}">
-<input type="hidden" id="preescucha" th:value="${preescucha.getId()}">
+<input type="hidden" id="preescucha" th:value="${preescucha?.id ?: 0}">
+
 <div class="container-fluid">
     <div class="row mt-10" >
 
@@ -179,7 +180,6 @@
 
                                 </div>
                             </div>
-                            <i class="fas fa-heart ms-3 corazon" style="cursor:pointer;" title="Like"></i>
                         </div>
                         <div class="position-absolute top-0 end-0 dropdown" th:if="${rol == 'Admin'}">
                             <button class="btn btn-sm btn-light dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border: none; box-shadow: none; padding: 0px 5px;">⋮</button>
@@ -248,7 +248,7 @@
                         </div>
                         <div>
                             <strong th:text="${usuarios.getUser()}"></strong><br>
-                            <small th:text="'🎧 ' + ${usuarios.getEscuchando()}"></small>
+                            <small th:if="${preescucha == null}" th:text="'🎧 ' + ${usuarios.getEscuchando()}"></small>
 
                         </div>
                         <div th:if="${rol == 'Admin' && usuarios.getId() != id }" class="dropdown">
@@ -297,7 +297,8 @@
     <div class="position-absolute top-50 start-50 translate-middle text-center" id="centro" style="z-index: 2;">
         <div class="mb-2">
             <i class="fas fa-music fa-spin fa-lg text-success me-2"></i>
-            <span class="fw-light">Preescucha..</span>
+            <span th:text="${preescucha != null} ? 'Preescucha...' : 'Escuchando...'"></span>
+
         </div>
 
     </div>

@@ -38,9 +38,10 @@ public class ServicioPreescuchaImpl implements ServicioPreescucha {
         EstadoPreescucha estado = obtenerEstado(idComunidad);
         if (estado != null) {
             estado.setIndiceActual(nuevoIndice);
-            estado.setTimestampInicio(System.currentTimeMillis() - (nuevoSegundos * 1000));
-
+            estado.setTimestampInicio(System.currentTimeMillis() - (nuevoSegundos * 1000L));
+            System.out.println("Estado actualizado para comunidad no es null " + idComunidad + ": Indice actual: " + nuevoIndice + ", Timestamp inicio: " + estado.getTimestampInicio());
         }
+        System.out.println("Estado actualizado para comunidad " + idComunidad + ": Indice actual: " + nuevoIndice + ", Timestamp inicio: " + estado.getTimestampInicio());
     }
 
     public void iniciarPreescucha(Long idComunidad, List<CancionSimpleDto> canciones) {

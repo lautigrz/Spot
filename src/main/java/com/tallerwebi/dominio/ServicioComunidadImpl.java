@@ -226,10 +226,10 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     }
 
     @Override
-    public List<ComunidadPreescuchaDto> obtenerComunidadDePreescucha(Long idArtista) {
-
-       return null;
+    public Boolean obtenerComunidadDeArtista(Long idComunidad, Long idArtista) {
+        return repositorioComunidad.obtenerComunidadDeArtista(idComunidad, idArtista);
     }
+
 
     @Override
     public Comunidad obtenerComuniadDePreescucha(Long idPreescucha) {

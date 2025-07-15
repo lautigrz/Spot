@@ -26,6 +26,7 @@ public interface ServicioComunidad {
     List<ComunidadDto> buscarComunidadesPorNombre(String nombreComunidad);
     UsuarioDto obtenerUsuarioPorSuNombreEnUnaComunidad(String usuario, Long idComunidad);
     Long crearComunidadParaUnaPreescucha(Long idPreescucha);
-    List<ComunidadPreescuchaDto> obtenerComunidadDePreescucha(Long idArtista);
+    Boolean obtenerComunidadDeArtista(Long idComunidad, Long idArtista);
     Comunidad obtenerComuniadDePreescucha(Long idPreescucha);
+
 }

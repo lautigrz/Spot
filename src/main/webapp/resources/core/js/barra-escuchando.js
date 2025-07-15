@@ -6,7 +6,10 @@ let intervaloProgreso = null;
 document.addEventListener("DOMContentLoaded", () => {
 
     const idComunidad = document.getElementById("comunidad").value;
-    obtenerCancionActualDesdeServidor(idComunidad);
+    const preescucha = document.getElementById("preescucha").value;
+    if(preescucha === 0) {
+        obtenerCancionActualDesdeServidor(idComunidad);
+    }
 });
 
 function obtenerCancionActualDesdeServidor(idComunidad) {

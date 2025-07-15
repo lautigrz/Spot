@@ -36,6 +36,15 @@ function onConnected(datos) {
     console.log("Suscrito a: ", `/topic/${datos.idComunidad}`);
     stompClient.subscribe(`/topic/${datos.idComunidad}`, onMessageReceived);
 
+    let preescucha = document.getElementById("preescucha").value;
+
+    if(preescucha > 0) {
+        stompClient.subscribe(`/topic/estado-actual.${datos.idComunidad}`, function (message) {
+            console.log("Estado actual recibido en broadcast:", message);
+            var estado = JSON.parse(message.body);
+            mostrarPlayerSincronizado(estado.canciones, estado.indiceActual, estado.segundosReproducidos, estado.idComunidad);
+        });
+    }
 
     stompClient.send(
         `/app/chat.register/${datos.idComunidad}`,
@@ -43,13 +52,17 @@ function onConnected(datos) {
         JSON.stringify({sender: datos.username, type: "CHAT"}),
     );
 
-    stompClient.send(`/app/preescucha.estado.${datos.idComunidad}`, {}, JSON.stringify({
-        type: "SOLICITAR_ESTADO"
-    }));
+
+    if (preescucha > 0) {
+    stompClient.send(
+        `/app/preescucha.estado.${datos.idComunidad}`,
+        {},
+        null
+    );
+    }
 
 
-
-    obtenerCancionActualDesdeServidor(datos.idComunidad);
+   obtenerCancionActualDesdeServidor(datos.idComunidad);
 }
 
 function send(event){
@@ -114,8 +127,10 @@ function onMessageReceived(payload) {
             mensajeDiv.classList.add("text-muted");
         }
     }else if(message.type === "PREESCUCHA") {
-        mostrarPlayer(message.data.canciones);
-    } else if(message.type === "PREESCUCHA_ESTADO") {
+        console.log("Mensaje recibidoen preescucha:", message);
+        mostrarPlayer(message.data.canciones, message.data.idComunidad);
+
+    } else if(message.type === "PREESCUCHA_ESTADO" || message.type === "ESTADO_ACTUAL") {
         console.log("Estado sincronización recibido:", message);
 
         const canciones = message.canciones;
@@ -126,10 +141,26 @@ function onMessageReceived(payload) {
         mostrarPlayerSincronizado(canciones, indiceActual, segundosReproducidos, idComunidad);
     }
 
+
+
 }
 function mostrarPlayerSincronizado(canciones, indiceActual, segundosReproducidos, idComunidad) {
     const audioPlayer = document.getElementById("audioPlayer");
     const playlist = document.getElementById("playlist-escucha");
+    const footer = document.getElementById("footer");
+    const playerContainer = document.getElementById("playerContainer");
+
+    console.log("Mostrar player sincronizado con canciones:", canciones, indiceActual);
+
+
+    // Validar si ya terminó
+    if (indiceActual > canciones.length) {
+        console.log("Preescucha finalizada (usuario)");
+        playerContainer.style.display = "none";
+        footer.style.display = "none";
+        audioPlayer.pause();
+        return;
+    }
 
     // Limpiar y armar playlist
     playlist.innerHTML = "";
@@ -140,75 +171,52 @@ function mostrarPlayerSincronizado(canciones, indiceActual, segundosReproducidos
         playlist.appendChild(li);
     });
 
-    // Función para reproducir canción y actualizar footer
+    // Mostrar contenedor del player
+    playerContainer.style.display = "block";
+    footer.style.display = "flex";
+
+    // Función para reproducir la canción actual
     function reproducirActual() {
         const cancion = canciones[indiceActual];
 
         audioPlayer.src = cancion.ruta;
         audioPlayer.load();
 
-        // Actualiza footer dinámico
         actualizarFooterCancion({
-            urlImagen: cancion.urlPortada,   // Asegúrate de tener este campo en tu DTO
+            urlImagen: cancion.urlPortada,
             artista: cancion.artista || "Desconocido",
             titulo: cancion.titulo,
-            progreso: segundosReproducidos * 1000, // segundos => ms
-            duracion: cancion.duracion * 1000       // segundos => ms
+            progreso: segundosReproducidos * 1000,
+            duracion: cancion.duracion * 1000
         });
 
-        document.getElementById("footer").style.display = "block";
-
-        audioPlayer.addEventListener("loadedmetadata", function handler() {
-            audioPlayer.currentTime = segundosReproducidos;
-            audioPlayer.play();
-            audioPlayer.removeEventListener("loadedmetadata", handler);
-        });
-
-        // Resaltar canción actual
         Array.from(playlist.children).forEach((li, idx) => {
             li.style.fontWeight = (idx === indiceActual) ? "bold" : "normal";
         });
+
+        function handler() {
+            audioPlayer.currentTime = segundosReproducidos;
+            audioPlayer.play();
+            audioPlayer.removeEventListener("loadedmetadata", handler);
+        }
+
+        audioPlayer.removeEventListener("loadedmetadata", handler);
+        audioPlayer.addEventListener("loadedmetadata", handler);
     }
 
-    // Quitar listener anterior por seguridad
+    // Limpiar listeners previos y definir uno nuevo
+    audioPlayer.onended = null;
     audioPlayer.removeEventListener('ended', onSongEnded);
 
     function onSongEnded() {
-        indiceActual++;
-        segundosReproducidos = 0;
-
-        // Actualiza estado en el servidor
-        stompClient.send(
-            `/app/preescucha.actualizarEstado.${idComunidad}`,
-            {},
-            JSON.stringify({
-                type: 'ACTUALIZAR_ESTADO',
-                indiceActual: indiceActual,
-                segundosReproducidos: segundosReproducidos
-            })
-        );
-
-        if (indiceActual < canciones.length) {
-            reproducirActual();
-        } else {
-            console.log("Preescucha finalizada");
-            document.getElementById("playerContainer").style.display = "none";
-        }
+        console.log("Canción finalizada (usuario sincronizado). Esperando host...");
+        // Opcional: mostrar UI de espera
     }
 
     audioPlayer.addEventListener('ended', onSongEnded);
 
-    // Mostrar contenedor del player
-    document.getElementById("playerContainer").style.display = "block";
-
     reproducirActual();
 }
-
-
-
-
-
-
 
 
 
@@ -402,7 +410,7 @@ window.addEventListener("load", function () {
         if (estado) {
             connect();
         }
-        connect();
+
     })();
 
 
@@ -467,10 +475,11 @@ async function existeUsuarioEnLaComunidad() {
     }
 }
 
-
-function mostrarPlayer(canciones) {
+function mostrarPlayer(canciones,idComunidad) {
     const audioPlayer = document.getElementById("audioPlayer");
     const playlist = document.getElementById("playlist-escucha");
+    const playerContainer = document.getElementById("playerContainer");
+    const footer = document.getElementById("footer");
 
     playlist.innerHTML = "";
 
@@ -480,11 +489,14 @@ function mostrarPlayer(canciones) {
         playlist.appendChild(li);
     });
 
-    document.getElementById("playerContainer").style.display = "block";
-    let indice = 0;
+    playerContainer.style.display = "block";
+    footer.style.display = "flex";
+
+    let indiceActual = 0;
+    let segundosReproducidos = 0;
 
     function reproducirActual() {
-        const cancionActual = canciones[indice];
+        const cancionActual = canciones[indiceActual];
         audioPlayer.src = cancionActual.ruta;
         audioPlayer.play();
 
@@ -496,24 +508,50 @@ function mostrarPlayer(canciones) {
             duracion: (cancionActual.duracion || 0) * 1000
         });
 
-        document.getElementById("footer").style.display = "flex";
-
         Array.from(playlist.children).forEach((li, idx2) => {
-            li.style.fontWeight = idx2 === indice ? "bold" : "normal";
+            li.style.fontWeight = idx2 === indiceActual ? "bold" : "normal";
         });
     }
 
-    audioPlayer.onended = function () {
-        indice++;
-        if (indice < canciones.length) {
+    function onSongEnded() {
+        indiceActual++;
+        segundosReproducidos = 0;
+        console.log("Canción finalizada. Reproduciendo la siguiente...");
+
+        if (stompClient && idComunidad) {
+            console.log("Enviando actualización de estado a la comunidad:", idComunidad);
+            stompClient.send(
+                `/app/preescucha.actualizarEstado.${idComunidad}`,
+                {},
+                JSON.stringify({
+                    type: 'ACTUALIZAR_ESTADO',
+                    indiceActual: indiceActual,
+                    segundosReproducidos: segundosReproducidos
+                })
+            );
+
+        } else {
+            console.error("stompClient o idComunidad no están definidos. No se puede enviar el estado.");
+        }
+
+
+        if (indiceActual < canciones.length) {
             reproducirActual();
         } else {
             console.log("Preescucha finalizada");
+            playerContainer.style.display = "none";
+            footer.style.display = "none";
         }
-    };
+    }
+
+    // Limpia listeners anteriores por seguridad
+    audioPlayer.onended = null;
+    audioPlayer.removeEventListener('ended', onSongEnded);
+    audioPlayer.addEventListener('ended', onSongEnded);
 
     reproducirActual();
 }
+
 
 
 
@@ -532,6 +570,7 @@ document.getElementById("reproduccionPreescucha").addEventListener("click", func
                 JSON.stringify({
                     type: "PREESCUCHA",
                     data: {
+                        idComunidad: idComunidad,
                         canciones: canciones
                     }
                 })
@@ -540,28 +579,6 @@ document.getElementById("reproduccionPreescucha").addEventListener("click", func
         .catch(error => console.error("Error al traer canciones:", error));
 });
 
-
-
-
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Tu listener de corazón
-    const heartIcons = document.querySelectorAll('.corazon');
-    heartIcons.forEach(heartIcon => {
-        heartIcon.addEventListener('click', () => {
-            if (heartIcon.classList.contains('text-danger')) {
-                heartIcon.classList.remove('fas', 'fa-heart', 'ms-3', 'text-danger');
-                heartIcon.classList.add('fa-regular', 'fa-heart', 'ms-3');
-            } else {
-                heartIcon.classList.remove('fa-regular', 'fa-heart', 'ms-3');
-                heartIcon.classList.add('fas', 'fa-heart', 'ms-3', 'text-danger');
-            }
-        });
-    });
-
-
-});
 
 function actualizarFooterCancion(dt){
     const colorThief = new ColorThief();
