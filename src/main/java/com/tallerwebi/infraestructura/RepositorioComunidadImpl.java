@@ -47,15 +47,18 @@ public class RepositorioComunidadImpl implements RepositorioComunidad {
     }
     @Override
     public List<Comunidad> obtenerComunidades() {
-        String hql = "FROM Comunidad c WHERE c.preescucha IS NULL ORDER BY c.id DESC";
+        String hql = "FROM Comunidad c LEFT JOIN FETCH c.usuarios u WHERE c.preescucha IS NULL ORDER BY c.id DESC";
         TypedQuery<Comunidad> query = sessionFactory.getCurrentSession().createQuery(hql, Comunidad.class);
         return query.getResultList();
     }
 
     @Override
     public Comunidad obtenerComunidad(Long id) {
+        String hql = "FROM Comunidad c LEFT JOIN FETCH c.usuarios LEFT JOIN FETCH c.playlists u WHERE c.id = :id";
+        Query<Comunidad> query = sessionFactory.getCurrentSession().createQuery(hql, Comunidad.class);
+        query.setParameter("id", id);
 
-        return sessionFactory.getCurrentSession().get(Comunidad.class, id);
+        return query.getSingleResult();
     }
 
     @Override

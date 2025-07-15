@@ -185,7 +185,7 @@
                 </div>
                 <div class="d-flex flex-column justify-content-center">
                     <span th:text="${comunidad.getNombre()}" class="fw-semibold text-dark"></span>
-                    <small class="text-muted">24.1k miembros</small>
+                    <small class="text-muted" th:text="${comunidad.usuarios.size()} + ' Miembros'"></small>
                 </div>
             </a>
             </div>
@@ -258,7 +258,7 @@
                             <th>Artista</th>
                             <th>Precio</th>
                             <th>Fecha</th>
-                            <th>Acciones</th>
+                            <th>Sala</th>
                         </tr>
                         </thead>
                         <tbody>

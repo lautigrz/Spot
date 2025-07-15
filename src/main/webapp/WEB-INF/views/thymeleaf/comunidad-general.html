@@ -103,16 +103,20 @@
                         <img th:src="${comunidad.getUrlFoto()}" alt="Billie Eilish" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover; border: 2px solid white;">
                         <div>
                             <h3 class="mb-0" th:text="${comunidad.getNombre()}"></h3>
-                            <small class="text-white">Est. 2020 · +120k fans</small>
+                            <small class="text-white">
+                                Est. 2025 · +<span th:text="${#lists.size(comunidad.usuarios)}">0</span> Miembros
+                            </small>
+
                         </div>
                     </div>
 
                     <p class="mb-3" th:text="${comunidad.getDescripcion()}"></p>
 
                     <div class="stats d-flex gap-4 mb-3 text-white">
-                        <small>🎧 56 playlists compartidas</small>
-                        <small>💬 2430 conversaciones activas</small>
-                        <small>🖼️ 870 artworks subidos</small>
+                        <small>
+                            🎧 <span th:text="${#lists.size(comunidad.playlists)}">0</span> playlists compartidas
+                        </small>
+
                     </div>
 
                     <div class="d-flex justify-content-between">
@@ -397,7 +401,7 @@
                         <div class="playlist-item ver-canciones" th:id="${playlist.getId()}" role="button" tabindex="0" aria-label="Ver canciones Electrónica Chill">
 
                             <div class="playlist-thumb position-relative">
-                                <img th:src="${playlist.getUrlImagen()}" alt="Electrónica Chill" class="img-fluid rounded">
+                                <img th:src="${playlist.getUrlImagen()}" alt="Portada playlist" class="img-fluid rounded">
                                 <div class="playlist-overlay">
                                     <i class="fas fa-play"></i>
                                 </div>
@@ -405,7 +409,7 @@
 
                             <div class="playlist-info mt-2">
                                 <h5 id="name-playlist" class="mb-1" th:text="${playlist.getNombre()}"></h5>
-                                <p class="mb-0 text-muted">Sonidos suaves para relajarte</p>
+
                             </div>
 
                         </div>

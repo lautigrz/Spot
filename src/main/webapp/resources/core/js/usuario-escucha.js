@@ -10,6 +10,8 @@ function obtenerCancionActualDesdeServidor(idUsuario) {
             return response.json();
         })
         .then(data => {
+
+            console.log("Datos de la canción actual:", data);
             actualizarFooterCancion(data);
 
             console.log(data);
@@ -42,6 +44,8 @@ function actualizarFooterCancion(dt) {
 
 function aplicarColoresDesdePaleta(colorThief, img) {
     const footer = document.getElementById("footer");
+    const boton = document.getElementById("backToTop");
+
     const palette = colorThief.getPalette(img, 5);
     const [color1, color2] = palette;
 
@@ -51,7 +55,7 @@ function aplicarColoresDesdePaleta(colorThief, img) {
 
     footer.style.background = gradient;
     footer.style.display = "flex";
-
+    boton.style.display = "flex";
 
     const luminance = 0.299 * color1[0] + 0.587 * color1[1] + 0.114 * color1[2];
 
