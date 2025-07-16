@@ -50,7 +50,7 @@ public class ControladorPerfil {
     private ServicioGuardarImagen servicioGuardarImagen;
 
     @Autowired
-    public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioEstadoDeAnimo servicioEstadoDeAnimo, ServicioRecomendaciones servicioRecomendaciones, ServicioUsuario servicioUsuario, ServicioReproduccion servicioReproduccion, ServicioLike servicioLike) {
+    public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioEstadoDeAnimo servicioEstadoDeAnimo, ServicioRecomendaciones servicioRecomendaciones, ServicioUsuario servicioUsuario, ServicioReproduccion servicioReproduccion, ServicioLike servicioLike,ServicioRating servicioRating ) {
         this.servicioPerfil = servicioPerfil;
         this.servicioEstadoDeAnimo = servicioEstadoDeAnimo;
         this.servicioReproduccion = servicioReproduccion;
