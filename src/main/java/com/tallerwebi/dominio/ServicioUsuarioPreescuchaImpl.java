@@ -36,16 +36,6 @@ public class ServicioUsuarioPreescuchaImpl implements ServicioUsuarioPreescucha 
     }
 
     @Override
-    public UsuarioPreescucha buscarPorId(Long id) {
-        return null;
-    }
-
-    @Override
-    public void eliminar(Long id) {
-
-    }
-
-    @Override
     public Boolean comprobarSiYaCompro(Long idUsuario, Long idPreescucha) {
         return repositorioUsuarioPreescucha.existePorUsuarioYPreescucha(idUsuario, idPreescucha);
     }
@@ -53,6 +43,20 @@ public class ServicioUsuarioPreescuchaImpl implements ServicioUsuarioPreescucha 
     @Override
     public List<UsuarioPreescuchaDto> buscarPorUsuario(Long id) {
         List<UsuarioPreescucha> usuarioPreescuchas = repositorioUsuarioPreescucha.buscarPorUsuario(id);
+        return getUsuarioPreescuchaDtos(usuarioPreescuchas);
+
+    }
+
+
+    @Override
+    public List<UsuarioPreescuchaDto> buscarPorUsuarioOrdenado(Long idUsuario, String orden) {
+
+        List<UsuarioPreescucha> usuarioPreescuchas = repositorioUsuarioPreescucha.buscarPorUsuarioOrdenado(idUsuario, orden);
+        return getUsuarioPreescuchaDtos(usuarioPreescuchas);
+
+    }
+
+    private List<UsuarioPreescuchaDto> getUsuarioPreescuchaDtos(List<UsuarioPreescucha> usuarioPreescuchas) {
         if (usuarioPreescuchas.isEmpty()) {
             return List.of();
         }
@@ -67,11 +71,5 @@ public class ServicioUsuarioPreescuchaImpl implements ServicioUsuarioPreescucha 
                         up.getPreescucha().getFechaFormateada()
                 ))
                 .collect(Collectors.toList());
-
-    }
-
-    @Override
-    public List<UsuarioPreescucha> buscarPorPreescucha(Long id) {
-        return List.of();
     }
 }

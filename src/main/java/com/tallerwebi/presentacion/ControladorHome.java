@@ -3,6 +3,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.presentacion.dto.PostLikeDto;
+import com.tallerwebi.presentacion.dto.UsuarioPreescuchaDto;
 import org.dom4j.rule.Mode;
 
 import com.tallerwebi.dominio.ServicioComunidad;
@@ -11,12 +12,11 @@ import com.tallerwebi.dominio.ServicioNotificacion;
 import com.tallerwebi.dominio.ServicioUsuario;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
@@ -115,6 +115,22 @@ public class ControladorHome {
         modelMap.put("comunidades", servicioComunidad.obtenerTodasLasComunidades());
         return new ModelAndView("home", modelMap);
     }
+
+    @GetMapping("/compras-usuario/{idUsuario}")
+    @ResponseBody
+    public ResponseEntity<List<UsuarioPreescuchaDto>> comprasOrdenadas(
+            @PathVariable Long idUsuario,
+            @RequestParam(defaultValue = "ASC") String orden) {
+
+        List<UsuarioPreescuchaDto> compras = servicioUsuarioPreescucha.buscarPorUsuarioOrdenado(idUsuario, orden);
+
+        if (compras.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(compras);
+    }
+
 
 
     @GetMapping("/buscar-artista")

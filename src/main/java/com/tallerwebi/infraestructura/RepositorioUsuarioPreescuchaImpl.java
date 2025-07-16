@@ -36,14 +36,6 @@ public class RepositorioUsuarioPreescuchaImpl implements RepositorioUsuarioPrees
     }
 
     @Override
-    public UsuarioPreescucha buscarPorId(Long id) {
-
-        String hql = "FROM UsuarioPreescucha up WHERE up.id = :id";
-
-        return null;
-    }
-
-    @Override
     public Boolean existePorUsuarioYPreescucha(Long usuarioId, Long preescuchaId) {
 
         String hql = "SELECT COUNT(up) FROM UsuarioPreescucha up WHERE up.usuario.id = :usuarioId AND up.preescucha.id = :preescuchaId";
@@ -52,11 +44,6 @@ public class RepositorioUsuarioPreescuchaImpl implements RepositorioUsuarioPrees
         query.setParameter("preescuchaId", preescuchaId);
         Long count = query.uniqueResult();
         return count != null && count > 0;
-    }
-
-    @Override
-    public void eliminar(Long id) {
-
     }
 
     @Override
@@ -71,8 +58,15 @@ public class RepositorioUsuarioPreescuchaImpl implements RepositorioUsuarioPrees
         return resultados != null ? resultados : Collections.emptyList();
     }
 
+
     @Override
-    public List<UsuarioPreescucha> buscarPorPreescucha(Long id) {
-        return List.of();
+    public List<UsuarioPreescucha> buscarPorUsuarioOrdenado(Long idUsuario, String orden) {
+        String hql = "FROM UsuarioPreescucha up WHERE up.usuario.id = :idUsuario ORDER BY up.fechaCompra " + orden;
+
+        Query<UsuarioPreescucha> query = sessionFactory.getCurrentSession().createQuery(hql, UsuarioPreescucha.class);
+        query.setParameter("idUsuario", idUsuario);
+
+        return query.list();
     }
+
 }
