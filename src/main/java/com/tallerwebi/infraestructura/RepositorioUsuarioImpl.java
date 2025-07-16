@@ -45,4 +45,16 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
     public void actualizarUsuario(Usuario usuario) {
         sessionFactory.getCurrentSession().update(usuario);
     }
+
+    @Override
+    public void actualizarFotoPerfil(Usuario usuario, String urlFotoPerfil) {
+        usuario.setUrlFoto(urlFotoPerfil);
+        sessionFactory.getCurrentSession().update(usuario);
+    }
+
+    @Override
+    public void actualizarFotoPortada(Usuario usuario, String urlFotoPortada) {
+        usuario.setUrlPortada(urlFotoPortada);
+        sessionFactory.getCurrentSession().update(usuario);
+    }
 }

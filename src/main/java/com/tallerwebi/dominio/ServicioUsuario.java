@@ -12,4 +12,7 @@ public interface ServicioUsuario {
     Set<UsuarioDto> obtenerSeguidos(Long usuarioId);
     boolean yaSigo(Long seguidorId, Long seguidoId) throws Exception;
     UsuarioDto obtenerUsuarioDtoPorId(Long idUsuario);
+    void actualizarFotoPerfil(Long idUsuario, String urlFotoPerfil);
+
+    void actualizarFotoPortada(Long idUsuario, String urlFoto);
 }

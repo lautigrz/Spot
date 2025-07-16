@@ -74,7 +74,7 @@ public class ServicioAuthImpl implements ServicioAuth {
         usuario.setUser(user.getDisplayName());
         usuario.setToken(token);
         usuario.setRefreshToken(refreshToken);
-
+        usuario.setUrlPortada("/spring/uploads/img.png");
         if (user.getImages() != null && user.getImages().length > 0) {
             usuario.setUrlFoto(user.getImages()[0].getUrl());
         }

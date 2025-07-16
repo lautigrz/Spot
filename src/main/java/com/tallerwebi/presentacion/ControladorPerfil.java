@@ -20,6 +20,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Controller
@@ -43,7 +47,10 @@ public class ControladorPerfil {
     private ServicioRating servicioRating;
 
     @Autowired
-    public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioEstadoDeAnimo servicioEstadoDeAnimo, ServicioRecomendaciones servicioRecomendaciones, ServicioUsuario servicioUsuario, ServicioReproduccion servicioReproduccion, ServicioLike servicioLike, ServicioRating servicioRating) {
+    private ServicioGuardarImagen servicioGuardarImagen;
+
+    @Autowired
+    public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioEstadoDeAnimo servicioEstadoDeAnimo, ServicioRecomendaciones servicioRecomendaciones, ServicioUsuario servicioUsuario, ServicioReproduccion servicioReproduccion, ServicioLike servicioLike) {
         this.servicioPerfil = servicioPerfil;
         this.servicioEstadoDeAnimo = servicioEstadoDeAnimo;
         this.servicioReproduccion = servicioReproduccion;
@@ -298,12 +305,6 @@ public class ControladorPerfil {
 
             model.addAttribute("misSeguidos", seguidos);
             model.addAttribute("misSeguidores", seguidores);
-
-            String spotifyId = user.getId();
-            System.out.println("Usuario encontrado: " + usuario.getId() + " - " + usuario.getSpotifyID());
-            List<Rating> ratings = servicioRating.obtenerRating(spotifyId);
-            System.out.println("Número de ratings encontrados: " + ratings.size()); // Log Y
-            model.addAttribute("ratings", ratings);
 
         }catch (Exception e) {
             e.printStackTrace();
