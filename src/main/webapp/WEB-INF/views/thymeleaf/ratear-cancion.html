@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ratear Canción</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1DB954;
+            --secondary-color: #191414;
+            --hover-color: #1ed760;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        #inputBusqueda {
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 2px solid #e1e1e1;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        #inputBusqueda:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(29, 185, 84, 0.25);
+        }
+
+        #resultados {
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .resultado-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            border-left: 4px solid transparent;
+            transform: translateX(0);
+        }
+
+        .resultado-item:hover {
+            background-color: #f0f0f0;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .resultado-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            margin-right: 15px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .song-info {
+            flex-grow: 1;
+        }
+
+        .song-title {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .song-artist {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        #detalleCancion {
+            margin-top: 30px;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: none; /* Oculto inicialmente */
+        }
+
+        .song-detail {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .song-detail img {
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            margin-right: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .song-detail-text h4 {
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .song-detail-text p {
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        /* Estilos para el rating con estrellas */
+        .rating-container {
+            margin: 20px 0;
+        }
+
+        .rating-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .rating-stars {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+
+        .rating-stars input {
+            display: none;
+        }
+
+        .rating-stars label {
+            cursor: pointer;
+            width: 36px;
+            height: 30px;
+            margin: 0 3px;
+            font-size: 28px;
+            color: #ddd;
+            transition: all 0.2s;
+        }
+
+        .rating-stars label:hover,
+        .rating-stars label:hover ~ label,
+        .rating-stars input:checked ~ label {
+            color: var(--primary-color);
+        }
+
+        .submit-btn {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-2px);
+        }
+
+        #resultados::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #resultados::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        #resultados::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        #resultados::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+<div class="container search-container">
+    <h1 class="text-center mb-4" style="color: var(--secondary-color);">Ratear Canción</h1>
+
+    <div class="mb-4">
+        <input id="inputBusqueda" type="text" class="form-control" placeholder="Buscar canción, artista...">
+    </div>
+
+    <div id="resultados" class="list-group"></div>
+
+    <div id="detalleCancion">
+        <div class="song-detail">
+            <img id="detailImage" src="" alt="Portada">
+            <div class="song-detail-text">
+                <h4 id="detailTitle"></h4>
+                <p id="detailArtist"></p>
+            </div>
+        </div>
+
+        <form id="ratingForm" action="/cancion/ratear" method="post">
+            <input type="hidden" name="spotifyId" id="spotifyId">
+
+            <div class="rating-container">
+                <div class="rating-title">Califica esta canción:</div>
+                <div class="rating-stars">
+                    <input type="radio" id="star5" name="puntaje" value="5">
+                    <label for="star5"><i class="fas fa-star"></i></label>
+
+                    <input type="radio" id="star4" name="puntaje" value="4">
+                    <label for="star4"><i class="fas fa-star"></i></label>
+
+                    <input type="radio" id="star3" name="puntaje" value="3">
+                    <label for="star3"><i class="fas fa-star"></i></label>
+
+                    <input type="radio" id="star2" name="puntaje" value="2">
+                    <label for="star2"><i class="fas fa-star"></i></label>
+
+                    <input type="radio" id="star1" name="puntaje" value="1">
+                    <label for="star1"><i class="fas fa-star"></i></label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn submit-btn mt-3">Enviar Calificación</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const inputBusqueda = document.getElementById("inputBusqueda");
+    const resultados = document.getElementById("resultados");
+    const detalle = document.getElementById("detalleCancion");
+    const detailImage = document.getElementById("detailImage");
+    const detailTitle = document.getElementById("detailTitle");
+    const detailArtist = document.getElementById("detailArtist");
+    const spotifyIdInput = document.getElementById("spotifyId");
+
+    inputBusqueda.addEventListener("input", async () => {
+        const texto = inputBusqueda.value.trim();
+        if (texto.length < 2) {
+            resultados.innerHTML = "";
+            return;
+        }
+
+        try {
+            const res = await fetch(`/spring/cancion/buscar?texto=${encodeURIComponent(texto)}`);
+            if (!res.ok) throw new Error(res.statusText);
+
+            const canciones = await res.json();
+            resultados.innerHTML = "";
+
+            if (canciones.length === 0) {
+                resultados.innerHTML = `<div class="text-center py-3 text-muted">No se encontraron resultados</div>`;
+                return;
+            }
+
+            canciones.forEach(c => {
+                const item = document.createElement("div");
+                item.className = "resultado-item list-group-item list-group-item-action";
+
+                item.innerHTML = `
+                        <img src="${c.urlImagen}" alt="${c.titulo}">
+                        <div class="song-info">
+                            <div class="song-title">${c.titulo}</div>
+                            <div class="song-artist">${c.artista}</div>
+                        </div>
+                    `;
+
+                item.addEventListener("click", () => mostrarDetalleCancion(c));
+                resultados.appendChild(item);
+            });
+        } catch (error) {
+            console.error("Error buscando canciones:", error);
+            resultados.innerHTML = `<div class="alert alert-danger">Error al buscar canciones</div>`;
+        }
+    });
+
+    function mostrarDetalleCancion(cancion) {
+        detalle.style.display = "block";
+
+        detailImage.src = cancion.urlImagen;
+        detailImage.alt = cancion.titulo;
+        detailTitle.textContent = cancion.titulo;
+        detailArtist.textContent = cancion.artista;
+        spotifyIdInput.value = cancion.spotifyId;
+
+        document.querySelectorAll('input[name="puntaje"]').forEach(radio => {
+            radio.checked = false;
+        });
+
+        detalle.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.querySelectorAll('.rating-stars label').forEach(star => {
+        star.addEventListener('mouseover', function() {
+            const stars = document.querySelectorAll('.rating-stars label');
+            const currentIndex = parseInt(this.htmlFor.replace('star', ''));
+
+            stars.forEach((s, index) => {
+                if (index >= 5 - currentIndex) {
+                    s.style.color = '#1DB954';
+                }
+            });
+        });
+
+        star.addEventListener('mouseout', function() {
+            const stars = document.querySelectorAll('.rating-stars label');
+            const checkedStar = document.querySelector('.rating-stars input:checked');
+
+            stars.forEach(s => {
+                s.style.color = checkedStar && parseInt(checkedStar.value) >= parseInt(s.htmlFor.replace('star', ''))
+                    ? '#1DB954'
+                    : '#ddd';
+            });
+        });
+    });
+</script>
+</body>
+</html>

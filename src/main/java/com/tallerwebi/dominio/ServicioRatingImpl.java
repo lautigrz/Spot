@@ -37,11 +37,15 @@ public class ServicioRatingImpl implements ServicioRating {
             throw new Exception("Canción no encontrada.");
         }
 
-        Rating rating = new Rating();
-        rating.setUsuario(usuario);
-        rating.setCancion(cancion);
-        rating.setPuntaje(puntaje);
-        repositoriorRating.guardarRating(rating);
+        Rating ratingExistente = repositoriorRating.buscarPorUsuarioYCancion(usuario, cancion);
+
+        if (ratingExistente != null) {
+            ratingExistente.setPuntaje(puntaje);
+            repositoriorRating.guardarRating(ratingExistente); // ojo, que guardarRating puede ser save o update
+        } else {
+            Rating nuevoRating = new Rating(usuario, cancion, puntaje);
+            repositoriorRating.guardarRating(nuevoRating);
+        }
     }
 
     @Override
@@ -49,8 +53,6 @@ public class ServicioRatingImpl implements ServicioRating {
         Usuario usuario = repositorioUsuario.buscarUsuarioPorId(usuarioId);
         return repositoriorRating.obtenerRating(usuario);
     }
-
-
 
 
 }

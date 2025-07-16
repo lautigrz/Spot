@@ -25,4 +25,10 @@ public class Rating {
     private Cancion cancion;
 
     private Integer puntaje;
+
+    public Rating(Usuario usuario, Cancion cancion, Integer puntaje) {
+        this.usuario = usuario;
+        this.cancion = cancion;
+        this.puntaje = puntaje;
+    }
 }
