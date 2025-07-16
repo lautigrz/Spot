@@ -73,6 +73,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
             UsuarioComunidad usuarioComunidad = repositorioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
            Long id = repositorioComunidad.guardarMensajeDeLaComunidad(message.getContent(), usuarioComunidad.getComunidad(),usuarioComunidad.getUsuario());
            message.setId(String.valueOf(id));
+           message.setIdUsuario(String.valueOf(idUsuario));
 
            return message;
         } catch (Exception e) {

@@ -241,8 +241,17 @@ function crearMensajeHTML(message) {
     const textDiv = document.createElement("div");
     textDiv.className = "flex-grow-1";
 
+
+    const link = document.createElement("a");
+    link.href = `/spring/perfil/${message.idUsuario}`;
+    link.style.textDecoration = "none"; // Quita subrayado
+    link.style.color = "inherit";       // Hereda color
+
     const strong = document.createElement("strong");
     strong.textContent = message.sender;
+
+    link.appendChild(strong);
+
 
 
     const fecha = new Date();
@@ -267,20 +276,12 @@ function crearMensajeHTML(message) {
     p.className = "mb-0 d-inline";
     p.textContent = " " + message.content;
 
-
-    const heartIcon = document.createElement("i");
-    heartIcon.className = "fa-regular fa-heart ms-3 corazon";
-    heartIcon.title = "Like";
-    heartIcon.style.cursor = "pointer";
-
-
-    textDiv.appendChild(strong);
+    textDiv.appendChild(link);
     textDiv.appendChild(document.createElement("br"));
     textDiv.appendChild(small);
     textDiv.appendChild(p);
 
     contentWrapper.appendChild(textDiv);
-    contentWrapper.appendChild(heartIcon);
 
     container.appendChild(img);
     container.appendChild(contentWrapper);

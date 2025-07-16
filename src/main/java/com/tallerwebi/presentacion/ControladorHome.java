@@ -89,7 +89,18 @@ public class ControladorHome {
 
             modelMap.put("posteos", postsConLike);
 
-            modelMap.put("usuarioComunidad", servicioUsuarioComunidad.obtenerComunidadesDondeELUsuarioEsteUnido(idUsuario));
+
+            List<Comunidad> comunidadesUnidas = servicioUsuarioComunidad.obtenerComunidadesDondeELUsuarioEsteUnido(idUsuario);
+
+            List<Comunidad> todasLasComunidades = servicioComunidad.obtenerTodasLasComunidades();
+
+            List<Comunidad> comunidadesNoUnidas = todasLasComunidades.stream()
+                    .filter(comunidad -> !comunidadesUnidas.contains(comunidad))
+                    .collect(Collectors.toList());
+
+
+            modelMap.put("usuarioComunidad", comunidadesUnidas);
+            modelMap.put("comunidades", comunidadesNoUnidas);
 
             modelMap.put("compras", servicioUsuarioPreescucha.buscarPorUsuario(idUsuario));
             modelMap.put("notificacion", servicioNotificacion.elUsuarioTieneNotificaciones(idUsuario));
@@ -112,7 +123,7 @@ public class ControladorHome {
             return new ModelAndView("redirect:/login");
         }
 
-        modelMap.put("comunidades", servicioComunidad.obtenerTodasLasComunidades());
+       // modelMap.put("comunidades", servicioComunidad.obtenerTodasLasComunidades());
         return new ModelAndView("home", modelMap);
     }
 

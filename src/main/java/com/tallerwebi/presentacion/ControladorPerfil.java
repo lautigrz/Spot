@@ -208,6 +208,9 @@ public class ControladorPerfil {
     public String perfilArtista(@PathVariable Long id, HttpSession session, Model model) throws Exception {
         String token = (String) session.getAttribute("token");
         Artista artista1 = servicioArtista.buscarPorId(id);
+        Long idUsuario = (Long) session.getAttribute("user");
+        Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
+        boolean esFavorito = servicioFavorito.yaEsFavorito("LOCAL_" + id,usuario);
 
         try {
             model.addAttribute("habilitar", true);
@@ -217,7 +220,7 @@ public class ControladorPerfil {
             model.addAttribute("foto", artista1.getFotoPerfil());
             model.addAttribute("posteos", servicioPosteo.obtenerPosteosDeArtista(artista1));
             model.addAttribute("preescuchas", servicioPreescucha.obtenerPreescuchasPorArtista(artista1.getId()));
-
+            model.addAttribute("esFavorito", esFavorito);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -305,13 +308,17 @@ public class ControladorPerfil {
     }
 
 
-    @GetMapping("/perfi/{id}")
+    @GetMapping("/perfil/{id}")
     public String perfilMejoradoPorId(@PathVariable Long id, HttpSession session, Model model) throws Exception {
+
+        Long usuarioId = (Long) session.getAttribute("user");
+
+        Boolean esUsuarioLogueado = usuarioId != null && usuarioId.equals(id);
 
         Usuario usuarioPerfil = servicioUsuario.obtenerUsuarioPorId(id);
         try {
             User user = servicioPerfil.obtenerPerfilUsuario(usuarioPerfil.getToken());
-
+            model.addAttribute("usuarioId", esUsuarioLogueado);
             model.addAttribute("inicio", "Se inicio correctamente");
             model.addAttribute("nombre",user.getDisplayName());
             model.addAttribute("foto", user.getImages()[0].getUrl());

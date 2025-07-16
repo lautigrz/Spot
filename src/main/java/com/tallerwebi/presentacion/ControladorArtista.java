@@ -146,7 +146,22 @@ public class ControladorArtista {
             servicioFavorito.agregarFavorito(idLocal,usuario);
         }
 
-        return "redirect:/perfil";
+        return "redirect:/perfil/artista/" +id;
+    }
+
+    @PostMapping("/artistas-locales/{id}/quitar-favorito")
+    public String quitarFavoritoLocal(@PathVariable Long id, HttpSession session) {
+        Object usuarioIdObj = session.getAttribute("user");
+
+        if (usuarioIdObj != null) {
+            Long usuarioId = Long.valueOf(usuarioIdObj.toString());
+            Usuario usuario = servicioUsuario.obtenerUsuarioPorId(usuarioId);
+
+            String idLocal = "LOCAL_" + id;
+            servicioFavorito.quitarFavorito(idLocal,usuario);
+        }
+
+        return "redirect:/perfil/artista/" +id;
     }
 
 

@@ -76,4 +76,9 @@ public class ServicioFavoritoImpl implements ServicioFavorito {
         return repositorioFavorito.yaEsFavorito(spotifyArtistId, usuario.getId());
     }
 
+    @Override
+    public void quitarFavorito(String idLocal, Usuario usuario) {
+        repositorioFavorito.quitarFavorito(idLocal, usuario.getId());
+    }
+
 }

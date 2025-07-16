@@ -44,5 +44,14 @@
             return query.uniqueResult() > 0;
         }
 
+        @Override
+        public void quitarFavorito(String idLocal, Long id) {
+            String hql = "DELETE FROM Favorito f WHERE f.spotifyArtistId = :idLocal AND f.usuario.id = :idUsuario";
+            Query query = sessionFactory.getCurrentSession().createQuery(hql);
+            query.setParameter("idLocal", idLocal);
+            query.setParameter("idUsuario", id);
+            query.executeUpdate();
+        }
+
 
     }

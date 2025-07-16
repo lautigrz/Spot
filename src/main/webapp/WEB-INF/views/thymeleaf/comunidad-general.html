@@ -156,7 +156,11 @@
                         <img th:src="@{${mensaje.getUsuario().getUrlFoto()}}" class="rounded-circle me-3" alt="User" style="width: 50px; height: 50px; object-fit: cover;">
                         <div class="d-flex align-items-center flex-grow-1">
                             <div class="flex-grow-1">
-                                <strong th:text="${mensaje.getUsuario().getUser()}"></strong><br>
+                                <a
+                                   th:href="@{/perfil/{id}(id=${mensaje.getUsuario().getId()})}"
+                                   style="text-decoration: none; color: inherit;">
+                                    <strong th:text="${mensaje.getUsuario().getUser()}"></strong>
+                                </a><br />
 
                                 <small class="text-muted"
                                        th:with="formatter=${T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yy · HH:mm')}"

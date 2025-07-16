@@ -91,23 +91,65 @@
         />
     </div>
 
-    <!-- Info del perfil y botones -->
+
     <div class="d-flex justify-content-between align-items-center mb-3" style="margin-top: -40px; margin-left: 13%;">
         <div>
             <h5 class="fw-bold mb-0" th:text="'@' + ${nombre}"></h5>
-            <small class="text-muted">Usuario</small>
+            <small class="text-muted" th:if="${usuario != null}">Usuario</small>
+            <small class="text-muted" th:if="${artista != null}">Artista</small>
         </div>
 
-    <div th:if="${usuario != null}">
-        <form th:action="@{/artistas-locales/{id}/favorito(id=${artistaId})}" method="post">
-            <button type="submit">Agregar a favoritos</button>
-        </form>
-    </div>
+        <div th:if="${usuario != null}">
+
+            <form th:if="${!esFavorito}"
+                  th:action="@{/artistas-locales/{id}/favorito(id=${artistaId})}"
+                  method="post" style="display: inline;">
+                <button type="submit"
+                        style="
+              background-color: #0d6efd;
+              color: #ffffff;
+              border: none;
+              border-radius: 20px;
+              padding: 8px 16px;
+              font-size: 14px;
+              cursor: pointer;
+              transition: background-color 0.3s ease;
+            "
+                        onmouseover="this.style.backgroundColor='#0a58ca';"
+                        onmouseout="this.style.backgroundColor='#0d6efd';"
+                >
+                    Agregar a favoritos
+                </button>
+            </form>
+
+
+            <form th:if="${esFavorito}"
+                  th:action="@{/artistas-locales/{id}/quitar-favorito(id=${artistaId})}"
+                  method="post" style="display: inline;">
+                <button type="submit"
+                        style="
+              background-color: #dc3545;
+              color: #ffffff;
+              border: none;
+              border-radius: 20px;
+              padding: 8px 16px;
+              font-size: 14px;
+              cursor: pointer;
+              transition: background-color 0.3s ease;
+            "
+                        onmouseover="this.style.backgroundColor='#bb2d3b';"
+                        onmouseout="this.style.backgroundColor='#dc3545';"
+                >
+                    Quitar de favoritos
+                </button>
+            </form>
+        </div>
+
 
     </div>
 
 
-    <!-- Menú pestañas -->
+
     <ul class="nav nav-tabs mb-4" th:if="${habilitar}">
 
         <li class="nav-item"><a class="nav-link" href="#">Info</a></li>

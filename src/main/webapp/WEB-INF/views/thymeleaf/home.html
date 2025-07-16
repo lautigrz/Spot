@@ -130,7 +130,12 @@
                         <img th:src="${postDto.post.artista.fotoPerfil != null} ? ${postDto.post.artista.fotoPerfil} : '/images/default-avatar.png'"
                              class="rounded-circle me-2 avatar-user" alt="Avatar" style="width:40px; height:40px;" />
                         <div>
-                            <strong th:text="${postDto.post.artista.nombre}">Nombre Artista</strong><br />
+                            <a
+                               th:href="@{/perfil/artista/{id}(id=${postDto.post.artista.id})}"
+                               style="text-decoration: none; color: inherit;">
+                                <strong th:text="${postDto.post.artista.nombre}">Nombre Artista</strong>
+                            </a><br />
+
                             <small class="text-secondary" th:text="${postDto.post.fechaFormateada}">Fecha</small>
                         </div>
                     </div>
@@ -270,9 +275,10 @@
                         <tbody>
                         <tr th:each="fav : ${favoritos}"
                             th:with="url=${#strings.startsWith(fav.spotifyArtistId, 'LOCAL_')} ?
-              '/artistas-local/' + ${fav.spotifyArtistId.substring(6)} :
-              '/artistas/' + ${fav.spotifyArtistId}">
-                            <td>
+              '/perfil/artista/' + ${fav.spotifyArtistId.substring(6)} :
+              '/perfil/artista/' + ${fav.spotifyArtistId}">
+
+                        <td>
                                 <img th:src="${fav.imagenUrl}" alt="Foto" class="rounded-circle img-fluid"
                                      style="width: 50px; height: 50px; object-fit: cover;">
                             </td>
