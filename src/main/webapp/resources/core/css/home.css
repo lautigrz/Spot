@@ -142,6 +142,7 @@ body:not(.sidebar-collapsed) .feed-col {
 
 }
 
+
 body.sidebar-collapsed .avatar-user {
     width: 45px;
     height: 45px;

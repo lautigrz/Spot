@@ -41,11 +41,10 @@ public class ControladorHome {
     private ServicioPosteo servicioPosteo;
     private ServicioLike servicioLike;
     private ServicioComentario servicioComentario;
-
-    @Autowired
+    private ServicioFavorito servicioFavorito;
     private ServicioUsuarioPreescucha servicioUsuarioPreescucha;
 
-    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioComentario servicioComentario) {
+    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioComentario servicioComentario, ServicioFavorito servicioFavorito, ServicioUsuarioPreescucha servicioUsuarioPreescucha) {
             this.servicioArtista = servicioArtista;
 
         this.servicioUsuario = servicioUsuario;
@@ -57,6 +56,8 @@ public class ControladorHome {
         this.servicioLike = servicioLike;
         this.servicioPosteo = servicioPosteo;
         this.servicioComentario = servicioComentario;
+        this.servicioFavorito = servicioFavorito;
+        this.servicioUsuarioPreescucha = servicioUsuarioPreescucha;
     }
 
     @GetMapping("/home")
@@ -69,6 +70,9 @@ public class ControladorHome {
         if (idUsuario != null) {
             Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
             modelMap.put("usuario", usuario);
+            modelMap.put("favoritos", servicioFavorito.obtenerFavoritos(usuario));
+
+
 
             List<Post> posteos = servicioPosteo.obtenerPosteosDeArtistasFavoritos(usuario);
             List<Long> idsDePostConLike = servicioLike.devolverIdsDePostConLikeDeUsuarioDeUnaListaDePosts(idUsuario, posteos.stream().map(Post::getId).collect(Collectors.toList()));
