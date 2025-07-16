@@ -34,6 +34,24 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
     }
 
     @Override
+    public void actualizarFotoPerfil(Long idUsuario, String urlFotoPerfil) {
+        Usuario usuario = repositorioUsuario.buscarUsuarioPorId(idUsuario);
+        if (usuario == null) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+        repositorioUsuario.actualizarFotoPerfil(usuario, urlFotoPerfil);
+    }
+
+    @Override
+    public void actualizarFotoPortada(Long idUsuario, String urlFoto) {
+        Usuario usuario = repositorioUsuario.buscarUsuarioPorId(idUsuario);
+        if (usuario == null) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+        repositorioUsuario.actualizarFotoPortada(usuario, urlFoto);
+    }
+
+    @Override
     public Usuario obtenerUsuarioPorId(Long idUsuario) {
     Usuario usuario = repositorioUsuario.buscarUsuarioPorId(idUsuario);
         if (usuario == null) {

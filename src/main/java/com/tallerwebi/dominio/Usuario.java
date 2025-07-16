@@ -26,6 +26,9 @@ public class    Usuario {
     private String refreshToken;
     private String urlFoto;
     private String spotifyID;
+
+    private String urlPortada;
+
     @OneToOne
     private EstadoDeAnimo estadoDeAnimo;
 

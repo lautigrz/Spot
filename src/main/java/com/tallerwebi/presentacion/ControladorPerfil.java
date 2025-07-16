@@ -15,15 +15,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 @Controller
 public class ControladorPerfil {
@@ -42,6 +44,9 @@ public class ControladorPerfil {
     private ServicioPosteo servicioPosteo;
     @Autowired
     private ServicioArtista servicioArtista;
+
+    @Autowired
+    private ServicioGuardarImagen servicioGuardarImagen;
 
     @Autowired
     public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioEstadoDeAnimo servicioEstadoDeAnimo, ServicioRecomendaciones servicioRecomendaciones, ServicioUsuario servicioUsuario, ServicioReproduccion servicioReproduccion, ServicioLike servicioLike) {
@@ -228,14 +233,6 @@ public class ControladorPerfil {
         return "perfil-mejorado";
     }
 
-
-
-
-
-
-
-
-
     @PostMapping("/seguir/{id}")
     public String seguirUsuario(@PathVariable Long id, HttpSession session) throws Exception {
         Long idLogueado = (Long) session.getAttribute("user");
@@ -259,10 +256,11 @@ public class ControladorPerfil {
 
         try {
             User user = servicioPerfil.obtenerPerfilUsuario(token);
-
+            model.addAttribute("usuarioLogueado",true);
+            model.addAttribute("portada", usuario.getUrlPortada());
             model.addAttribute("inicio", "Se inicio correctamente");
             model.addAttribute("nombre",user.getDisplayName());
-            model.addAttribute("foto", user.getImages()[0].getUrl());
+            model.addAttribute("foto", usuario.getUrlFoto());
             model.addAttribute("seguidos", servicioPerfil.obtenerCantidadDeArtistaQueSigueElUsuario(token));
             model.addAttribute("mejores", servicioPerfil.obtenerMejoresArtistasDelUsuario(token));
             model.addAttribute("playlist", servicioPerfil.obtenerNombreDePlaylistDelUsuario(token));
@@ -318,10 +316,11 @@ public class ControladorPerfil {
         Usuario usuarioPerfil = servicioUsuario.obtenerUsuarioPorId(id);
         try {
             User user = servicioPerfil.obtenerPerfilUsuario(usuarioPerfil.getToken());
-            model.addAttribute("usuarioId", esUsuarioLogueado);
+            model.addAttribute("portada", usuarioPerfil.getUrlPortada());
+            model.addAttribute("usuarioLogueado", esUsuarioLogueado);
             model.addAttribute("inicio", "Se inicio correctamente");
             model.addAttribute("nombre",user.getDisplayName());
-            model.addAttribute("foto", user.getImages()[0].getUrl());
+            model.addAttribute("foto", usuarioPerfil.getUrlFoto());
             model.addAttribute("seguidos", servicioPerfil.obtenerCantidadDeArtistaQueSigueElUsuario(usuarioPerfil.getToken()));
             model.addAttribute("mejores", servicioPerfil.obtenerMejoresArtistasDelUsuario(usuarioPerfil.getToken()));
             model.addAttribute("playlist", servicioPerfil.obtenerNombreDePlaylistDelUsuario(usuarioPerfil.getToken()));
@@ -372,6 +371,44 @@ public class ControladorPerfil {
     public CancionDto escuchando(@PathVariable Long idUsuario) throws Exception {
         CancionDto cancionDto = servicioReproduccion.obtenerCancionActualDeUsuario(idUsuario);
         return cancionDto;
+    }
+
+    @PostMapping("/actualizar-foto-perfil")
+    public String actualizarFotoPerfil(@RequestParam("fotoPerfil") MultipartFile archivo, HttpSession session) {
+        Long idUsuario = (Long) session.getAttribute("user");
+        Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
+
+        if (usuario != null && !archivo.isEmpty()) {
+            try {
+                String urlFoto = servicioGuardarImagen.guardarImagenPerfilDeArtista(archivo);
+
+                servicioUsuario.actualizarFotoPerfil(idUsuario, urlFoto);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return "redirect:/perfil";
+    }
+
+    @PostMapping("/actualizar-portada")
+    public String actualizarFotoPortada(@RequestParam("fotoPortada") MultipartFile archivo, HttpSession session) {
+        Long idUsuario = (Long) session.getAttribute("user");
+        Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
+
+        if (usuario != null && !archivo.isEmpty()) {
+            try {
+                String urlFoto = servicioGuardarImagen.guardarImagenPerfilDeArtista(archivo);
+
+                servicioUsuario.actualizarFotoPortada(idUsuario, urlFoto);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return "redirect:/perfil";
     }
 
 

@@ -21,6 +21,7 @@
                     class="rounded-circle mb-3 sidebar-avatar"
                     alt="Perfil"
                     th:src="${usuario != null} ? ${usuario.urlFoto} : (${artista != null} ? ${artista.fotoPerfil} : '/images/default-avatar.png')"
+                    style="object-fit: cover"
             />
 
 
