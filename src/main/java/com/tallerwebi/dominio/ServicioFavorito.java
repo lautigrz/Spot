@@ -8,4 +8,6 @@ public interface ServicioFavorito {
     void agregarFavorito(String spotifyArtistId, Usuario usuario);
     List<FavoritoDTO> obtenerFavoritos(Usuario usuario);
     boolean yaEsFavorito(String spotifyArtistId, Usuario usuario);
+
+    void quitarFavorito(String idLocal, Usuario usuario);
 }

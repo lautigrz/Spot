@@ -207,7 +207,7 @@ public class ControladorComunidad {
             model.put("playlistsDeLaComunidad", servicioPlaylist.obtenerPlaylistsRelacionadasAUnaComunidad(id));
             model.put("mensajes", servicioComunidad.obtenerMensajes(id));
             model.put("rol", usuarioComunidad.getRol());
-
+            model.put("usuarioComunidad", servicioUsuarioComunidad.obtenerComunidadesDondeELUsuarioEsteUnido(idUsuario));
             model.put("recomendaciones", servicioRecomedacionComunidad.obtenerRecomendacionesPorComunidadQueNoFueronLeidas(Long.parseLong(idComunidad)));
             model.put("eventos", servicioEventoCombinado.obtenerEventos(comunidad.getArtista(), id));
             estaEnComunidad = true;

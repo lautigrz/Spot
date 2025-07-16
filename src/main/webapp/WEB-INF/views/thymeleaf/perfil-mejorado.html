@@ -79,9 +79,9 @@
 <!-- Banner y Perfil -->
 <div class="container mt-3">
     <!-- Botón Volver -->
-    <button onclick="history.back()" class="btn btn-outline-secondary mb-3">
+    <a th:href="@{/home}" class="btn btn-outline-secondary mb-3">
         ← Volver
-    </button>
+    </a>
 
     <div class="banner rounded-3 mb-5 position-relative">
         <img
@@ -91,23 +91,86 @@
         />
     </div>
 
-    <!-- Info del perfil y botones -->
+
     <div class="d-flex justify-content-between align-items-center mb-3" style="margin-top: -40px; margin-left: 13%;">
         <div>
             <h5 class="fw-bold mb-0" th:text="'@' + ${nombre}"></h5>
-            <small class="text-muted">Usuario</small>
+            <small class="text-muted" th:if="${usuario != null}">Usuario</small>
+            <small class="text-muted" th:if="${artista != null}">Artista</small>
         </div>
 
+        <div th:if="${usuario != null}">
+
+            <form th:if="${!esFavorito}"
+                  th:action="@{/artistas-locales/{id}/favorito(id=${artistaId})}"
+                  method="post" style="display: inline;">
+                <button type="submit"
+                        style="
+              background-color: #0d6efd;
+              color: #ffffff;
+              border: none;
+              border-radius: 20px;
+              padding: 8px 16px;
+              font-size: 14px;
+              cursor: pointer;
+              transition: background-color 0.3s ease;
+            "
+                        onmouseover="this.style.backgroundColor='#0a58ca';"
+                        onmouseout="this.style.backgroundColor='#0d6efd';"
+                >
+                    Agregar a favoritos
+                </button>
+            </form>
+
+
+            <form th:if="${esFavorito}"
+                  th:action="@{/artistas-locales/{id}/quitar-favorito(id=${artistaId})}"
+                  method="post" style="display: inline;">
+                <button type="submit"
+                        style="
+              background-color: #dc3545;
+              color: #ffffff;
+              border: none;
+              border-radius: 20px;
+              padding: 8px 16px;
+              font-size: 14px;
+              cursor: pointer;
+              transition: background-color 0.3s ease;
+            "
+                        onmouseover="this.style.backgroundColor='#bb2d3b';"
+                        onmouseout="this.style.backgroundColor='#dc3545';"
+                >
+                    Quitar de favoritos
+                </button>
+            </form>
+        </div>
+
+
     </div>
+
+
+
+    <ul class="nav nav-tabs mb-4" th:if="${habilitar}">
+
+        <li class="nav-item"><a class="nav-link" href="#">Info</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Redes</a></li>
+
+    </ul>
 
 
 
     <div class="row">
         <!-- Col Izquierda - Funciones y Fotos -->
         <div class="col-lg-4 mb-4">
-            <div class="card shadow-sm mb-3">
+            <div class="card shadow-sm mb-3" th:if="${habilitar != null || artista != null}">
                 <div class="card-header fw-bold">Funciones</div>
                 <div class="card-body d-flex flex-column gap-2">
+                    <button class="btn btn-outline-primary btn-sm" th:if="${usuarioId != null}">Nueva comunidad</button>
+                    <button class="btn btn-outline-primary btn-sm" th:if="${usuarioId != null}">Mis artistas favoritos</button>
+                    <button class="btn btn-outline-primary btn-sm" th:if="${usuarioId != null}">Mis comunidades</button>
+                    <a th:href="@{/crear-preescucha}" class="btn btn-outline-primary btn-sm" th:if="${artista != null}">Nueva preescucha</a>
+                    <button class="btn btn-outline-primary btn-sm" th:if="${artista != null}">Editar perfil</button>
+
                     <button class="btn btn-outline-primary btn-sm">Nueva comunidad</button>
                     <button class="btn btn-outline-primary btn-sm">Mis artistas favoritos</button>
                     <button class="btn btn-outline-primary btn-sm">Mis comunidades</button>
@@ -116,7 +179,7 @@
             </div>
 
             <!-- Playlists Spotify -->
-            <div class="card shadow-sm">
+            <div class="card shadow-sm" th:if="${usuarioId != null}">
                 <div class="card-header fw-bold d-flex justify-content-between align-items-center">
                     Playlists de Spotify
                     <a href="#" class="text-decoration-none fs-5">&rarr;</a>
@@ -169,7 +232,7 @@
         </div>
 
         <!-- Col Derecha - Posts que el usuario dio like y top artistas -->
-        <div class="col-lg-8">
+        <div class="col-lg-8" th:if="${usuarioId != null}">
             <!-- Feed posts que el usuario dio like -->
             <div class="card shadow-sm mb-3">
                 <div class="card-header fw-bold">Posts que gustaron</div>
@@ -208,9 +271,82 @@
             </div>
 
         </div>
+
+
+        <div class="col-lg-8" th:if="${habilitar}" >
+            <div class="card shadow-sm mb-3"  th:if="${artista != null}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mt-2 feed-icons">
+                        <form th:action="@{/postear-perfil}" method="post" style="width:100%;">
+                            <input
+                                    name="texto"
+                                    type="text"
+                                    class="form-control border-0"
+                                    placeholder="Compartile a tus seguidores lo que quieras decir!"
+                                    style="border-radius: 20px; padding: 12px 20px; height: 80px; background-color: #fff; color: #000;"
+                                    required
+                            />
+                            <div class="d-flex justify-content-end mt-2">
+                                <button type="submit" class="btn btn-success btn-sm px-4">Publicar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feed post ejemplo -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                    <div class="d-flex gap-3 mb-3" th:each="posteo : ${posteos}">
+                        <img th:src="${posteo.getArtista().getFotoPerfil()}" alt="user" class="rounded-circle" width="45" height="45" />
+                        <div>
+                            <h6 class="mb-0 fw-semibold" th:text="${posteo.getArtista().getNombre()}"></h6>
+                            <small class="text-muted" th:text="${posteo.getFechaFormateada()}"></small>
+                            <p class="mb-0 mt-1" style="font-size: 0.9rem;" th:text="${posteo.getContenido()}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
+    <!-- Sección Preescuchas -->
+    <div class="mt-5" th:if="${habilitar}">
+        <h5 class="fw-bold mb-3">Preescuchas</h5>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+            <div class="col" th:each="preescucha : ${preescuchas}">
+                <div class="card h-100 shadow-sm">
+                    <img th:src="${preescucha.preescuchaFotoUrl}" class="card-img-top img-fluid" alt="Preescucha">
+                    <div class="card-body">
+                        <h6 class="card-title mb-1 fw-bold" th:text="${preescucha.titulo}">Nombre Preescucha</h6>
+                        <small class="text-muted">Fecha <span th:text="${preescucha.fechaFormateada}"></span></small>
+                        <small class="text-muted">Precio $<span th:text="${preescucha.precio}"></span></small>
+                    </div>
+                    <div class="card-footer bg-transparent border-0" th:if="${usuario != null}">
+                        <form th:action="@{/comprar-preescucha/{idPreescucha}(idPreescucha=${preescucha.id})}" method="post">
+                            <button type="submit" class="btn btn-sm btn-outline-primary w-100">Comprar</button>
+                        </form>
+                    </div>
+
+                    <div class="card-footer bg-transparent border-0" th:if="${artista != null}">
+                        <a th:href="@{/ver-preescucha/{idPreescucha}(idPreescucha=${preescucha.id})}"
+                           class="btn btn-sm btn-outline-primary w-100">Ver</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
-<footer class="music-player-footer text-white fixed-bottom px-4 d-flex align-items-center justify-content-between shadow-lg" id="footer"  style="height: 50px !important; padding: 35px !important; display: none !important;">
+
+
+
+
+
+
+
+<footer class="music-player-footer text-white fixed-bottom px-4 align-items-center justify-content-between shadow-lg" id="footer"  style="height: 50px !important; padding: 35px !important; display: none !important;">
     <!-- Información de la canción -->
 
     <div class="d-flex align-items-center z-1">
@@ -230,12 +366,17 @@
     </div>
 
 
-    <!-- Botón de cerrar -->
+
+
+
+
+
+
     <button class="btn btn-sm btn-outline-light rounded-circle z-1" id="cerrar" style="width: 28px; height: 28px; line-height: 1; padding: 0;">
         &times;
     </button>
 </footer>
-<a href="#" id="backToTop" class="btn btn-dark position-fixed bottom-0 start-50 translate-middle-x mb-3" style="z-index: 1000;">
+<a href="#" id="backToTop" class="btn btn-dark position-fixed bottom-0 start-50 translate-middle-x mb-3" style="z-index: 1000; display: none">
     <i class="fas fa-chevron-up"></i>
 </a>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>

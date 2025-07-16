@@ -6,7 +6,10 @@ let intervaloProgreso = null;
 document.addEventListener("DOMContentLoaded", () => {
 
     const idComunidad = document.getElementById("comunidad").value;
-    obtenerCancionActualDesdeServidor(idComunidad);
+    const preescucha = document.getElementById("preescucha").value;
+    if(preescucha === 0) {
+        obtenerCancionActualDesdeServidor(idComunidad);
+    }
 });
 
 function obtenerCancionActualDesdeServidor(idComunidad) {
@@ -62,12 +65,6 @@ function actualizarFooterCancion(dt) {
     document.getElementById("artista").textContent = dt.artista;
     document.getElementById("titulo").textContent = dt.titulo;
 
-    document.getElementById("tiempoActual").textContent = millisToMinSeg(dt.progreso);
-    document.getElementById("tiempoTotal").textContent = millisToMinSeg(dt.duracion);
-
-    const progresoPorcentaje = Math.min((dt.progreso / dt.duracion) * 100, 100);
-    document.getElementById("barraProgreso").style.width = progresoPorcentaje + "%";
-
     imgElement.onload = function () {
         aplicarColoresDesdePaleta(colorThief, imgElement);
     };
@@ -98,8 +95,3 @@ function actualizarFooterCancion(dt) {
     }
 }
 
-function millisToMinSeg(ms) {
-    const min = Math.floor(ms / 60000);
-    const seg = Math.floor((ms % 60000) / 1000).toString().padStart(2, '0');
-    return `${min}:${seg}`;
-}

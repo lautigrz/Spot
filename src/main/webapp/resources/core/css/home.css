@@ -142,6 +142,7 @@ body:not(.sidebar-collapsed) .feed-col {
 
 }
 
+
 body.sidebar-collapsed .avatar-user {
     width: 45px;
     height: 45px;
@@ -218,4 +219,67 @@ body.sidebar-collapsed .avatar-user {
  margin-top: 15px !important;
 }
 
+.post-comentarios {
+    margin-top: 12px;
+    padding-left: 1rem;
+    border-left: 3px solid #198754; /* verde acorde a liked btn */
+}
+
+.comentario {
+    background-color: #f5f5f5;
+    color: #333;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.comentario-usuario {
+    font-weight: 600;
+    color: #198754;
+    margin-bottom: 2px;
+}
+
+.comentario-texto {
+    color: #444;
+}
+
+.comentario-fecha {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 3px;
+}
+
+.form-comentar {
+    margin-top: 10px;
+    display: flex;
+    gap: 6px;
+}
+
+.form-comentar textarea {
+    flex-grow: 1;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 8px;
+    resize: vertical;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.9rem;
+    min-height: 40px;
+}
+
+.form-comentar button {
+    background-color: #198754;
+    border: none;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.form-comentar button:hover {
+    background-color: #0b5e3b;
+}
 

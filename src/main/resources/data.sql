@@ -17,3 +17,17 @@ VALUES
     ('Feliz', 0.8, 0.7, 0.9, 120.0),
     ('Triste', 0.2, 0.3, 0.2, 70.0),
     ('Enojado', 0.9, 0.4, 0.1, 140.0);
+INSERT INTO artista (nombre, email, password, fotoPerfil)
+VALUES ('Lionel', 'messi@gmail.com', '123', 'ruta/a/foto.jpg');
+INSERT INTO preescucha
+(fechaEscucha, precio, preescuchaFotoUrl, rutaAudio, titulo, artista_id)
+VALUES
+    (
+
+        NOW(),
+        100,
+        '/spring/uploads/portadas-preescucha/3dee863d-b484-47c9-a96f-9d1372b369a3-messi-scaled.jpg',
+        '/spring/uploads/preescuchas-audio/33bdefd5-edec-4328-a83a-f9c505e0df76-incredimod-downtown-estela-320kbps-8980277.mp3',
+        'prueba',
+     1
+    );

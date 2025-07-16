@@ -105,7 +105,7 @@ public class ControladorArtista {
             List<Long> preescuchasCompradasIds = new ArrayList<>();
             if (usuario != null) {
                 for (Preescucha p : preescuchas) {
-                    if (servicioPreescucha.yaComproPreescuchaLocal(p.getId(), usuario)) {
+                    if (servicioPreescucha.yaComproPreescuchaLocal(1, usuario)) {
                         preescuchasCompradasIds.add((long) p.getId());
                     }
                 }
@@ -146,32 +146,19 @@ public class ControladorArtista {
             servicioFavorito.agregarFavorito(idLocal,usuario);
         }
 
-        return "redirect:/perfil";
+        return "redirect:/perfil/artista/" +id;
     }
 
-    @PostMapping("/artistas/{id}/comprar-preescucha")
-    public String comprarPreescucha(@PathVariable String id, HttpSession session, String albumId) {
+    @PostMapping("/artistas-locales/{id}/quitar-favorito")
+    public String quitarFavoritoLocal(@PathVariable Long id, HttpSession session) {
         Object usuarioIdObj = session.getAttribute("user");
 
         if (usuarioIdObj != null) {
             Long usuarioId = Long.valueOf(usuarioIdObj.toString());
             Usuario usuario = servicioUsuario.obtenerUsuarioPorId(usuarioId);
 
-            if(!servicioPreescucha.yaComproPreescucha(albumId, usuario)){
-                try{
-                    Preference pref = servicioMercadoPago.crearPreferenciaPago(
-                            "Pre-escucha exclusiva del album " + albumId,
-                            new BigDecimal("100.00"),
-                            "https://e63cc7a933be.ngrok-free.app/spring/pago-exitoso",
-                            "https://e63cc7a933be.ngrok-free.app/spring/pago-error",
-                            albumId
-                    );
-                    return "redirect:" + pref.getInitPoint();
-                } catch (Exception e){
-                    e.printStackTrace();
-                    return "redirect:/perfil?errorPago";
-                }
-            }
+            String idLocal = "LOCAL_" + id;
+            servicioFavorito.quitarFavorito(idLocal,usuario);
         }
         return "redirect:/perfil";
     }
@@ -189,8 +176,7 @@ public class ControladorArtista {
                 session.setAttribute("preescuchaExitosaLocal", "Compra exitosa de la preescucha");
             }
 
-        }
-        return "redirect:/perfil";
+        return "redirect:/perfil/artista/" +id;
     }
 
 
