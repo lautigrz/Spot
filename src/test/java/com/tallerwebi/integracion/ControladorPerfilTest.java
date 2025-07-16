@@ -27,6 +27,7 @@ public class ControladorPerfilTest {
     private ServicioRecomendaciones servicioRecomendaciones;
     private ServicioUsuario servicioUsuario;
     private ServicioReproduccion servicioReproduccion;
+    private ServicioRating servicioRating;
     @BeforeEach
     public void setup() {
         servicioPerfil = mock(ServicioPerfil.class);
@@ -34,7 +35,8 @@ public class ControladorPerfilTest {
         servicioRecomendaciones = mock(ServicioRecomendaciones.class);
         servicioUsuario = mock(ServicioUsuario.class);
         servicioReproduccion = mock(ServicioReproduccion.class);
-        controladorPerfil = new ControladorPerfil(servicioPerfil, servicioEstadoDeAnimo, servicioRecomendaciones, servicioUsuario, servicioReproduccion, null);
+        servicioRating = mock(ServicioRating.class);
+        controladorPerfil = new ControladorPerfil(servicioPerfil, servicioEstadoDeAnimo, servicioRecomendaciones, servicioUsuario, servicioReproduccion, null, servicioRating);
         session = mock(HttpSession.class);
         model = mock(Model.class);
     }

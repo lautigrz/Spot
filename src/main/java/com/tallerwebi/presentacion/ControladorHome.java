@@ -92,8 +92,13 @@ public class ControladorHome {
             return new ModelAndView("redirect:/login");
         }
 
+        System.out.println("CONTROLADOR HOME: Login completado:");
+        System.out.println("CONTROALDOR HOME: - spotifyId en sesión: " + session.getAttribute("spotifyId"));
+        System.out.println("CONTROLADOR HOME: - usuarioId en sesión: " + session.getAttribute("usuarioId"));
+
         modelMap.put("comunidades", servicioComunidad.obtenerTodasLasComunidades());
         return new ModelAndView("home", modelMap);
+
     }
 
 

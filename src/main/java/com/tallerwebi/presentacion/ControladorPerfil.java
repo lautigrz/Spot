@@ -18,10 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 public class ControladorPerfil {
@@ -35,14 +32,17 @@ public class ControladorPerfil {
     private ServicioPreescucha servicioPreescucha;
     private ServicioReproduccion servicioReproduccion;
     private ServicioLike servicioLike;
+    private ServicioRating servicioRating;
+
     @Autowired
-    public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioEstadoDeAnimo servicioEstadoDeAnimo, ServicioRecomendaciones servicioRecomendaciones, ServicioUsuario servicioUsuario, ServicioReproduccion servicioReproduccion, ServicioLike servicioLike) {
+    public ControladorPerfil(ServicioPerfil servicioPerfil, ServicioEstadoDeAnimo servicioEstadoDeAnimo, ServicioRecomendaciones servicioRecomendaciones, ServicioUsuario servicioUsuario, ServicioReproduccion servicioReproduccion, ServicioLike servicioLike, ServicioRating servicioRating) {
         this.servicioPerfil = servicioPerfil;
         this.servicioEstadoDeAnimo = servicioEstadoDeAnimo;
         this.servicioReproduccion = servicioReproduccion;
         this.servicioRecomendaciones = servicioRecomendaciones;
         this.servicioUsuario = servicioUsuario;
         this.servicioLike = servicioLike;
+        this.servicioRating = servicioRating;
     }
 
     @Autowired
@@ -195,12 +195,14 @@ public class ControladorPerfil {
         String token = (String) session.getAttribute("token");
         String refreshToken = (String) session.getAttribute("refreshToken");
         Long usuarioId = (Long) session.getAttribute("user");
+        System.out.println("CONTROLADOR PERFIL: Token en sesión: " + token);
         Usuario usuario = servicioUsuario.obtenerUsuarioPorId(usuarioId);
+        System.out.println("CONTROLADOR PERFIL: Usuario encontrado: " + (usuario != null ? usuario.getId() + " - " + usuario.getSpotifyID() : "null"));
 
 
         try {
             User user = servicioPerfil.obtenerPerfilUsuario(token);
-
+            System.out.println("CONTROLADOR PERFIL: ID Spotify obtenido del API: " + user.getId());
             model.addAttribute("inicio", "Se inicio correctamente");
             model.addAttribute("nombre",user.getDisplayName());
             model.addAttribute("foto", user.getImages()[0].getUrl());
@@ -239,6 +241,12 @@ public class ControladorPerfil {
 
             model.addAttribute("misSeguidos", seguidos);
             model.addAttribute("misSeguidores", seguidores);
+
+            String spotifyId = user.getId();
+            System.out.println("Usuario encontrado: " + usuario.getId() + " - " + usuario.getSpotifyID());
+            List<Rating> ratings = servicioRating.obtenerRating(spotifyId);
+            System.out.println("Número de ratings encontrados: " + ratings.size()); // Log Y
+            model.addAttribute("ratings", ratings);
 
         }catch (Exception e) {
             e.printStackTrace();

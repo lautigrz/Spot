@@ -111,6 +111,7 @@
                     <button class="btn btn-outline-primary btn-sm">Nueva comunidad</button>
                     <button class="btn btn-outline-primary btn-sm">Mis artistas favoritos</button>
                     <button class="btn btn-outline-primary btn-sm">Mis comunidades</button>
+                    <a th:href="@{/cancion/ratear}" class="btn btn-outline-primary btn-sm">Ratear canción</a>
                 </div>
             </div>
 
@@ -135,6 +136,33 @@
                     </a>
 
 
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-header fw-bold d-flex justify-content-between align-items-center">
+                    Mis valoraciones
+                    <a th:href="@{/cancion/ratear}" class="text-decoration-none fs-5">+</a>
+                </div>
+                <div class="card-body p-2">
+                    <div th:each="rating : ${ratings}" class="d-flex align-items-center mb-3">
+                        <img th:src="${rating.cancion.urlImagen}"
+                             alt="Portada"
+                             class="rounded me-3"
+                             style="width: 50px; height: 50px; object-fit: cover;">
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold" th:text="${rating.cancion.titulo}"></div>
+                            <small class="text-muted" th:text="${rating.cancion.artista}"></small>
+                        </div>
+                        <div class="text-warning ms-2">
+                <span th:each="i : ${#numbers.sequence(1, 5)}">
+                    <i th:class="${i <= rating.puntaje} ? 'fas fa-star' : 'far fa-star'"></i>
+                </span>
+                        </div>
+                    </div>
+                    <div th:if="${ratings == null || ratings.empty}" class="text-center text-muted py-2">
+                        <i class="fas fa-music me-2"></i> Aún no has valorado canciones
+                    </div>
                 </div>
             </div>
 

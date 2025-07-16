@@ -212,8 +212,12 @@
             </div>
         </div>
 
-        <form id="ratingForm" action="/cancion/ratear" method="post">
+        <form id="ratingForm" th:action="@{/cancion/ratear}" method="post">
             <input type="hidden" name="spotifyId" id="spotifyId">
+            <input type="hidden" name="titulo" id="tituloCancion">
+            <input type="hidden" name="artista" id="artistaCancion">
+            <input type="hidden" name="urlImagen" id="urlImagenCancion">
+            <input type="hidden" name="uri" id="uriCancion">
 
             <div class="rating-container">
                 <div class="rating-title">Califica esta canción:</div>
@@ -293,6 +297,12 @@
 
     function mostrarDetalleCancion(cancion) {
         detalle.style.display = "block";
+
+        document.getElementById("spotifyId").value = cancion.spotifyId;
+        document.getElementById("tituloCancion").value = cancion.titulo;
+        document.getElementById("artistaCancion").value = cancion.artista;
+        document.getElementById("urlImagenCancion").value = cancion.urlImagen;
+        document.getElementById("uriCancion").value = cancion.uri;
 
         detailImage.src = cancion.urlImagen;
         detailImage.alt = cancion.titulo;
