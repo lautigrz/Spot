@@ -72,7 +72,7 @@ public class ControladorRating {
             return "redirect:/cancion/ratear";
         }
 
-        return "redirect:/perfilMejorado";
+        return "redirect:/perfil";
     }
 
 

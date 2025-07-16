@@ -163,6 +163,8 @@ public class ControladorArtista {
         return "redirect:/perfil";
     }
 
+
+    /*
     @PostMapping("/artistas-locales/{artistaId}/comprar-preescucha/{preescuchaId}")
     public String comprarPreescuchaLocal(@PathVariable Long artistaId, @PathVariable int preescuchaId, HttpSession session) {
         Object usuarioIdObj = session.getAttribute("user");
@@ -171,36 +173,12 @@ public class ControladorArtista {
             Long usuarioId = Long.valueOf(usuarioIdObj.toString());
             Usuario usuario = servicioUsuario.obtenerUsuarioPorId(usuarioId);
 
-            if (!servicioPreescucha.yaComproPreescuchaLocal(preescuchaId, usuario)){
+            if (!servicioPreescucha.yaComproPreescuchaLocal(preescuchaId, usuario)) {
                 servicioPreescucha.comprarPreescuchaLocal(preescuchaId, usuario);
                 session.setAttribute("preescuchaExitosaLocal", "Compra exitosa de la preescucha");
             }
-
-        return "redirect:/perfil/artista/" +id;
-    }
-
-
-    @GetMapping("/pago-exitoso")
-    public String pagoExitoso(@RequestParam Map<String, String> params, HttpSession session, Model model){
-        Object usuarioIdObj = session.getAttribute("user");
-        if (usuarioIdObj != null) {
-            Long usuarioId = Long.valueOf(usuarioIdObj.toString());
-            Usuario usuario = servicioUsuario.obtenerUsuarioPorId(usuarioId);
-
-            String albumId = params.get("external_reference");
-
-            if(albumId != null && !servicioPreescucha.yaComproPreescucha(albumId, usuario)){
-                servicioPreescucha.comprarPreescucha(albumId, usuario);
-            }
-            model.addAttribute("albumId", albumId);
         }
-        return "pago-exitoso";
+        return "redirect:/perfil/artista/" + artistaId;
     }
-
-    @GetMapping("/pago-error")
-    public String pagoError(){
-        return "pago-error";
-    }
-
-
+    */
 }
