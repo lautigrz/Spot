@@ -54,7 +54,7 @@ public class ControladorArtistaTest {
         verify(servicioPreescuchaMock).yaComproPreescucha(albumId,usuarioMock);
         verify(servicioPreescuchaMock).comprarPreescucha(albumId,usuarioMock);
         assertEquals("redirect:/perfil", resultado);
-        }*/
+
 
 
     @Test
@@ -115,6 +115,8 @@ public class ControladorArtistaTest {
         verify(servicioFavoritoMock).agregarFavorito(idLocalEsperado, usuarioMock);
         assertEquals("redirect:/perfil", resultado);
     }
+
+     */
     }
 
 

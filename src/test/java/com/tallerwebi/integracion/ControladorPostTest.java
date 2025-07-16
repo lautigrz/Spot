@@ -1,6 +1,7 @@
 package com.tallerwebi.integracion;
 
 import com.tallerwebi.dominio.Artista;
+import com.tallerwebi.dominio.ServicioComentario;
 import com.tallerwebi.dominio.ServicioLike;
 import com.tallerwebi.dominio.ServicioPosteo;
 import com.tallerwebi.presentacion.ControladorPost;
@@ -20,13 +21,14 @@ public class ControladorPostTest {
 
     private ServicioPosteo servicioPosteoMock;
     private ServicioLike servicioLikeMock;
+    private ServicioComentario servicioComentarioMock;
     private ControladorPost controladorPost;
     @BeforeEach
     public void setUp() {
         servicioPosteoMock = mock(ServicioPosteo.class);
         servicioLikeMock = mock(ServicioLike.class);
-        controladorPost = new ControladorPost(servicioPosteoMock, servicioLikeMock);
-
+        servicioComentarioMock = mock(ServicioComentario.class);
+        controladorPost = new ControladorPost(servicioPosteoMock, servicioLikeMock, servicioComentarioMock);
     }
 
     @Test
@@ -96,5 +98,34 @@ public class ControladorPostTest {
         assertThat(response.getStatusCodeValue(), equalTo(200));
         Map<String, Object> body = (Map<String, Object>) response.getBody();
         assertThat(body.get("mensaje"), equalTo("dislike dado correctamente"));
+    }
+
+    @Test
+    public void debeComentarUnPosteoYRedirigir(){
+        Long idPosteo = 1L;
+        String textoComentario = "Hola";
+        Long idUsuario = 2L;
+
+        HttpSession sessionMock = mock(HttpSession.class);
+        when(sessionMock.getAttribute("user")).thenReturn(idUsuario);
+
+        String resultado = controladorPost.comentarPost(idPosteo, textoComentario, sessionMock);
+
+        verify(servicioComentarioMock).comentarEnPosteo(idUsuario,idPosteo,textoComentario);
+        assertThat(resultado, equalTo("redirect:/home"));
+    }
+
+    @Test
+    public void noDebeComentarSiElUsuarioEsNuloYRedirigeAlHome(){
+        Long idPosteo = 1L;
+        String textoComentario = "Hola";
+
+        HttpSession sessionMock = mock(HttpSession.class);
+        when(sessionMock.getAttribute("user")).thenReturn(null);
+
+        String resultado = controladorPost.comentarPost(idPosteo, textoComentario, sessionMock);
+
+        verify(servicioComentarioMock, never()).comentarEnPosteo(any(), any(), any());
+        assertThat(resultado, equalTo("redirect:/home"));
     }
 }

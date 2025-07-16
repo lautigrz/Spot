@@ -8,7 +8,7 @@ public interface ServicioUsuarioComunidad {
     Boolean agregarUsuarioAComunidad(Usuario usuario, Comunidad comunidad, String rol);
     UsuarioComunidad obtenerUsuarioEnComunidad(Long idUsuario, Long id);
     Boolean eliminarUsuarioDeComunidad(Long idUsuario, Long idComunidad);
-    List<Comunidad> obtenerComunidadesDondeElUsuarioEsteUnido(Long idUsuario);
     void compartirPosteoEnComunidad(Long idPost, List<Long> comunidades, Long idUsuario);
-
+    Boolean agregarUsuarioAComunidadDePreescucha(Long id, Long idPreescucha, String rol);
+    List<Comunidad> obtenerComunidadesDondeELUsuarioEsteUnido(Long idUsuario);
 }

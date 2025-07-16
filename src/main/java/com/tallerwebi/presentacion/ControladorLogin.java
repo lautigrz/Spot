@@ -18,6 +18,10 @@ public class ControladorLogin {
     public ControladorLogin(ServicioLoginArtista servicioLoginArtista) {
         this.servicioLoginArtista = servicioLoginArtista;
     }
+    @GetMapping("/landing")
+    public String landingPage() {
+        return "landing-page";
+    }
 
     @GetMapping("/login")
     public String login() {

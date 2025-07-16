@@ -12,14 +12,17 @@ import java.util.List;
 public class ServicioUsuarioComunidadImpl implements ServicioUsuarioComunidad {
     @Autowired
     private RepositorioUsuarioComunidad repositorioUsuarioComunidad;
-    @Autowired
+
     private ServicioUsuario servicioUsuario;
 
+    @Autowired
+    private ServicioComunidad servicioComunidad;
 
     private ServicioPosteo servicioPosteo;
 
-    public ServicioUsuarioComunidadImpl(RepositorioUsuarioComunidad repositorioUsuarioComunidad, ServicioPosteo servicioPosteo) {
+    public ServicioUsuarioComunidadImpl(RepositorioUsuarioComunidad repositorioUsuarioComunidad, ServicioPosteo servicioPosteo,ServicioUsuario servicioUsuario) {
         this.repositorioUsuarioComunidad = repositorioUsuarioComunidad;
+        this.servicioUsuario = servicioUsuario;
         this.servicioPosteo = servicioPosteo;
     }
 
@@ -46,12 +49,6 @@ public class ServicioUsuarioComunidadImpl implements ServicioUsuarioComunidad {
     }
 
     @Override
-    public List<Comunidad> obtenerComunidadesDondeElUsuarioEsteUnido(Long idUsuario) {
-        Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
-        return repositorioUsuarioComunidad.obtenerComunidadesDondeElUsuarioEsteUnido(usuario);
-    }
-
-    @Override
     public void compartirPosteoEnComunidad(Long idPost, List<Long> comunidades, Long idUsuario) {
         Post post = servicioPosteo.obtenerPosteoPorId(idPost);
         List<Comunidad> comunidads = new ArrayList<>();
@@ -66,5 +63,27 @@ public class ServicioUsuarioComunidadImpl implements ServicioUsuarioComunidad {
         }
 
         repositorioUsuarioComunidad.compartirPosteoEnComunidad(post,comunidads,usuario);
+    }
+
+    @Override
+    public Boolean agregarUsuarioAComunidadDePreescucha(Long id, Long idPreescucha, String rol) {
+
+        Comunidad comunidad = servicioComunidad.obtenerComuniadDePreescucha(idPreescucha);
+        Usuario usuario = servicioUsuario.obtenerUsuarioPorId(id);
+        if (comunidad == null || usuario == null) {
+            return false; // Comunidad o usuario no encontrado
+        }
+        return repositorioUsuarioComunidad.agregarUsuarioAComunidad(usuario, comunidad, rol);
+
+    }
+
+    @Override
+    public List<Comunidad> obtenerComunidadesDondeELUsuarioEsteUnido(Long idUsuario) {
+      Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
+        if (usuario != null) {
+            return repositorioUsuarioComunidad.obtenerComunidadesDondeELUsuarioEsteUnido(usuario);
+        }
+
+        return List.of();
     }
 }

@@ -37,7 +37,7 @@ public class ServicioComunidadImplTest {
         repositorioComunidadMock = mock(RepositorioComunidad.class);
         repositorioUsuarioComunidadMock = mock(RepositorioUsuarioComunidad.class);
         servicioReproduccionMock = mock(ServicioReproduccion.class);
-        servicioComunidad = new ServicioComunidadImpl(repositorioComunidadMock, repositorioUsuarioComunidadMock,servicioReproduccionMock);
+        servicioComunidad = new ServicioComunidadImpl(repositorioComunidadMock, repositorioUsuarioComunidadMock,servicioReproduccionMock, null);
     }
     @AfterEach
     public void limpiarEstadoGlobal() {

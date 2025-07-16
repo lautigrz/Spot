@@ -3,6 +3,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.presentacion.dto.PostLikeDto;
+import com.tallerwebi.presentacion.dto.UsuarioPreescuchaDto;
 import org.dom4j.rule.Mode;
 
 import com.tallerwebi.dominio.ServicioComunidad;
@@ -11,12 +12,11 @@ import com.tallerwebi.dominio.ServicioNotificacion;
 import com.tallerwebi.dominio.ServicioUsuario;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
@@ -40,16 +40,25 @@ public class ControladorHome {
     private ServicioInstancia spotify;
     private ServicioPosteo servicioPosteo;
     private ServicioLike servicioLike;
+    private ServicioComentario servicioComentario;
+    private ServicioFavorito servicioFavorito;
+    private ServicioUsuarioPreescucha servicioUsuarioPreescucha;
 
-    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad) {
+    private ServicioPreescucha servicioPreescucha;
+    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioComentario servicioComentario, ServicioFavorito servicioFavorito, ServicioUsuarioPreescucha servicioUsuarioPreescucha, ServicioPreescucha servicioPreescucha) {
             this.servicioArtista = servicioArtista;
+
         this.servicioUsuario = servicioUsuario;
+        this.servicioPreescucha = servicioPreescucha;
         this.servicioUsuarioComunidad = servicioUsuarioComunidad;
         this.servicioComunidad = servicioComunidad;
         this.servicioNotificacion = servicioNotificacion;
         this.spotify = spotify;
         this.servicioLike = servicioLike;
         this.servicioPosteo = servicioPosteo;
+        this.servicioComentario = servicioComentario;
+        this.servicioFavorito = servicioFavorito;
+        this.servicioUsuarioPreescucha = servicioUsuarioPreescucha;
     }
 
     @GetMapping("/home")
@@ -62,20 +71,38 @@ public class ControladorHome {
         if (idUsuario != null) {
             Usuario usuario = servicioUsuario.obtenerUsuarioPorId(idUsuario);
             modelMap.put("usuario", usuario);
+            modelMap.put("favoritos", servicioFavorito.obtenerFavoritos(usuario));
+
+
 
             List<Post> posteos = servicioPosteo.obtenerPosteosDeArtistasFavoritos(usuario);
             List<Long> idsDePostConLike = servicioLike.devolverIdsDePostConLikeDeUsuarioDeUnaListaDePosts(idUsuario, posteos.stream().map(Post::getId).collect(Collectors.toList()));
 
             List<PostLikeDto> postsConLike = posteos.stream()
-                    .map(p -> new PostLikeDto(p, idsDePostConLike.contains(p.getId())))
+                    .map(post -> {
+                        boolean liked = idsDePostConLike.contains(post.getId());
+                        List<Comentario> comentarios = servicioComentario.obtenerComentariosDePosteo(post.getId());
+                        return new PostLikeDto(post, liked, comentarios);
+                    })
                     .collect(Collectors.toList());
 
 
             modelMap.put("posteos", postsConLike);
 
-            modelMap.put("usuarioComunidad", servicioUsuarioComunidad.obtenerComunidadesDondeElUsuarioEsteUnido(idUsuario));
+
+            List<Comunidad> comunidadesUnidas = servicioUsuarioComunidad.obtenerComunidadesDondeELUsuarioEsteUnido(idUsuario);
+
+            List<Comunidad> todasLasComunidades = servicioComunidad.obtenerTodasLasComunidades();
+
+            List<Comunidad> comunidadesNoUnidas = todasLasComunidades.stream()
+                    .filter(comunidad -> !comunidadesUnidas.contains(comunidad))
+                    .collect(Collectors.toList());
 
 
+            modelMap.put("usuarioComunidad", comunidadesUnidas);
+            modelMap.put("comunidades", comunidadesNoUnidas);
+
+            modelMap.put("compras", servicioUsuarioPreescucha.buscarPorUsuario(idUsuario));
             modelMap.put("notificacion", servicioNotificacion.elUsuarioTieneNotificaciones(idUsuario));
         } else if (artistaObj != null) {
             Artista artista = (Artista) artistaObj;
@@ -83,18 +110,38 @@ public class ControladorHome {
 
             List<Post> posteos = servicioPosteo.obtenerPosteosDeArtista(artista);
             List<PostLikeDto> postsConLike = posteos.stream()
-                    .map(p -> new PostLikeDto(p, false))
+                    .map(post -> {
+                        List<Comentario> comentarios = servicioComentario.obtenerComentariosDePosteo(post.getId());
+                        return new PostLikeDto(post, false, comentarios);
+                    })
                     .collect(Collectors.toList());
 
 
             modelMap.put("posteos", postsConLike);
+            modelMap.put("preescucha", servicioPreescucha.obtenerPreescuchasPorArtista(artista.getId()));
         } else {
             return new ModelAndView("redirect:/login");
         }
 
-        modelMap.put("comunidades", servicioComunidad.obtenerTodasLasComunidades());
+       // modelMap.put("comunidades", servicioComunidad.obtenerTodasLasComunidades());
         return new ModelAndView("home", modelMap);
     }
+
+    @GetMapping("/compras-usuario/{idUsuario}")
+    @ResponseBody
+    public ResponseEntity<List<UsuarioPreescuchaDto>> comprasOrdenadas(
+            @PathVariable Long idUsuario,
+            @RequestParam(defaultValue = "ASC") String orden) {
+
+        List<UsuarioPreescuchaDto> compras = servicioUsuarioPreescucha.buscarPorUsuarioOrdenado(idUsuario, orden);
+
+        if (compras.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(compras);
+    }
+
 
 
     @GetMapping("/buscar-artista")

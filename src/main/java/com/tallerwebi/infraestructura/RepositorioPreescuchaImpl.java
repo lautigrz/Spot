@@ -21,39 +21,31 @@ public class RepositorioPreescuchaImpl  implements RepositorioPreescucha {
         this.sessionFactory = sessionFactory;
     }
     @Override
-    public void guardar(Preescucha preescucha) {
+    public Long guardar(Preescucha preescucha) {
         sessionFactory.getCurrentSession().save(preescucha);
+        return preescucha.getId();
     }
 
     @Override
     public boolean existeCompra(String albumId, Long usuarioId) {
-        String hql = "SELECT COUNT(p) FROM Preescucha p WHERE p.spotifyAlbumId = :albumId AND p.usuario.id = :usuarioId";
-        Query<Long> query = sessionFactory.getCurrentSession().createQuery(hql, Long.class);
-        query.setParameter("albumId", albumId);
-        query.setParameter("usuarioId", usuarioId);
-        return query.uniqueResult() > 0;
+     return false;
     }
 
 
     @Override
     public List<Preescucha> obtenerComprasPorUsuario(Long usuarioId){
-        String hql = "FROM Preescucha p WHERE p.usuario.id = :usuarioId";
-        Query<Preescucha> query = sessionFactory.getCurrentSession().createQuery(hql, Preescucha.class);
-        query.setParameter("usuarioId", usuarioId);
-        return query.list();
+
+        return List.of();
     }
 
     @Override
     public boolean existeCompraLocal(int preescuchaId, Long usuarioId){
-        String hql = "SELECT COUNT(p) FROM Preescucha p WHERE p.id = :preescuchaId AND p.usuario.id = :usuarioId";
-        Query<Long> query = sessionFactory.getCurrentSession().createQuery(hql, Long.class);
-        query.setParameter("preescuchaId", preescuchaId);
-        query.setParameter("usuarioId", usuarioId);
-        return query.uniqueResult() > 0;
+
+        return false;
     }
 
     @Override
-    public Preescucha buscarPreescuchaPorId(int preescuchaId){
+    public Preescucha buscarPreescuchaPorId(Long preescuchaId){
         String hql = "FROM Preescucha p WHERE p.id = :id";
         Query query = sessionFactory.getCurrentSession().createQuery(hql, Preescucha.class);
         query.setParameter("id", preescuchaId);
@@ -62,10 +54,17 @@ public class RepositorioPreescuchaImpl  implements RepositorioPreescucha {
 
     @Override
     public List<Preescucha> obtenerPreescuchasLocalesCompradasPorUsuario(Long usuarioId) {
-        String hql = "FROM Preescucha p WHERE p.usuario.id = :usuarioId AND p.fechaCompra IS NOT NULL";
+
+        return List.of();
+    }
+
+    @Override
+    public List<Preescucha> obtenerPreescuchasPorArtista(Long idArtista) {
+        String hql = "FROM Preescucha p WHERE p.artista.id = :idArtista";
         Query<Preescucha> query = sessionFactory.getCurrentSession().createQuery(hql, Preescucha.class);
-        query.setParameter("usuarioId", usuarioId);
-        return query.list();
+        query.setParameter("idArtista", idArtista);
+        return query.getResultList();
+
     }
 
 }

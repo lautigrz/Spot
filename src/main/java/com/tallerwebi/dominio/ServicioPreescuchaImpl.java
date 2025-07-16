@@ -1,5 +1,7 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.presentacion.dto.CancionSimpleDto;
+import com.tallerwebi.presentacion.dto.EstadoPreescucha;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -9,12 +11,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
 public class ServicioPreescuchaImpl implements ServicioPreescucha {
     private final RepositorioPreescucha repositorioPreescucha;
     private SpotifyApi spotifyApi;
+
+    private final Map<Long, EstadoPreescucha> estadosPreescucha = new ConcurrentHashMap<>();
 
 
     @Autowired
@@ -23,6 +29,30 @@ public class ServicioPreescuchaImpl implements ServicioPreescucha {
         this.spotifyApi = spotifyApi;
 
     }
+    public EstadoPreescucha obtenerEstado(Long idComunidad) {
+        return estadosPreescucha.get(idComunidad);
+    }
+
+    @Override
+    public void actualizarEstado(Long idComunidad, int nuevoIndice, int nuevoSegundos) {
+        EstadoPreescucha estado = obtenerEstado(idComunidad);
+        if (estado != null) {
+            estado.setIndiceActual(nuevoIndice);
+            estado.setTimestampInicio(System.currentTimeMillis() - (nuevoSegundos * 1000L));
+            System.out.println("Estado actualizado para comunidad no es null " + idComunidad + ": Indice actual: " + nuevoIndice + ", Timestamp inicio: " + estado.getTimestampInicio());
+        }
+        System.out.println("Estado actualizado para comunidad " + idComunidad + ": Indice actual: " + nuevoIndice + ", Timestamp inicio: " + estado.getTimestampInicio());
+    }
+
+    public void iniciarPreescucha(Long idComunidad, List<CancionSimpleDto> canciones) {
+        EstadoPreescucha estado = new EstadoPreescucha();
+        estado.setCanciones(canciones);
+        estado.setIndiceActual(0);
+        estado.setTimestampInicio(System.currentTimeMillis());
+        estado.setReproduciendo(true);
+        estadosPreescucha.put(idComunidad, estado);
+    }
+
 
     @Override
     public boolean yaComproPreescucha(String albumId, Usuario usuario) {
@@ -32,11 +62,7 @@ public class ServicioPreescuchaImpl implements ServicioPreescucha {
     @Override
     public void comprarPreescucha(String albumId, Usuario usuario) {
         if(!repositorioPreescucha.existeCompra(albumId, usuario.getId())){
-            Preescucha preescucha = new Preescucha();
-            preescucha.setSpotifyAlbumId(albumId);
-            preescucha.setUsuario(usuario);
-            preescucha.setFechaCompra(LocalDateTime.now());
-            repositorioPreescucha.guardar(preescucha);
+
         }
 
     }
@@ -50,32 +76,16 @@ public class ServicioPreescuchaImpl implements ServicioPreescucha {
     }
 
     @Override
-    public void crearPreescuchaLocal(Double precio, String titulo, String preescuchaFotoUrl, String rutaAudio, Artista artista){
-        Preescucha nuevaPreescucha = new Preescucha();
-        nuevaPreescucha.setPrecio(precio);
-        nuevaPreescucha.setTitulo(titulo);
-        nuevaPreescucha.setPreescuchaFotoUrl(preescuchaFotoUrl);
-        nuevaPreescucha.setRutaAudio(rutaAudio);
-        nuevaPreescucha.setArtista(artista);
-        repositorioPreescucha.guardar(nuevaPreescucha);
+    public Long crearPreescuchaLocal(Preescucha preescucha) {
+
+        repositorioPreescucha.guardar(preescucha);
+        return preescucha.getId();
     }
 
     @Override
     public void comprarPreescuchaLocal(int preescuchaId, Usuario usuario) {
-        if (!repositorioPreescucha.existeCompraLocal(preescuchaId, usuario.getId())) {
-            Preescucha original = repositorioPreescucha.buscarPreescuchaPorId(preescuchaId);
-            if (original != null && usuario != null) {
-                Preescucha copia = new Preescucha();
-                copia.setPrecio(original.getPrecio());
-                copia.setTitulo(original.getTitulo());
-                copia.setPreescuchaFotoUrl(original.getPreescuchaFotoUrl());
-                copia.setRutaAudio(original.getRutaAudio());
-                copia.setArtista(original.getArtista());
-                copia.setUsuario(usuario);
-                copia.setFechaCompra(LocalDateTime.now());
-                repositorioPreescucha.guardar(copia);
-            }
-        }
+
+
     }
 
     @Override
@@ -85,5 +95,15 @@ public class ServicioPreescuchaImpl implements ServicioPreescucha {
 
     public List<Preescucha> obtenerPreescuchasCompradasLocalmente(Usuario usuario){
         return repositorioPreescucha.obtenerPreescuchasLocalesCompradasPorUsuario(usuario.getId());
+    }
+
+    @Override
+    public Preescucha obtenerPreescuchaLocal(Long id) {
+        return repositorioPreescucha.buscarPreescuchaPorId(id);
+    }
+
+    @Override
+    public List<Preescucha> obtenerPreescuchasPorArtista(Long idArtista) {
+        return repositorioPreescucha.obtenerPreescuchasPorArtista(idArtista);
     }
 }

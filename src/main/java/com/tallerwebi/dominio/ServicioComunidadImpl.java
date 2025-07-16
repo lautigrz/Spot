@@ -28,10 +28,11 @@ public class ServicioComunidadImpl implements ServicioComunidad {
     private RepositorioUsuarioComunidad repositorioUsuarioComunidad;
 
     private ServicioReproduccion servicioReproduccion;
+    private ServicioPreescucha servicioPreescucha;
 
-
-    public ServicioComunidadImpl(RepositorioComunidad repositorioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad, @Lazy ServicioReproduccion servicioReproduccion) {
+    public ServicioComunidadImpl(RepositorioComunidad repositorioComunidad, RepositorioUsuarioComunidad repositorioUsuarioComunidad, @Lazy ServicioReproduccion servicioReproduccion, ServicioPreescucha servicioPreescucha) {
         this.repositorioUsuarioComunidad = repositorioUsuarioComunidad;
+        this.servicioPreescucha = servicioPreescucha;
         this.repositorioComunidad = repositorioComunidad;
         this.servicioReproduccion = servicioReproduccion;
     }
@@ -72,6 +73,7 @@ public class ServicioComunidadImpl implements ServicioComunidad {
             UsuarioComunidad usuarioComunidad = repositorioUsuarioComunidad.obtenerUsuarioEnComunidad(idUsuario, idComunidad);
            Long id = repositorioComunidad.guardarMensajeDeLaComunidad(message.getContent(), usuarioComunidad.getComunidad(),usuarioComunidad.getUsuario());
            message.setId(String.valueOf(id));
+           message.setIdUsuario(String.valueOf(idUsuario));
 
            return message;
         } catch (Exception e) {
@@ -213,6 +215,27 @@ public class ServicioComunidadImpl implements ServicioComunidad {
         return usuarioDto;
 
 
+    }
+
+    @Override
+    public Long crearComunidadParaUnaPreescucha(Long idPreescucha) {
+        Preescucha preescucha = servicioPreescucha.obtenerPreescuchaLocal(idPreescucha);
+        if (preescucha == null) {
+            return null;
+        }
+        return repositorioComunidad.crearComunidadParaUnaPreescucha(preescucha);
+    }
+
+    @Override
+    public Boolean obtenerComunidadDeArtista(Long idComunidad, Long idArtista) {
+        return repositorioComunidad.obtenerComunidadDeArtista(idComunidad, idArtista);
+    }
+
+
+    @Override
+    public Comunidad obtenerComuniadDePreescucha(Long idPreescucha) {
+
+        return repositorioComunidad.obtenerComuniadDePreescucha(idPreescucha);
     }
 
 

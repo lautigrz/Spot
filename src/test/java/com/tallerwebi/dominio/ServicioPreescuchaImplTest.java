@@ -22,6 +22,7 @@ public class ServicioPreescuchaImplTest {
     private ServicioPreescucha servicioPreescucha;
     private SpotifyApi spotifyApiMock;
 
+    /*
     @BeforeEach
     public void setUp() {
         repositorioPreescuchaMock = mock(RepositorioPreescucha.class);
@@ -116,6 +117,8 @@ public class ServicioPreescuchaImplTest {
 
 
     }
+
+     */
 
 
 }

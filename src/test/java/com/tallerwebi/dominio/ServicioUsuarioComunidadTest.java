@@ -15,11 +15,13 @@ public class ServicioUsuarioComunidadTest {
     private RepositorioUsuarioComunidad repositorioUsuarioComunidadMock;
     private ServicioUsuarioComunidad servicioUsuarioComunidad;
     private ServicioPosteo servicioPosteoMock;
+    private ServicioUsuario servicioUsuario;
     @BeforeEach
     public void setUp() {
+        servicioUsuario = mock(ServicioUsuario.class);
         servicioPosteoMock = mock(ServicioPosteo.class);
       repositorioUsuarioComunidadMock = mock(RepositorioUsuarioComunidad.class);
-      servicioUsuarioComunidad = new ServicioUsuarioComunidadImpl(repositorioUsuarioComunidadMock, servicioPosteoMock);
+      servicioUsuarioComunidad = new ServicioUsuarioComunidadImpl(repositorioUsuarioComunidadMock, servicioPosteoMock,servicioUsuario);
 
     }
 
@@ -124,6 +126,24 @@ public class ServicioUsuarioComunidadTest {
         verify(servicioPosteoMock).obtenerPosteoPorId(idPost);
         verify(repositorioUsuarioComunidadMock).obtenerUsuarioEnComunidad(idUsuario, idComunidad);
         verify(repositorioUsuarioComunidadMock).compartirPosteoEnComunidad(postMock, List.of(comunidadMock), usuarioMock);
+    }
+
+    @Test
+    public void seDebeObtenerLasComunidadesDondeElUsuarioEsteUnido() {
+
+        Long idUsuario = 1L;
+        Usuario usuarioMock = new Usuario();
+        Comunidad comunidadMock = new Comunidad();
+
+        when(servicioUsuario.obtenerUsuarioPorId(idUsuario))
+            .thenReturn(usuarioMock);
+        when(repositorioUsuarioComunidadMock.obtenerComunidadesDondeELUsuarioEsteUnido(usuarioMock))
+            .thenReturn(List.of(comunidadMock));
+
+        List<Comunidad> comunidades = servicioUsuarioComunidad.obtenerComunidadesDondeELUsuarioEsteUnido(idUsuario);
+
+        assertThat(comunidades.size(), equalTo(1));
+        assertThat(comunidades.get(0), equalTo(comunidadMock));
     }
 
 }

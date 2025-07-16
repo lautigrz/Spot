@@ -184,5 +184,34 @@ public class RepositorioUsuarioComunidadTest {
 
     }
 
+    @Rollback
+    @Test
+    public void seDebeObtenerLasComunidadesDondeElUsuarioEsteUnido() {
+        Usuario usuario = new Usuario();
+        usuario.setUser("testUser");
+        usuario.setUrlFoto("http://example.com/test.jpg");
+
+        sessionFactory.getCurrentSession().save(usuario);
+
+        Comunidad comunidad1 = new Comunidad();
+        comunidad1.setNombre("Comunidad 1");
+        comunidad1.setUrlFoto("http://example.com/comunidad1.jpg");
+        sessionFactory.getCurrentSession().save(comunidad1);
+
+        Comunidad comunidad2 = new Comunidad();
+        comunidad2.setNombre("Comunidad 2");
+        comunidad2.setUrlFoto("http://example.com/comunidad2.jpg");
+        sessionFactory.getCurrentSession().save(comunidad2);
+
+        repositorioUsuarioComunidad.agregarUsuarioAComunidad(usuario, comunidad1, "Miembro");
+        repositorioUsuarioComunidad.agregarUsuarioAComunidad(usuario, comunidad2, "Miembro");
+
+        List<Comunidad> comunidades = repositorioUsuarioComunidad.obtenerComunidadesDondeELUsuarioEsteUnido(usuario);
+
+        assertThat(comunidades.size(), equalTo(2));
+        assertThat(comunidades.get(0).getNombre(), equalTo("Comunidad 1"));
+        assertThat(comunidades.get(1).getNombre(), equalTo("Comunidad 2"));
+    }
+
 
 }

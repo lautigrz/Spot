@@ -43,6 +43,7 @@ public class SpringWebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/css/**").addResourceLocations("/resources/core/css/");
         registry.addResourceHandler("/js/**").addResourceLocations("/resources/core/js/");
+        registry.addResourceHandler("/img/**").addResourceLocations("/resources/core/img/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("/webjars/");
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:uploads/");
@@ -117,7 +118,8 @@ public class SpringWebConfig implements WebMvcConfigurer {
     @Bean(name = "multipartResolver")
     public CommonsMultipartResolver multipartResolver() {
         CommonsMultipartResolver resolver = new CommonsMultipartResolver();
-        resolver.setMaxUploadSize(5 * 1024 * 1024); // 5 MB
+        resolver.setMaxUploadSize(50 * 1024 * 1024); // 50 MB
+
         return resolver;
     }
 
