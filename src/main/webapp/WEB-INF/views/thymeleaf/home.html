@@ -25,7 +25,11 @@
 
 
             <nav class="nav flex-column w-100 px-2" style="padding-left: 0 !important;">
-                <a class="nav-link active d-flex align-items-center px-3 py-2 text-start" th:href="@{/perfil}">
+                <a class="nav-link active d-flex align-items-center px-3 py-2 text-start" th:if="${usuario != null}" th:href="@{/perfil}">
+                    <i class="bi bi-person me-2 fs-5"></i> <span class="link-text">Perfil</span>
+                </a>
+
+                <a class="nav-link active d-flex align-items-center px-3 py-2 text-start" th:if="${artista != null}" th:href="@{/perfil/artista}">
                     <i class="bi bi-person me-2 fs-5"></i> <span class="link-text">Perfil</span>
                 </a>
 

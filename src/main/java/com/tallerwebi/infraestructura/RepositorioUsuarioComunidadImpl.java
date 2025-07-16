@@ -131,7 +131,7 @@ public class RepositorioUsuarioComunidadImpl implements RepositorioUsuarioComuni
 
     @Override
     public List<Comunidad> obtenerComunidadesDondeELUsuarioEsteUnido(Usuario usuario) {
-        String hql = "SELECT uc.comunidad FROM UsuarioComunidad uc WHERE uc.usuario.id = :idUsuario";
+        String hql = "SELECT uc.comunidad FROM UsuarioComunidad uc WHERE uc.usuario.id = :idUsuario AND uc.comunidad.preescucha IS NULL";
         TypedQuery<Comunidad> comunidadesQuery = sessionFactory.getCurrentSession().createQuery(hql, Comunidad.class);
         comunidadesQuery.setParameter("idUsuario", usuario.getId());
 

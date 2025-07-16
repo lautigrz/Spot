@@ -42,6 +42,8 @@ public class ControladorHome {
     private ServicioLike servicioLike;
     private ServicioComentario servicioComentario;
 
+    @Autowired
+    private ServicioUsuarioPreescucha servicioUsuarioPreescucha;
 
     public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioComentario servicioComentario) {
             this.servicioArtista = servicioArtista;
@@ -84,7 +86,7 @@ public class ControladorHome {
 
             modelMap.put("usuarioComunidad", servicioUsuarioComunidad.obtenerComunidadesDondeELUsuarioEsteUnido(idUsuario));
 
-
+            modelMap.put("compras", servicioUsuarioPreescucha.buscarPorUsuario(idUsuario));
             modelMap.put("notificacion", servicioNotificacion.elUsuarioTieneNotificaciones(idUsuario));
         } else if (artistaObj != null) {
             Artista artista = (Artista) artistaObj;

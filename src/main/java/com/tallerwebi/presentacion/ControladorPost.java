@@ -41,6 +41,19 @@ public class ControladorPost {
         return "redirect:/home";
     }
 
+    @PostMapping("/postear-perfil")
+    public String postearDesdePerfil(@RequestParam("texto") String texto, HttpSession session) {
+        Object artistaObj = session.getAttribute("artista");
+        if (artistaObj == null) {
+
+            return "redirect:/home";
+        }
+
+        Artista artista = (Artista) artistaObj;
+        servicioPosteo.publicarPosteo(artista, texto);
+        return "redirect:/perfil/artista";
+    }
+
     @PostMapping("/like/{idPosteo}/{idUsuario}")
     @ResponseBody
     public ResponseEntity<?> darLike(
