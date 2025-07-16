@@ -8,6 +8,7 @@ import com.tallerwebi.presentacion.dto.UsuarioDto;
 import org.apache.maven.model.Model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -40,11 +41,14 @@ public class ControladorHomeTest {
     private ServicioComentario servicioComentarioMock;
     private ServicioFavorito servicioFavoritoMock;
     private ServicioUsuarioPreescucha servicioUsuarioPreescuchaMock;
+    private ServicioPreescucha servicioPreescuchaMock;
     private ControladorHome controladorHome;
+
 
     @BeforeEach
     public void setup() {
 
+        servicioPreescuchaMock = mock(ServicioPreescucha.class);
         servicioArtistaMock = mock(ServicioArtista.class);
         servicioUsuarioMock = mock(ServicioUsuario.class);
         servicioComunidadMock = mock(ServicioComunidad.class);
@@ -58,7 +62,7 @@ public class ControladorHomeTest {
         servicioFavoritoMock = mock(ServicioFavorito.class);
         servicioUsuarioPreescuchaMock = mock(ServicioUsuarioPreescucha.class);
 
-        controladorHome = new ControladorHome(servicioArtistaMock,servicioUsuarioMock, servicioComunidadMock, servicioInstanciaMock, servicioNotificacionMock, servicioPosteoMock, servicioLikeMock, servicioUsuarioComunidadMock,servicioComentarioMock, servicioFavoritoMock, servicioUsuarioPreescuchaMock);
+        controladorHome = new ControladorHome(servicioArtistaMock,servicioUsuarioMock, servicioComunidadMock, servicioInstanciaMock, servicioNotificacionMock, servicioPosteoMock, servicioLikeMock, servicioUsuarioComunidadMock,servicioComentarioMock, servicioFavoritoMock, servicioUsuarioPreescuchaMock, servicioPreescuchaMock);
 
     }
 

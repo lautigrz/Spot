@@ -44,11 +44,12 @@ public class ControladorHome {
     private ServicioFavorito servicioFavorito;
     private ServicioUsuarioPreescucha servicioUsuarioPreescucha;
 
-    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioComentario servicioComentario, ServicioFavorito servicioFavorito, ServicioUsuarioPreescucha servicioUsuarioPreescucha) {
+    private ServicioPreescucha servicioPreescucha;
+    public ControladorHome(ServicioArtista servicioArtista,ServicioUsuario servicioUsuario, ServicioComunidad servicioComunidad, ServicioInstancia spotify, ServicioNotificacion servicioNotificacion,ServicioPosteo servicioPosteo, ServicioLike servicioLike, ServicioUsuarioComunidad servicioUsuarioComunidad, ServicioComentario servicioComentario, ServicioFavorito servicioFavorito, ServicioUsuarioPreescucha servicioUsuarioPreescucha, ServicioPreescucha servicioPreescucha) {
             this.servicioArtista = servicioArtista;
 
         this.servicioUsuario = servicioUsuario;
-
+        this.servicioPreescucha = servicioPreescucha;
         this.servicioUsuarioComunidad = servicioUsuarioComunidad;
         this.servicioComunidad = servicioComunidad;
         this.servicioNotificacion = servicioNotificacion;
@@ -106,6 +107,7 @@ public class ControladorHome {
 
 
             modelMap.put("posteos", postsConLike);
+            modelMap.put("preescucha", servicioPreescucha.obtenerPreescuchasPorArtista(artista.getId()));
         } else {
             return new ModelAndView("redirect:/login");
         }
