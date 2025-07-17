@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 
 import com.tallerwebi.dominio.*;
+import com.tallerwebi.presentacion.dto.ArtistaDto;
 import com.tallerwebi.presentacion.dto.PostLikeDto;
 import com.tallerwebi.presentacion.dto.UsuarioPreescuchaDto;
 import org.dom4j.rule.Mode;
@@ -23,6 +24,7 @@ import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -169,7 +171,7 @@ public class ControladorHome {
                 return "redirect:/artistas/" + coincidenciaExacta.get().getId();
             } else if (artistas.length > 0) {
                 model.addAttribute("errorBusqueda", "No se encontró una coincidencia exacta. Mostrando el más parecido.");
-                return "redirect:/artistas/" + artistas[0].getId();
+                return "redirect:/perfil/artista/" + artistas[0].getId();
             } else {
                 model.addAttribute("errorBusqueda", "No se encontró ningún artista con ese nombre.");
                 return "home";
@@ -181,6 +183,37 @@ public class ControladorHome {
         }
     }
 
+
+    @GetMapping("/buscador-artista")
+    @ResponseBody
+    public ResponseEntity<List<ArtistaDto>> buscarArtistas(@RequestParam String texto, HttpSession session) {
+        try{
+            List<ArtistaDto> resultados = new ArrayList<>();
+
+            //1ero buscamos localmente
+            List<Artista> artistasLocales = servicioArtista.buscarPorTexto(texto);
+            for (Artista a : artistasLocales) {
+                resultados.add(new ArtistaDto(a.getId(), a.getNombre(), a.getFotoPerfil(), "/spring/perfil/artista/" + a.getId(), true));
+            }
+
+            //2 Se busca por spoti
+            String token = (String) session.getAttribute("token");
+            if (token != null) {
+                SpotifyApi api = spotify.obtenerInstanciaDeSpotifyConToken(token);
+                Paging<Artist> respuesta = api.searchArtists(texto).limit(5).build().execute();
+                for (Artist a : respuesta.getItems()) {
+                    String imagen = a.getImages().length > 0 ? a.getImages()[0].getUrl() : null;
+                    resultados.add(new ArtistaDto(null, a.getName(), imagen, "/spring/artistas/" + a.getId(), false));
+                }
+            }
+
+            return ResponseEntity.ok(resultados);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
+
+    }
 
 
     @GetMapping("/cerrar")

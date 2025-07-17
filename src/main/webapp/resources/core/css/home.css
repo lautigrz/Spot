@@ -58,12 +58,20 @@ body {
 }
 .search-bar input {
     border-radius: 50px;
-    border: none;
+    border: 1px solid #ccc;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     padding: 0.7rem 1.5rem;
     background-color: #f7f4f4;
     color: #c2bebe;
+    outline: none;
 }
+
+.search-bar input:focus {
+    border-color: #198754;
+    box-shadow: 0 0 5px rgba(25, 135, 84, 0.5);
+    color: #000;
+}
+
 .search-bar input::placeholder {
     color: #aaa;
 }
@@ -281,5 +289,28 @@ body.sidebar-collapsed .avatar-user {
 
 .form-comentar button:hover {
     background-color: #0b5e3b;
+}
+
+.resultados-autocompletar {
+    border-radius: 0 0 50px 50px;
+    border: none; /* quitar borde */
+    box-shadow: none; /* quitar sombra */
+    background-color: #fff;
+    max-height: 250px;
+    overflow-y: auto;
+    position: absolute;
+    width: 100%;
+    z-index: 999;
+    margin-top: 0;
+    padding: 0;
+}
+
+.resultado-item {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.resultado-item:hover {
+    background-color: #f2f2f2;
 }
 

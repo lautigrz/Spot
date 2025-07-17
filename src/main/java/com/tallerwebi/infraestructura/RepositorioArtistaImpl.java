@@ -59,4 +59,14 @@ public class RepositorioArtistaImpl implements RepositorioArtista {
         query.setParameter("artistaId", artistaId);
         return query.list();
     }
+
+    @Override
+    public List<Artista> buscarPorTexto(String texto) {
+        String hql = "FROM Artista a WHERE lower(a.nombre) LIKE :texto";
+        Query<Artista> query = sessionFactory.getCurrentSession().createQuery(hql, Artista.class);
+        query.setParameter("texto", "%" + texto.toLowerCase() + "%");
+        return query.list();
+    }
+
+
 }

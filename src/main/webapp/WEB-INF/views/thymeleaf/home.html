@@ -96,10 +96,9 @@
         <!-- Feed -->
         <div class="col-md-7 offset-md-2 p-4 feed-col">
             <!-- Barra de búsqueda -->
-            <div class="search-bar mb-4">
-                <form th:action="@{/buscar-artista}" method="get">
-                    <input type="text" class="form-control" name="nombre" placeholder="Buscar artistas...">
-                </form>
+            <div class="search-bar mb-4 position-relative">
+                <input type="text" id="buscador-artista" class="form-control" placeholder="Buscar artistas...">
+                <div id="resultados-artista" class="resultados-autocompletar"></div>
             </div>
 
             <!-- Publicar nuevo post solamente si soy artista -->
@@ -480,6 +479,41 @@
 
 
 
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const input = document.getElementById("buscador-artista");
+        const resultados = document.getElementById("resultados-artista");
+
+        input.addEventListener("input", async function () {
+            const texto = input.value.trim();
+
+            if (texto.length < 2) {
+                resultados.innerHTML = '';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/spring/buscador-artista?texto=${encodeURIComponent(texto)}`);
+                if (!res.ok) throw new Error("Error en la búsqueda");
+
+                const data = await res.json();
+
+                resultados.innerHTML = data.map(a => `
+                    <div class="resultado-item">
+                        <a href="${a.urlPerfil}" class="d-flex align-items-center text-decoration-none text-dark">
+                            <img src="${a.fotoPerfil || '/img/default.jpg'}" alt="foto" class="me-2" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                            <span>${a.nombre}</span>
+                            ${a.local ? '<span class="badge bg-warning text-dark ms-2">Local</span>' : ''}
+                        </a>
+                    </div>
+                `).join('');
+            } catch (error) {
+                resultados.innerHTML = '<div class="text-danger mt-2">Error al buscar artistas.</div>';
+            }
+        });
+    });
 </script>
 
 

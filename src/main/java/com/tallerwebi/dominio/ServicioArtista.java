@@ -10,4 +10,5 @@ public interface ServicioArtista {
     Artista buscarPorNombre(String nombre);
     Artista buscarPorId(Long id);
     List<Preescucha> obtenerPreescuchasDeArtista(Long artistaId);
+    List<Artista> buscarPorTexto(String texto);
 }
