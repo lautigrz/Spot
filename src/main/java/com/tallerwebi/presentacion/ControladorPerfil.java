@@ -236,13 +236,6 @@ public class ControladorPerfil {
     }
 
 
-
-
-
-
-
-
-
     @PostMapping("/seguir/{id}")
     public String seguirUsuario(@PathVariable Long id, HttpSession session) throws Exception {
         Long idLogueado = (Long) session.getAttribute("user");
@@ -266,9 +259,10 @@ public class ControladorPerfil {
 
         try {
             User user = servicioPerfil.obtenerPerfilUsuario(token);
-
+            model.addAttribute("usuarioLogueado", true);
             model.addAttribute("inicio", "Se inicio correctamente");
             model.addAttribute("nombre",user.getDisplayName());
+            model.addAttribute("portada", usuario.getUrlPortada());
             model.addAttribute("foto", user.getImages()[0].getUrl());
             model.addAttribute("seguidos", servicioPerfil.obtenerCantidadDeArtistaQueSigueElUsuario(token));
             model.addAttribute("mejores", servicioPerfil.obtenerMejoresArtistasDelUsuario(token));
@@ -292,6 +286,11 @@ public class ControladorPerfil {
             if (!model.containsAttribute("recomendaciones")) {
                 model.addAttribute("recomendaciones", new ArrayList<Track>());
             }
+            String spotifyId = user.getId();
+            System.out.println("Usuario encontrado: " + usuario.getId() + " - " + usuario.getSpotifyID());
+            List<Rating> ratings = servicioRating.obtenerRating(spotifyId);
+            System.out.println("Número de ratings encontrados: " + ratings.size()); // Log Y
+            model.addAttribute("ratings", ratings);
 
             List<String> albumsId = servicioPreescucha.obtenerAlbumesComprados(usuario);
             List<Album> albumesComprados = servicioPerfil.obtenerAlbumesDePreescuchaCompradosPorElUsuario(albumsId, token);
@@ -325,9 +324,10 @@ public class ControladorPerfil {
         Usuario usuarioPerfil = servicioUsuario.obtenerUsuarioPorId(id);
         try {
             User user = servicioPerfil.obtenerPerfilUsuario(usuarioPerfil.getToken());
-            model.addAttribute("usuarioId", esUsuarioLogueado);
+            model.addAttribute("usuarioLogueado", esUsuarioLogueado);
             model.addAttribute("inicio", "Se inicio correctamente");
             model.addAttribute("nombre",user.getDisplayName());
+            model.addAttribute("portada", usuarioPerfil.getUrlPortada());
             model.addAttribute("foto", user.getImages()[0].getUrl());
             model.addAttribute("seguidos", servicioPerfil.obtenerCantidadDeArtistaQueSigueElUsuario(usuarioPerfil.getToken()));
             model.addAttribute("mejores", servicioPerfil.obtenerMejoresArtistasDelUsuario(usuarioPerfil.getToken()));
