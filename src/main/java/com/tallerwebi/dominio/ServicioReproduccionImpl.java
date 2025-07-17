@@ -94,7 +94,7 @@ public class ServicioReproduccionImpl implements ServicioReproduccion {
         }
 
         for (String usuario : usuariosActivos) {
-            if (esUsuarioInvalido(usuario) || !estaEscuchandoMusica(usuario)) {
+            if (esUsuarioInvalido(usuario) || !estaEscuchandoMusica(usuario, idComunidad)) {
                 continue;
             }
 
@@ -117,8 +117,12 @@ public class ServicioReproduccionImpl implements ServicioReproduccion {
     }
 
     @Override
-    public Boolean estaEscuchandoMusica(String usuario) {
-        return reproduccionDelUsuario.get(usuario) != null;
+    public Boolean estaEscuchandoMusica(String usuario, Long idComunidad) {
+        String nombreReproduccion = reproduccionDelUsuario.get(usuario);
+        String nombrePlaylist = repositorioComunidad.obtenerPlaylistDeUnaComunidad(idComunidad).getNombre();
+
+        return nombreReproduccion != null && nombreReproduccion.equals(nombrePlaylist);
+
     }
 
     @Override

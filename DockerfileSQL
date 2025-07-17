@@ -12,5 +12,4 @@ ENV MYSQL_DATABASE=${MYSQL_DATABASE}
 ENV MYSQL_USER=${MYSQL_USER}
 ENV MYSQL_PASSWORD=${MYSQL_PASSWORD}
 
-# Copia cualquier script SQL que desees ejecutar en la inicialización
-#COPY ./init.sql /docker-entrypoint-initdb.d/
+COPY ./init/ /docker-entrypoint-initdb.d/

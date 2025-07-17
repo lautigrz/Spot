@@ -103,7 +103,7 @@
                         <img th:src="${comunidad.getUrlFoto()}" alt="Billie Eilish" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover; border: 2px solid white;">
                         <div>
                             <h3 class="mb-0" th:text="${comunidad.getNombre()}"></h3>
-                            <small class="text-white">
+                            <small class="text-white" th:if="${habilitar}">
                                 Est. 2025 · +<span th:text="${#lists.size(comunidad.usuarios)}">0</span> Miembros
                             </small>
 
@@ -112,7 +112,7 @@
 
                     <p class="mb-3" th:text="${comunidad.getDescripcion()}"></p>
 
-                    <div class="stats d-flex gap-4 mb-3 text-white">
+                    <div class="stats d-flex gap-4 mb-3 text-white" th:if="${habilitar}">
                         <small>
                             🎧 <span th:text="${#lists.size(comunidad.playlists)}">0</span> playlists compartidas
                         </small>

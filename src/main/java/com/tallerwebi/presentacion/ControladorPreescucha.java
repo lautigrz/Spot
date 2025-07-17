@@ -156,16 +156,16 @@ public class ControladorPreescucha {
 
                 System.out.println("ids:" + idUsuario + " - " + idPreescucha);
 
-                String urlExito = "https://8452dde42022.ngrok-free.app/spring/pago-exitoso/" + preescucha.getId() + "/" + idUsuario;
+                String urlExito = "https://cdd21ace3030.ngrok-free.app/spring/pago-exitoso/" + preescucha.getId() + "/" + idUsuario;
 
 
-                String notificationUrl = "https://8452dde42022.ngrok-free.app/spring/mercadopago/notification";
+                String notificationUrl = "https://cdd21ace3030.ngrok-free.app/spring/mercadopago/notification";
 
                 Preference pref = servicioMercadoPago.crearPreferenciaPago(
                         "Pre-escucha exclusiva de " + preescucha.getTitulo(),
                         BigDecimal.valueOf(preescucha.getPrecio()),
                         urlExito,
-                        "https://8452dde42022.ngrok-free.app/spring/pago-error",
+                        "https://cdd21ace3030.ngrok-free.app/spring/pago-error",
                         preescucha.getTitulo(),
                         idUsuario,
                         idPreescucha,

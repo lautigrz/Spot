@@ -15,6 +15,7 @@ public class DatabaseInitializationConfig {
     @Autowired
     private DataSource dataSource;
 
+
     @Bean
     public DataSourceInitializer dataSourceInitializer() {
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();

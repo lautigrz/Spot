@@ -145,7 +145,7 @@ public class ControladorPerfil {
         model.put("nombre", artista.getNombre());
         model.put("posteos", servicioPosteo.obtenerPosteosDeArtista(artista));
         model.put("preescuchas", servicioPreescucha.obtenerPreescuchasPorArtista(artista.getId()));
-
+        model.addAttribute("portada", artista.getPortada());
         return new ModelAndView("perfil-mejorado", model);
     }
 
@@ -228,6 +228,7 @@ public class ControladorPerfil {
             model.addAttribute("posteos", servicioPosteo.obtenerPosteosDeArtista(artista1));
             model.addAttribute("preescuchas", servicioPreescucha.obtenerPreescuchasPorArtista(artista1.getId()));
             model.addAttribute("esFavorito", esFavorito);
+            model.addAttribute("portada", artista1.getPortada());
         } catch (Exception e) {
             e.printStackTrace();
         }

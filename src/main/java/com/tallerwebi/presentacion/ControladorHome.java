@@ -118,7 +118,7 @@ public class ControladorHome {
                     })
                     .collect(Collectors.toList());
 
-
+            modelMap.put("comunidades", servicioComunidad.obtenerTodasLasComunidades());
             modelMap.put("posteos", postsConLike);
             modelMap.put("preescucha", servicioPreescucha.obtenerPreescuchasPorArtista(artista.getId()));
         } else {

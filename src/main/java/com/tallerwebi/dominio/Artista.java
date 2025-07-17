@@ -26,6 +26,7 @@ public class Artista {
     private String email;
     private String password;
     private String fotoPerfil;
+    private String portada;
 
     @OneToMany(mappedBy = "artista", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Preescucha> preescuchas = new ArrayList<>();

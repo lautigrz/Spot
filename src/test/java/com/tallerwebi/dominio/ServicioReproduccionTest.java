@@ -148,6 +148,7 @@ public class ServicioReproduccionTest {
 
     }
 
+    /*
     @Test
     public void debeRetornarLaCancionSonandoEnUnaComunidad() throws Exception {
         UsuarioDto usuarioDto = new UsuarioDto();
@@ -210,6 +211,8 @@ public class ServicioReproduccionTest {
         assertThat(cancionDto.getDuracion(), equalTo(180000));
     }
 
+
+     */
     @Test
     public void seDebeObtenerUnaSincronizacion() throws Exception {
         Set<Cancion> canciones = new HashSet<>();

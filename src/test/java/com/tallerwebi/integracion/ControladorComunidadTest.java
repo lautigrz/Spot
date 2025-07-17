@@ -118,7 +118,7 @@ public class ControladorComunidadTest {
         when(servicioComunidadMock.obtenerMensajes(idComunidad)).thenReturn(mensajesMock);
         when(servicioUsuarioMock.obtenerUsuarioDtoPorId(idUsuario)).thenReturn(usuarioDtoMock);
         when(servicioComunidadMock.obtenerUsuariosDeLaComunidad(idComunidad)).thenReturn(usuariosActivosMock);
-        when(servicioReproduccion.estaEscuchandoMusica(anyString())).thenReturn(true);
+        when(servicioReproduccion.estaEscuchandoMusica(anyString(), anyLong())).thenReturn(true);
         when(servicioRecomedacionComunidadMock.obtenerRecomendacionesPorComunidadQueNoFueronLeidas(anyLong())).thenReturn(List.of(new Recomendacion()));
         when(servicioUsuarioComunidadMock.obtenerComunidadesDondeELUsuarioEsteUnido(anyLong())).thenReturn(List.of(comunidadMock));
         ModelMap model = new ModelMap();
